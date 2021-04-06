@@ -91,6 +91,10 @@ def programme_cleaner(df):
             df["Programme_c"] = df["Programme_c"].replace(i,"DS")
         elif "fin" in i.lower() or "f&t" in i.lower():
             df["Programme_c"] = df["Programme_c"].replace(i,"FT")
+        elif len(i) > 5:
+            df["Programme_c"] = df["Programme_c"].replace(i,i[0:5])
+
+
 
     return df
 
