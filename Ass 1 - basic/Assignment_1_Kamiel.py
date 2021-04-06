@@ -5,7 +5,7 @@ import seaborn as sns
 from Data_cleaner import Data_cleaner
 import matplotlib.pyplot as plt
 
-ODI_data = pd.read_csv("Data/ODI-2021.csv")
+ODI_data = pd.read_csv("Ass 1 - basic/Data/ODI-2021.csv")
 
 print(ODI_data.head())
 
