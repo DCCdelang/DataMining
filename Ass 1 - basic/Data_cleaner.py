@@ -18,8 +18,6 @@ class Data_cleaner:
     def remove_numeric_values(self,column_name, high, low):
         
 
-        for i in self.dataframe["RN"]:
-            print(i)
         self.dataframe = self.dataframe[self.dataframe[column_name] > low]
 
         self.dataframe = self.dataframe[self.dataframe[column_name] < high] 
