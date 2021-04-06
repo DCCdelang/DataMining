@@ -1,26 +1,21 @@
 import pandas as pd
-class Data_cleaner:
-    def __init__(self,dataframe):
-        self.dataframe = dataframe
-   
-    def rename_collumns(self, new_collumns):
-        for i, col in enumerate(self.dataframe.columns):
-            self.dataframe = self.dataframe.rename(columns={col: new_collumns[i]})
-        return self.dataframe
+
+def rename_collumns(df, new_collumns):
+    for i, col in enumerate(df.columns):
+        df = df.rename(columns={col: new_collumns[i]})
+    return df
+
+def make_numeric(df, column_name):
+    df[column_name] = pd.to_numeric(df[column_name], errors='coerce', downcast='integer')
+    return df
+
+def remove_nan(df):
+    return df.dropna()
+
+def remove_numeric_values(df,column_name, high, low):
     
-    def make_numeric(self, column_name):
-        self.dataframe[column_name] = pd.to_numeric(self.dataframe[column_name], errors='coerce', downcast='integer')
-        return self.dataframe
 
-    def remove_nan(self):
-        return self.dataframe.dropna()
+    df = df[df[column_name] > low]
 
-    def remove_numeric_values(self,column_name, high, low):
-        
-
-        for i in self.dataframe["RN"]:
-            print(i)
-        self.dataframe = self.dataframe[self.dataframe[column_name] > low]
-
-        self.dataframe = self.dataframe[self.dataframe[column_name] < high] 
-        return self.dataframe 
+    df = df[df[column_name] < high] 
+    return df 
