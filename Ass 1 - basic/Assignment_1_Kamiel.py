@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np 
 import math
 import seaborn as sns
-from Data_cleaner import Data_cleaner
+import Data_cleaner
 import matplotlib.pyplot as plt
 from scipy import stats
 import collections
@@ -10,7 +10,7 @@ import collections
 
 ODI_data = pd.read_csv("Ass 1 - basic/Data/ODI-2021.csv")
 
-print(ODI_data.head())
+# print(ODI_data.head())
 
 print("Amount of colomns = ", ODI_data.shape[1])
 print("Amount of answers = ", ODI_data.shape[0])
@@ -45,9 +45,9 @@ def stress_check(df, course):
     Checks the difference in stress between a group who did do a course
     and a group who did not do that course
     """
-    df = Data_cleaner(df).make_numeric("Stress")
-    df = Data_cleaner(df).remove_nan()
-    df = Data_cleaner(df).remove_numeric_values("Stress",100, 0)
+    df = Data_cleaner.make_numeric(df,"Stress")
+    df = Data_cleaner.remove_nan(df)
+    df = Data_cleaner.remove_numeric_values(df,"Stress",100, 0)
 
     sns.catplot(x=course, y="Stress", data=df)
     plt.show()
@@ -65,18 +65,19 @@ def stress_check(df, course):
     print(stats.mannwhitneyu(x, y))
 
 
-if __name__ == "main":
+if __name__ == "__main__":
 
     # Import data
     df = ODI_data
-
+  
     # Make new collumn names
     new_cols = ["Time", "Programme", "ML", "IR", "Stat", "DB","Gender","Chocolate","Birthday","Neighbours", "Stand up", "Stress", "Self esteem", "RN", "Bedtime","GD1", "GD2"]
-    df = Data_cleaner(df).rename_collumns(new_cols)
+    df = Data_cleaner.rename_collumns(df,new_cols)
 
     # Activate functions
-    stress_check(df, "IR")
-    stress_esteam(df)
-    chocolate_gender(df)
+    # stress_check(df, "IR")
+    # stress_esteam(df)
+    # chocolate_gender(df)
 
-
+    for i in df["Neighbours"]:
+        print(i)
