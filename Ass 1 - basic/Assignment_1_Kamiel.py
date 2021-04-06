@@ -29,15 +29,10 @@ def stress_esteam(df):
     Looks at the relation between stress and the amount of money one would think
     he/she would earn when doing DM
     """
-    l = ["Stress", "Self esteem"]
-    for i in l:
-        df = Data_cleaner(df).make_numeric(i)
-        df = Data_cleaner(df).remove_nan()
-        df = Data_cleaner(df).remove_numeric_values(i,100, 0)
 
 
-    print(stats.spearmanr(df["Stress"], df["Self esteem"]))
-    sns.scatterplot(data=df, x="Stress", y="Self esteem")
+    print(stats.spearmanr(df["Stress_c"], df["Self esteem_c"]))
+    sns.scatterplot(data=df, x="Stress_c", y="Self esteem_c")
     plt.show()
 
 def stress_check(df, course):
@@ -73,11 +68,15 @@ if __name__ == "__main__":
     # Make new collumn names
     new_cols = ["Time", "Programme", "ML", "IR", "Stat", "DB","Gender","Chocolate","Birthday","Neighbours", "Stand up", "Stress", "Self esteem", "RN", "Bedtime","GD1", "GD2"]
     df = Data_cleaner.rename_collumns(df,new_cols)
-
+    # df = Data_cleaner.stress_cleaner(df)
+    # df = Data_cleaner.se_cleaner(df)
+    # df = df.dropna()
+    # Data_cleaner.RN_cleaner(df)
     # Activate functions
     # stress_check(df, "IR")
     # stress_esteam(df)
     # chocolate_gender(df)
+    Data_cleaner.programme_cleaner(df)
+    
 
-    for i in df["Neighbours"]:
-        print(i)
+ 
