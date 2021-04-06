@@ -16,30 +16,13 @@ print("Amount of colomns = ", ODI_data.shape[1])
 print("Amount of answers = ", ODI_data.shape[0])
 
 
-
-
-
-## [1, 2, 5]
-
-# sns.displot(ODI_data,x="What is your stress level (0-100)?", col = "What is your gender?", row = "Did you stand up?",binwidth=3, height=3, facet_kws=dict(margin_titles=True))
-# plt.show()
-
-
-
-df = ODI_data
-
-new_cols = ["Time", "Programme", "ML", "IR", "Stat", "DB","Gender","Chocolate","Birthday","Neighbours", "Stand up", "Stress", "Self esteem", "RN", "Bedtime","GD1", "GD2"]
-
-
-df = Data_cleaner(df).rename_collumns(new_cols)
-
 def chocolate_gender(df):    
     """
     Looks at how people from different gender look towards chocolate
     """
     sns.catplot(x="Gender", hue="Chocolate", kind="count", data=df)
     plt.show()
-# print(stats.shapiro(df["Self esteem"]))
+
 
 def stress_esteam(df):
     """
@@ -81,12 +64,19 @@ def stress_check(df, course):
     print(f"x ={x.mean()}, y = {y.mean()}")
     print(stats.mannwhitneyu(x, y))
 
-stress_check(df, "IR")
-"""
-TODO
-- Set new colomns labels
-- Filter data and make it neat
-- Show outliers
-- Make neat plots for the categorical colomns
-- 
-"""
+
+if __name__ == "main":
+
+    # Import data
+    df = ODI_data
+
+    # Make new collumn names
+    new_cols = ["Time", "Programme", "ML", "IR", "Stat", "DB","Gender","Chocolate","Birthday","Neighbours", "Stand up", "Stress", "Self esteem", "RN", "Bedtime","GD1", "GD2"]
+    df = Data_cleaner(df).rename_collumns(new_cols)
+
+    # Activate functions
+    stress_check(df, "IR")
+    stress_esteam(df)
+    chocolate_gender(df)
+
+
