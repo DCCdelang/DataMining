@@ -101,6 +101,17 @@ def programme_cleaner(df):
     return df
 
 
+def neighbors_cleaner(df):
+    df['Neighbors_c'] = df['Neighbours'].fillna(0)
+    df.iloc[33, df.columns.get_loc('Neighbors_c')] = 0
+    df.iloc[80, df.columns.get_loc('Neighbors_c')] = 0  
+    df.iloc[221, df.columns.get_loc('Neighbors_c')] = 1
+    df.iloc[222, df.columns.get_loc('Neighbors_c')] = 0
+    df.iloc[304, df.columns.get_loc('Neighbors_c')] = 2
+    df.iloc[267, df.columns.get_loc('Neighbors_c')] = 0
+    
+    df["Neighbours_c"] = pd.to_numeric(df["Neighbors_c"])
+
 def birth_date_cleaner(df):
     #column with all full birthdays
     df['Birthday_c'] = np.nan

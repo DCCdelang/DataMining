@@ -77,6 +77,8 @@ if __name__ == "__main__":
     # stress_esteam(df)
     # chocolate_gender(df)
     Data_cleaner.programme_cleaner(df)
+    Data_cleaner.birth_date_cleaner(df)
+    
     print(df["Programme_c"].head(100))
     print(df["Programme"].head(100))
     sns.catplot(x="Programme_c", kind="count", data=df)
