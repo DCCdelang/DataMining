@@ -4,6 +4,8 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 
 import dateparser as dp
+import re
+
 
 
 
@@ -68,8 +70,8 @@ def RN_cleaner(df):
             df["RN_c"] = df["RN_c"].replace(i,"NAN")
     df["RN_c"] = pd.to_numeric(df["RN_c"], errors='coerce', downcast='integer')
 
-    for i in df["RN_c"]:
-        print(i)
+    #for i in df["RN_c"]:
+        #print(i)
     return df
 
 def programme_cleaner(df):
@@ -111,12 +113,12 @@ def programme_cleaner(df):
 
 def neighbors_cleaner(df):
     df['Neighbors_c'] = df['Neighbours'].fillna(0)
-    df.iloc[33, df.columns.get_loc('Neighbors_c')] = 0
-    df.iloc[80, df.columns.get_loc('Neighbors_c')] = 0  
-    df.iloc[221, df.columns.get_loc('Neighbors_c')] = 1
-    df.iloc[222, df.columns.get_loc('Neighbors_c')] = 0
-    df.iloc[304, df.columns.get_loc('Neighbors_c')] = 2
-    df.iloc[267, df.columns.get_loc('Neighbors_c')] = 0
+    df.iloc[32, df.columns.get_loc('Neighbors_c')] = 0
+    df.iloc[79, df.columns.get_loc('Neighbors_c')] = 0  
+    df.iloc[218, df.columns.get_loc('Neighbors_c')] = 1
+    df.iloc[219, df.columns.get_loc('Neighbors_c')] = 0
+    df.iloc[298, df.columns.get_loc('Neighbors_c')] = 2
+    df.iloc[266, df.columns.get_loc('Neighbors_c')] = 0
     
     df["Neighbours_c"] = pd.to_numeric(df["Neighbors_c"])
 
@@ -189,5 +191,43 @@ def categorical(df, col, course=True):
 
     print(new_df)
     return new_df
+
+
+
+def bedtime_parser(df):
+    Hours = []
+    for time in df["Bedtime"]:
+        time_int  = re.findall(r'[0-9]+', time)
+        if len(time_int):
+            hour_int = int(time_int[0])
+            if hour_int == 10:
+                hour_int = 22
+            if hour_int == 11:
+                hour_int = 23
+            if hour_int == 12:
+                hour_int = 24
+            if hour_int > 24:
+                Hours.append(np.nan)
+            else:
+                Hours.append(hour_int)
+        else:
+            Hours.append(np.nan)
+            
+            
+
+    # print(Hours)
+    # plt.hist(Hours)
+    # plt.plot()
+    df["Bedtime_Hour_c"] = Hours
+    return df
+
+def calc_age(df):
+    year = df['Birthday_c'].str.split('-', expand=True)[2]
+    year = year.fillna(2021)
+    df['Age'] =  (2021 - year.astype(int))
+    df['Age'][df["Age"] > 60] = 0
+    
+    return df
+
 if __name__ == "__main__":
     pass
