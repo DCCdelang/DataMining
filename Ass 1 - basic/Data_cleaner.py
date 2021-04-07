@@ -3,6 +3,8 @@ import numpy as np
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 
+import dateparser as dp
+
 
 
 def rename_collumns(df, new_collumns):
