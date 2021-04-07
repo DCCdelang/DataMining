@@ -1,4 +1,11 @@
 import pandas as pd
+import numpy as np
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+
+import dateparser as dp
+
+
 
 def rename_collumns(df, new_collumns):
     for i, col in enumerate(df.columns):
@@ -50,8 +57,6 @@ def se_cleaner(df):
 
     return df
 
-
-
 def RN_cleaner(df):
     df["RN_c"] = df["RN"]
 
@@ -93,25 +98,96 @@ def programme_cleaner(df):
             df["Programme_c"] = df["Programme_c"].replace(i,"FT")
         elif len(i) > 5:
             df["Programme_c"] = df["Programme_c"].replace(i,i[0:5])
+        
+    for i in df["Programme_c"].unique():
 
+        if list(df["Programme_c"]).count(i) == 1:
+            df["Programme_c"] = df["Programme_c"].replace(i,"other")
+    
 
 
     return df
 
 
-            
-            
+def neighbors_cleaner(df):
+    df['Neighbors_c'] = df['Neighbours'].fillna(0)
+    df.iloc[33, df.columns.get_loc('Neighbors_c')] = 0
+    df.iloc[80, df.columns.get_loc('Neighbors_c')] = 0  
+    df.iloc[221, df.columns.get_loc('Neighbors_c')] = 1
+    df.iloc[222, df.columns.get_loc('Neighbors_c')] = 0
+    df.iloc[304, df.columns.get_loc('Neighbors_c')] = 2
+    df.iloc[267, df.columns.get_loc('Neighbors_c')] = 0
+    
+    df["Neighbours_c"] = pd.to_numeric(df["Neighbors_c"])
+
+def birth_date_cleaner(df):
+    #column with all full birthdays
+    df['Birthday_c'] = np.nan
+    #columns with all birhtdays , months and days
+    df['Birthdate_dm_c'] = np.nan
+    
+    for i in range(len(df)): 
+        date = cleanup_bday(df['Birthday'].iloc[i])
+        if date is not None and len(date) == 3:
+            df['Birthday_c'].iloc[i] = "{0}-{1}-{2}".format(date[0], date[1], date[2])
+            df['Birthdate_dm_c'].iloc[i] = "{0}-{1}".format(date[0], date[1])
+        elif date is not None and len(date) ==2:
+            df['Birthdate_dm_c'].iloc[i] = "{0}-{1}".format(date[0], date[1])
+   
+
+def cleanup_bday(date):
+    #handling some exceptions that are readable by humans
+    if date == 20051989:
+            return ([20, 5, 1989])
+    elif date ==23011999:
+            return [23, 1, 1999]
+    elif date ==19951124:
+            return [24, 11, 1995]
+    try: 
+        #returning exceptions that are no date
+        return str(int(date))
+    except ValueError: 
+        pass
+    
+    
+    date_2 = dp.parse(date, settings={'STRICT_PARSING': True})
+    if date_2 is not None:
+        return([date_2.day, date_2.month, date_2.year])
+        #return "{0}-{1}-{2}".format(date_2.day, date_2.month, date_2.year)
+    else:
+        date_3 = dp.parse(date,settings={'REQUIRE_PARTS': ['day', 'month']})
+        if date_3 is not None:
+            return([date_3.day, date_3.month])
+        
+    if date =='November 23rd, nineteen hundred eighty nine':
+        return [23, 11, 1989]
+
+    
+    return None
+    
             
           
 
 def remove_nan(df):
     return df.dropna()
 
-def remove_numeric_values(df,column_name, high, low):
+def categorical(df, col, course=True):
+    # creating instance of one-hot-encoder
+    enc = OneHotEncoder(handle_unknown='ignore')# passing bridge-types-cat column (label encoded values of bridge_types)
+    enc_df = pd.DataFrame(enc.fit_transform(df[[col]]).toarray())# merge with main df bridge_df on key values
+    new_df = df.join(enc_df)
+    
+    
+    if course:
+        new_df = new_df.rename(columns={0:f"{col},no"})
+        new_df = new_df.rename(columns={1:f"{col},yes"})
+        new_df = new_df.rename(columns={2:f"{col},uk"})
 
-    df = df[df[column_name] > low]
+    else:
+        for i in range(len(df["Programme_c"].unique())):
+            new_df = new_df.rename(columns={i:df["Programme_c"].unique()[i]})
 
-    df = df[df[column_name] < high] 
-    return df 
+    print(new_df)
+    return new_df
 if __name__ == "__main__":
     pass
