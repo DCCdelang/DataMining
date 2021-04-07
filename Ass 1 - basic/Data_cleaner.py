@@ -174,7 +174,6 @@ def categorical(df, col, course=True):
         for i in range(len(df["Programme_c"].unique())):
             new_df = new_df.rename(columns={i:df["Programme_c"].unique()[i]})
 
-    print(new_df)
     return new_df
 if __name__ == "__main__":
     pass

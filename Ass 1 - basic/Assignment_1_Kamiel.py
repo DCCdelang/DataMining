@@ -9,7 +9,7 @@ from scipy import stats
 import collections
 
 
-ODI_data = pd.read_csv("Data/ODI-2021.csv")
+ODI_data = pd.read_csv("Ass 1 - basic/Data/ODI-2021.csv")
 
 # print(ODI_data.head())
 
@@ -80,14 +80,14 @@ if __name__ == "__main__":
 
     # df = Data_cleaner.stress_cleaner(df)
 
-    # df = Data_cleaner.programme_cleaner(df)
+    df = Data_cleaner.programme_cleaner(df)
 
     # df = Data_cleaner.se_cleaner(df)
 
-    # for i in ["ML", "IR", "Stat", "DB"]:
-    #     df = Data_cleaner.categorical(df, i)
+    for i in ["ML", "IR", "Stat", "DB"]:
+        df = Data_cleaner.categorical(df, i)
     
-    # df = Data_cleaner.categorical(df, "Programme_c", course=False)
+    df = Data_cleaner.categorical(df, "Programme_c", course=False)
     
     # df = df.dropna()
     
@@ -100,13 +100,14 @@ if __name__ == "__main__":
     # stress_Msc(df)
 
 
-
+    for i in df.columns:
+        print(i)
     # Categorisations
 
-    # features = df["Programme_c"].unique()
-    # y = "Stress_c"
-    # Categorisations.tree(df, features, y)
-    # Categorisations.forest(df, features, y)
+    features = ["ML,no" , "ML,yes" ,"IR,no", "IR,yes" ,"IR,uk" ,"Stat,no", "Stat,yes", "Stat,uk" ,"DB,no" , "DB,yes" ,"DB,uk"]
+    y = df["Programme_c"].unique()
+    Categorisations.tree(df, features, y)
+    Categorisations.forest(df, features, y)
 
     
 
