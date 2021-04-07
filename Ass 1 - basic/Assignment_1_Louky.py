@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Apr  7 09:41:21 2021
+
+@author: Gebruiker
+"""
 import pandas as pd 
 import numpy as np 
 import math
