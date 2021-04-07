@@ -3,6 +3,7 @@ import numpy as np
 import math
 import seaborn as sns
 import Data_cleaner
+import Categorisations
 import matplotlib.pyplot as plt
 from scipy import stats
 import collections
@@ -34,17 +35,22 @@ def stress_esteam(df):
     print(stats.spearmanr(df["Stress_c"], df["Self esteem_c"]))
     sns.scatterplot(data=df, x="Stress_c", y="Self esteem_c")
     plt.show()
+def programme_count(df):
+    sns.catplot(x="Programme_c", kind="count", data=df)
+    plt.show()
+
+def stress_Msc(df):
+
+    sns.catplot(x="Programme_c", y="Stress_c", data=df)
+    plt.show()
 
 def stress_check(df, course):
     """
     Checks the difference in stress between a group who did do a course
     and a group who did not do that course
     """
-    df = Data_cleaner.make_numeric(df,"Stress")
-    df = Data_cleaner.remove_nan(df)
-    df = Data_cleaner.remove_numeric_values(df,"Stress",100, 0)
 
-    sns.catplot(x=course, y="Stress", data=df)
+    sns.catplot(x=course, y="Stress_c", data=df)
     plt.show()
 
     
@@ -68,14 +74,30 @@ if __name__ == "__main__":
     # Make new collumn names
     new_cols = ["Time", "Programme", "ML", "IR", "Stat", "DB","Gender","Chocolate","Birthday","Neighbours", "Stand up", "Stress", "Self esteem", "RN", "Bedtime","GD1", "GD2"]
     df = Data_cleaner.rename_collumns(df,new_cols)
+    
+
+    # Data cleaners
+
     # df = Data_cleaner.stress_cleaner(df)
+
+    # df = Data_cleaner.programme_cleaner(df)
+
     # df = Data_cleaner.se_cleaner(df)
+
+    # for i in ["ML", "IR", "Stat", "DB"]:
+    #     df = Data_cleaner.categorical(df, i)
+    
+    # df = Data_cleaner.categorical(df, "Programme_c", course=False)
+    
     # df = df.dropna()
-    # Data_cleaner.RN_cleaner(df)
-    # Activate functions
+    
+
+    # Plots
+
     # stress_check(df, "IR")
     # stress_esteam(df)
     # chocolate_gender(df)
+<<<<<<< HEAD
     Data_cleaner.programme_cleaner(df)
     Data_cleaner.birth_date_cleaner(df)
     
@@ -83,5 +105,19 @@ if __name__ == "__main__":
     print(df["Programme"].head(100))
     sns.catplot(x="Programme_c", kind="count", data=df)
     plt.show()
+=======
+    # stress_Msc(df)
+
+
+
+    # Categorisations
+
+    # features = df["Programme_c"].unique()
+    # y = "Stress_c"
+    # Categorisations.tree(df, features, y)
+    # Categorisations.forest(df, features, y)
+
+    
+>>>>>>> f9a9d90129ca4bdf4765be9ed28a66f44b896434
 
  

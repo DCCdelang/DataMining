@@ -1,7 +1,9 @@
 import pandas as pd
-#date parser for cleaning birth dates
-import dateparser as dp
 import numpy as np
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+
+
 
 def rename_collumns(df, new_collumns):
     for i, col in enumerate(df.columns):
@@ -53,7 +55,6 @@ def se_cleaner(df):
 
     return df
 
-
 def RN_cleaner(df):
     df["RN_c"] = df["RN"]
 
@@ -95,7 +96,12 @@ def programme_cleaner(df):
             df["Programme_c"] = df["Programme_c"].replace(i,"FT")
         elif len(i) > 5:
             df["Programme_c"] = df["Programme_c"].replace(i,i[0:5])
+        
+    for i in df["Programme_c"].unique():
 
+        if list(df["Programme_c"]).count(i) == 1:
+            df["Programme_c"] = df["Programme_c"].replace(i,"other")
+    
 
 
     return df
@@ -163,11 +169,23 @@ def cleanup_bday(date):
 def remove_nan(df):
     return df.dropna()
 
-def remove_numeric_values(df,column_name, high, low):
+def categorical(df, col, course=True):
+    # creating instance of one-hot-encoder
+    enc = OneHotEncoder(handle_unknown='ignore')# passing bridge-types-cat column (label encoded values of bridge_types)
+    enc_df = pd.DataFrame(enc.fit_transform(df[[col]]).toarray())# merge with main df bridge_df on key values
+    new_df = df.join(enc_df)
+    
+    
+    if course:
+        new_df = new_df.rename(columns={0:f"{col},no"})
+        new_df = new_df.rename(columns={1:f"{col},yes"})
+        new_df = new_df.rename(columns={2:f"{col},uk"})
 
-    df = df[df[column_name] > low]
+    else:
+        for i in range(len(df["Programme_c"].unique())):
+            new_df = new_df.rename(columns={i:df["Programme_c"].unique()[i]})
 
-    df = df[df[column_name] < high] 
-    return df 
+    print(new_df)
+    return new_df
 if __name__ == "__main__":
     pass
