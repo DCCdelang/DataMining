@@ -97,6 +97,15 @@ if __name__ == "__main__":
     # stress_check(df, "IR")
     # stress_esteam(df)
     # chocolate_gender(df)
+<<<<<<< HEAD
+    Data_cleaner.programme_cleaner(df)
+    Data_cleaner.birth_date_cleaner(df)
+    
+    print(df["Programme_c"].head(100))
+    print(df["Programme"].head(100))
+    sns.catplot(x="Programme_c", kind="count", data=df)
+    plt.show()
+=======
     # stress_Msc(df)
 
 
@@ -110,5 +119,6 @@ if __name__ == "__main__":
     Categorisations.forest(df, features, y)
 
     
+>>>>>>> f9a9d90129ca4bdf4765be9ed28a66f44b896434
 
  
