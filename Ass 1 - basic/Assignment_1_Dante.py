@@ -27,11 +27,6 @@ ODI_data = pd.read_csv("Ass 1 - basic/Data/ODI-2021.csv")
 print("Amount of colomns = ", ODI_data.shape[1])
 print("Amount of answers = ", ODI_data.shape[0])
 
-# sns.histplot(ODI_data["What is your stress level (0-100)?"],bins=10)
-
-# sns.displot(ODI_data,x="What is your stress level (0-100)?", col = "What is your gender?", row = "Did you stand up?",binwidth=3, height=3, facet_kws=dict(margin_titles=True))
-# plt.show()
-
 """
 TODO
 - Set new colomns labels
