@@ -13,12 +13,14 @@ import matplotlib.pyplot as plt
 from scipy import stats
 import collections
 
-
+import Categorisations
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
 pd.options.mode.chained_assignment = None  # default='warn'
 
 
 # ODI_data = pd.read_csv("Data/ODI-2021.csv")
-ODI_data = pd.read_csv("Ass 1 - basic/Data/ODI-2021.csv")
+ODI_data = pd.read_csv("Data/ODI-2021.csv")
 
 # print(ODI_data.head())
 
@@ -113,9 +115,12 @@ if __name__ == "__main__":
 
     # Import data
     df = ODI_data
-  
+    
+
     # Make new collumn names
     new_cols = ["Time", "Programme", "ML", "IR", "Stat", "DB","Gender","Chocolate","Birthday","Neighbours", "Stand up", "Stress", "Self esteem", "RN", "Bedtime","GD1", "GD2"]
+    
+    
     df = Data_cleaner.rename_collumns(df,new_cols)
     df = Data_cleaner.stress_cleaner(df)
     df = Data_cleaner.se_cleaner(df)
@@ -135,12 +140,29 @@ if __name__ == "__main__":
     
     print(df["Programme_c"].head(100))
     print(df["Programme"].head(100))
-    sns.catplot(x="Programme_c", kind="count", data=df)
+    #sns.catplot(x="Programme_c", kind="count", data=df)
     
     df = Data_cleaner.calc_age(df)
-    
-    
-    plt.show()
-    
+    #df =  Data_cleaner.binarize(df)
     pie_charts(df)
- 
+    
+    df = Data_cleaner.binarize(df)
+    
+    y = df['Stress_c']
+    
+    new_df_binary = df[['ML', 'Self esteem_c', 'RN_c', 'Neighbours_c', 'Bedtime_Hour_c', 'Age' ]]
+    
+    #one hot encoding
+    df_encode = df[['Chocolate', 'Programme', 'Gender', 'IR', 'Stand up', 'Stat', 'DB']]
+    df_encoded = pd.get_dummies(df_encode.astype(str))
+    
+    new_df = pd.concat([new_df_binary, df_encoded], axis=1)
+    
+    X_train, X_test, y_train, y_test = train_test_split(new_df, y, test_size=0.33) #random_state=seed
+    
+    rf = RandomForestRegressor(n_estimators = 1000)
+    rf.fit(X_train, y_train)
+    # 'Chocolate', programme
+    
+    
+    

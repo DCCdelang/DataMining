@@ -232,5 +232,16 @@ def calc_age(df):
     
     return df
 
+
+def binarize(df):
+    df = df.replace({'Stat' : { 'mu' : 1, 'sigma' : 0}})
+    #df = df.replace({'ML' : { 'yes' : 1, 'no' : 0}})
+    df = df.replace({'DB' : { 'ja' : 1, 'nee' : 0}})
+    df = df.replace({'ML' : { 'yes' : 1, 'no' : 0}})
+    df = df.replace({'Stand up' : { 'yes' : 1, 'no' : 0}})
+    #df = df.replace({'Gender' : { 'female' : 1, 'male' : 0}})
+    
+    return df
+
 if __name__ == "__main__":
     pass
