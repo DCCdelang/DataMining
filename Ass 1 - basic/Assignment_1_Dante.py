@@ -16,7 +16,6 @@ import flair
 flair_sentiment = flair.models.TextClassifier.load('en-sentiment')
 import re
 
-# ODI_data = pd.read_csv("Ass 1 - basic/Data/ODI-2021.csv")
 ODI_data = pd.read_csv("Ass 1 - basic/Data/ODI-2021.csv")
 
 """ Properties of dataset """
@@ -26,11 +25,6 @@ ODI_data = pd.read_csv("Ass 1 - basic/Data/ODI-2021.csv")
 
 print("Amount of colomns = ", ODI_data.shape[1])
 print("Amount of answers = ", ODI_data.shape[0])
-
-# sns.histplot(ODI_data["What is your stress level (0-100)?"],bins=10)
-
-# sns.displot(ODI_data,x="What is your stress level (0-100)?", col = "What is your gender?", row = "Did you stand up?",binwidth=3, height=3, facet_kws=dict(margin_titles=True))
-# plt.show()
 
 """
 TODO
@@ -42,7 +36,6 @@ TODO
 """
 
 # Adding some simple sentiment analyses on both open questions GD1 and 2
-
 def predict_flair(sentence):
     """ Predict the sentiment of a sentence """
     if sentence == "":
@@ -77,33 +70,6 @@ def add_NLP(df):
 
     return df
 
-# Bedtime preprocessing
-
-def bedtime_parser(df):
-    Hours = []
-    for time in df["Bedtime"]:
-        time_int  = re.findall(r'[0-9]+', time)
-        if len(time_int):
-            hour_int = int(time_int[0])
-            if hour_int == 10:
-                hour_int = 22
-            if hour_int == 11:
-                hour_int = 23
-            if hour_int == 12:
-                hour_int = 24
-            if hour_int > 24:
-                Hours.append(np.nan)
-            else:
-                Hours.append(hour_int)
-        else:
-            Hours.append(np.nan)
-
-    # print(Hours)
-    # plt.hist(Hours)
-    # plt.plot()
-    df["Bedtime_Hour"] = Hours
-    return df
-
 if __name__ == "__main__":
     # Import data
     df = ODI_data
@@ -112,7 +78,7 @@ if __name__ == "__main__":
     new_cols = ["Time", "Programme", "ML", "IR", "Stat", "DB","Gender","Chocolate","Birthday","Neighbours", "Stand up", "Stress", "Self esteem", "RN", "Bedtime","GD1", "GD2"]
     df = Data_cleaner.rename_collumns(df,new_cols)
     add_NLP(df)
-    bedtime_parser(df)
+    Data_cleaner.bedtime_parser(df)
     Data_cleaner.stress_cleaner(df)
     Data_cleaner.se_cleaner(df)
     Data_cleaner.remove_nan(df)

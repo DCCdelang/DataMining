@@ -180,9 +180,6 @@ def cleanup_bday(date):
 
     
     return None
-    
-            
-          
 
 def remove_nan(df):
     return df.dropna()
@@ -205,8 +202,6 @@ def categorical(df, col, course=True):
 
     return new_df
 
-
-
 def bedtime_parser(df):
     Hours = []
     for time in df["Bedtime"]:
@@ -226,11 +221,6 @@ def bedtime_parser(df):
         else:
             Hours.append(np.nan)
             
-            
-
-    # print(Hours)
-    # plt.hist(Hours)
-    # plt.plot()
     df["Bedtime_Hour_c"] = Hours
     return df
 
