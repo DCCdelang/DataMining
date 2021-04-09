@@ -66,7 +66,33 @@ def stress_check(df, course):
 
     print(f"x ={x.mean()}, y = {y.mean()}")
     print(stats.mannwhitneyu(x, y))
-
+    
+    
+def pie_charts(df):
+    df['Programme_c'].value_counts().plot(kind='pie', autopct='%1.1f%%')
+    plt.show()
+    df['ML'].value_counts().plot(kind='pie', autopct='%1.1f%%')
+    plt.show()
+    df['IR'].value_counts().plot(kind='pie', autopct='%1.1f%%')
+    plt.show()
+    df['Stat'].value_counts().plot(kind='pie', autopct='%1.1f%%')
+    plt.show()
+    df['DB'].value_counts().plot(kind='pie', autopct='%1.1f%%')
+    plt.show()
+    df['Gender'].value_counts().plot(kind='pie', autopct='%1.1f%%')
+    plt.show()
+    df['Chocolate'].value_counts().plot(kind='pie', autopct='%1.1f%%')
+    plt.show()
+    df['Stand up'].value_counts().plot(kind='pie', autopct='%1.1f%%')
+    plt.show()
+    
+    #histograms
+    df['Neighbors_c'].value_counts().plot(kind='hist')
+    plt.show()
+    df['Bedtime_Hour_c'].plot(kind='hist', bins = 30)
+    plt.show()
+    df['Age'].plot(kind='hist', bins = 40)
+    plt.show()
 
 if __name__ == "__main__":
 
@@ -76,20 +102,30 @@ if __name__ == "__main__":
     # Make new collumn names
     new_cols = ["Time", "Programme", "ML", "IR", "Stat", "DB","Gender","Chocolate","Birthday","Neighbours", "Stand up", "Stress", "Self esteem", "RN", "Bedtime","GD1", "GD2"]
     df = Data_cleaner.rename_collumns(df,new_cols)
-    # df = Data_cleaner.stress_cleaner(df)
-    # df = Data_cleaner.se_cleaner(df)
-    # df = df.dropna()
-    # Data_cleaner.RN_cleaner(df)
+    df = Data_cleaner.stress_cleaner(df)
+    df = Data_cleaner.se_cleaner(df)
+    df = df.dropna()
+    
+
+    Data_cleaner.RN_cleaner(df)
     # Activate functions
     # stress_check(df, "IR")
     # stress_esteam(df)
     # chocolate_gender(df)
+    
     Data_cleaner.programme_cleaner(df)
     Data_cleaner.neighbors_cleaner(df)
     Data_cleaner.birth_date_cleaner(df)
+    df = Data_cleaner.bedtime_parser(df)
+    
     print(df["Programme_c"].head(100))
     print(df["Programme"].head(100))
     sns.catplot(x="Programme_c", kind="count", data=df)
+    
+    df = Data_cleaner.calc_age(df)
+    
+    
     plt.show()
-
+    
+    pie_charts(df)
  

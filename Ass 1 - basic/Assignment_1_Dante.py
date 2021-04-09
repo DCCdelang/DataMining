@@ -6,14 +6,14 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import Data_cleaner
-# import Assignment_1_Kamiel
-# import Assignment_1_Louky
+import Assignment_1_Kamiel
+import Assignment_1_Louky
 import nltk
 # nltk.download('vader_lexicon')
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 sid = SentimentIntensityAnalyzer()
-import flair
-flair_sentiment = flair.models.TextClassifier.load('en-sentiment')
+#import flair
+# = flair.models.TextClassifier.load('en-sentiment')
 import re
 
 # ODI_data = pd.read_csv("Ass 1 - basic/Data/ODI-2021.csv")
