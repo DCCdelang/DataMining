@@ -21,7 +21,15 @@ def chocolate_gender(df):
     """
     Looks at how people from different gender look towards chocolate
     """
-    sns.catplot(x="Gender", hue="Chocolate", kind="count", data=df)
+    sns.catplot(x="Gender", hue="Chocolate", kind="count", data=df, legend=True)
+    
+    plt.xlabel("", fontsize=14)
+    plt.ylabel("", fontsize=14)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    # plt.legend(fontsize=14)
+    plt.tight_layout()
+    plt.savefig("chocolate_gender.pdf")
     plt.show()
 
 
@@ -34,6 +42,13 @@ def stress_esteam(df):
 
     print(stats.spearmanr(df["Stress_c"], df["Self esteem_c"]))
     sns.scatterplot(data=df, x="Stress_c", y="Self esteem_c")
+    plt.xlabel("Stress", fontsize=14)
+    plt.ylabel("Self esteem", fontsize=14)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    # plt.legend(fontsize=14)
+    plt.tight_layout()
+    plt.savefig("stress_esteem.pdf")
     plt.show()
 def programme_count(df):
     sns.catplot(x="Programme_c", kind="count", data=df)
@@ -43,6 +58,11 @@ def stress_Msc(df):
 
     sns.catplot(x="Programme_c", y="Stress_c", data=df)
     plt.show()
+
+def Age_stress(df):
+    sns.scatterplot(data=df, x="Stress_c", y="Age")
+    plt.show()
+
 
 def stress_check(df, course):
     """
@@ -78,16 +98,20 @@ if __name__ == "__main__":
 
     # Data cleaners
 
-    # df = Data_cleaner.stress_cleaner(df)
+    df = Data_cleaner.stress_cleaner(df)
+    # df = Data_cleaner.classify_numericals(df, "Stress_c")
+    # Data_cleaner.birth_date_cleaner(df)
+    # df = Data_cleaner.calc_age(df)
+    # Age_stress(df)
 
     df = Data_cleaner.programme_cleaner(df)
 
-    # df = Data_cleaner.se_cleaner(df)
+    df = Data_cleaner.se_cleaner(df)
 
-    for i in ["ML", "IR", "Stat", "DB"]:
-        df = Data_cleaner.categorical(df, i)
+    # for i in ["ML", "IR", "Stat", "DB"]:
+    #     df = Data_cleaner.categorical(df, i)
     
-    df = Data_cleaner.categorical(df, "Programme_c", course=False)
+    # df = Data_cleaner.categorical(df, "Programme_c", course=False)
     
     # df = df.dropna()
     
@@ -95,19 +119,34 @@ if __name__ == "__main__":
     # Plots
 
     # stress_check(df, "IR")
-    # stress_esteam(df)
+    stress_esteam(df)
     # chocolate_gender(df)
-    # stress_Msc(df)
+
+  
+    
+    # print(df["Programme_c"].head(100))
+    # print(df["Programme"].head(100))
+    # sns.catplot(x="Programme_c", kind="count", data=df)
+    # plt.show()
+
+    stress_Msc(df)
 
 
     for i in df.columns:
         print(i)
+
+
     # Categorisations
 
     features = ["ML,no" , "ML,yes" ,"IR,no", "IR,yes" ,"IR,uk" ,"Stat,no", "Stat,yes", "Stat,uk" ,"DB,no" , "DB,yes" ,"DB,uk"]
-    y = df["Programme_c"].unique()
+    features = df["Programme_c"].unique()
+    y = "Stress_c"
+
+
     Categorisations.tree(df, features, y)
     Categorisations.forest(df, features, y)
+    Categorisations.bayes(df, features, y)
+    
 
     
 
