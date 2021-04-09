@@ -6,9 +6,6 @@ from sklearn.preprocessing import OneHotEncoder
 import dateparser as dp
 import re
 
-
-
-
 def rename_collumns(df, new_collumns):
     for i, col in enumerate(df.columns):
         df = df.rename(columns={col: new_collumns[i]})
@@ -166,9 +163,6 @@ def cleanup_bday(date):
 
     
     return None
-    
-            
-          
 
 def remove_nan(df):
     return df.dropna()
@@ -192,8 +186,6 @@ def categorical(df, col, course=True):
     print(new_df)
     return new_df
 
-
-
 def bedtime_parser(df):
     Hours = []
     for time in df["Bedtime"]:
@@ -213,11 +205,6 @@ def bedtime_parser(df):
         else:
             Hours.append(np.nan)
             
-            
-
-    # print(Hours)
-    # plt.hist(Hours)
-    # plt.plot()
     df["Bedtime_Hour_c"] = Hours
     return df
 
