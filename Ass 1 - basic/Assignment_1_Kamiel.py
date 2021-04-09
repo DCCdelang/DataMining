@@ -108,18 +108,18 @@ if __name__ == "__main__":
 
     df = Data_cleaner.se_cleaner(df)
 
-    # for i in ["ML", "IR", "Stat", "DB"]:
-    #     df = Data_cleaner.categorical(df, i)
+    for i in ["ML", "IR", "Stat", "DB"]:
+        df = Data_cleaner.categorical(df, i)
     
-    # df = Data_cleaner.categorical(df, "Programme_c", course=False)
+    df = Data_cleaner.categorical(df, "Programme_c", course=False)
     
-    # df = df.dropna()
+    df = df.dropna()
     
 
     # Plots
 
     # stress_check(df, "IR")
-    stress_esteam(df)
+    # stress_esteam(df)
     # chocolate_gender(df)
 
   
@@ -129,18 +129,15 @@ if __name__ == "__main__":
     # sns.catplot(x="Programme_c", kind="count", data=df)
     # plt.show()
 
-    stress_Msc(df)
+    # stress_Msc(df)
 
-
-    for i in df.columns:
-        print(i)
 
 
     # Categorisations
 
     features = ["ML,no" , "ML,yes" ,"IR,no", "IR,yes" ,"IR,uk" ,"Stat,no", "Stat,yes", "Stat,uk" ,"DB,no" , "DB,yes" ,"DB,uk"]
     features = df["Programme_c"].unique()
-    y = "Stress_c"
+    y = "Self esteem_c"
 
 
     Categorisations.tree(df, features, y)
