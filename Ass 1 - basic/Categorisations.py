@@ -94,8 +94,27 @@ def forest(df, features, y):
       # print()
    # Calculate the mean absolute error of your Random Forest model on the validation data
    val_mae = mean_absolute_error(predicts, val_y)
-   print(val_mae)
-   print(cross_val_score(model, x, y, cv=10))
+   print('forest mae', val_mae)
+   print('forest, r2;', metrics.r2_score(val_y, predicts))
+   #print(cross_val_score(model, x, y, cv=10))
+   
+   
+def forest_2(df, y, test_size):
+    X_train, X_test, y_train, y_test = train_test_split(df, y, test_size=test_size) #random_state=seed
+    
+    rf = RandomForestRegressor(n_estimators = 1000)
+    rf.fit(X_train, y_train)
+    
+    predicts = rf.predict(X_test)
+    val_mae = mean_absolute_error(predicts, y_test)
+    
+    print(metrics.r2_score(y_test, predicts))
+    
+    print(val_mae)
+    #print(cross_val_score(rf, df, y, cv=10))
+    
+    #return(val_mae)
+    
 
 
 def bayes(df, features, y):
