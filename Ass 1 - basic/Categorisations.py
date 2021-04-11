@@ -9,6 +9,11 @@ from sklearn.model_selection import ShuffleSplit
 from sklearn.model_selection import cross_val_score
 
 
+from sklearn.pipeline import Pipeline
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.model_selection import GridSearchCV
+
+from sklearn.model_selection import cross_validate
 from sklearn import metrics
 
 
@@ -96,28 +101,47 @@ def forest(df, features, y):
    val_mae = mean_absolute_error(predicts, val_y)
    print('forest mae', val_mae)
    print('forest, r2;', metrics.r2_score(val_y, predicts))
-   #print(cross_val_score(model, x, y, cv=10))
+   print(cross_val_score(model, x, y, cv=10))
    
    
-def forest_2(df, y, test_size):
+def forest_2(df, y, test_size, seed = 43, fold = 10):
+    pipeline = Pipeline([
+
+        ('regressor', RandomForestRegressor(random_state = seed,n_estimators = 1000 ))
+    ])
+
     X_train, X_test, y_train, y_test = train_test_split(df, y, test_size=test_size) #random_state=seed
     
-    rf = RandomForestRegressor(n_estimators = 1000)
-    rf.fit(X_train, y_train)
+    pipeline.fit(X_train, y_train)
+    predicts = pipeline.predict(X_test)
     
-    predicts = rf.predict(X_test)
-    val_mae = mean_absolute_error(predicts, y_test)
+    mae = mean_absolute_error(predicts, y_test)
+    #mape = np.mean(np.abs((y_test - predicts) / np.abs(y_test)))
+    #print('Mean Absolute Percentage Error (MAPE):', round(mape * 100, 2))
+    #print('Accuracy:', round(100*(1 - mape), 2))
     
-    print(metrics.r2_score(y_test, predicts))
+    print('mae', mae)
+    print('r2',metrics.r2_score(y_test, predicts))
     
-    print(val_mae)
-    #print(cross_val_score(rf, df, y, cv=10))
+    #choose metrics to score the fit
+    scoring = ['r2', 'neg_mean_absolute_error']
     
-    #return(val_mae)
+    #cross validation (10 fold)
+    cross_val = cross_validate(pipeline['regressor'], df, y, cv = fold, scoring=scoring)
     
+    r2 = cross_val['test_r2']
+    neg_mae = cross_val['test_neg_mean_absolute_error']
+    print('Fold is', fold)
+    print()
+    print('r2 mean', r2.mean())
+    print('r2 std', r2.std())
+    
+    print()
+    print('neg mae mean', neg_mae.mean())
+    print('neg mae std', neg_mae.std())
 
 
-def bayes(df, features, y):
+def bayes(df, featuress, y):
    x = df[features]
    y = df[y]
    y=y.astype('int')

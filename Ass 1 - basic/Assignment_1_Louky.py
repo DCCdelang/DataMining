@@ -178,7 +178,7 @@ def main():
     #sns.catplot(x="Programme_c", kind="count", data=df)
     
     df = Data_cleaner.calc_age(df)
-    #df =  Data_cleaner.binarize(df)
+    df =  Data_cleaner.binarize(df)
     pie_charts(df)
     
     #df = binarize(df)
@@ -188,13 +188,32 @@ def main():
     new_df_binary = df[['ML', 'Self esteem_c', 'RN_c', 'Neighbors_c', 'Bedtime_Hour_c', 'Age', 'Time_c']]
     
     #one hot encoding
+    
+    """
     df_encode = df[['Chocolate', 'Programme', 'Gender', 'IR', 'Stand up', 'Stat', 'DB']]
     df_encoded = pd.get_dummies(df_encode.astype(str))
     
     new_df = pd.concat([new_df_binary, df_encoded], axis=1)
+    """
+    
+    df_selection = df[['Chocolate', 'Programme_c', 'Gender']]
+    df_encoded = pd.get_dummies(df_selection.astype(str))
+    
+    #perform forest with chocolate, programme and gender
+    Categorisations.forest_2(df_encoded, y, 0.2, seed = 43, fold = 5)
+
+    Categorisations.forest_2(df_encoded, y, 0.2, seed = 43, fold = 10)
+
     
     
-    # 'Chocolate', programme
+    new_df = pd.concat([df[['Self esteem_c', 'RN_c', 'Neighbors_c','Gender', 'DB']], df_encoded],axis = 1)
+    
+    #random forest
+    Categorisations.forest_2(new_df, y, 0.2, seed = 43, fold = 5)
+
+    Categorisations.forest_2(new_df, y, 0.2, seed = 43, fold = 10)
+    
+    
     
     
     
