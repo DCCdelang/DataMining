@@ -16,7 +16,9 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import cross_validate
 from sklearn import metrics
 
+from sklearn import linear_model
 
+from sklearn import svm
 
 def tree(df, features, y):
    x = df[features]
@@ -139,9 +141,45 @@ def forest_2(df, y, test_size, seed = 43, fold = 10):
     print()
     print('neg mae mean', neg_mae.mean())
     print('neg mae std', neg_mae.std())
+    
+def svm_model(df, y, test_size, fold = 10):
+    pipeline = Pipeline([
+
+        ('regressor', svm.SVR(gamma = 'scale'))
+    ])
+    X_train, X_test, y_train, y_test = train_test_split(df, y, test_size=test_size) #random_state=seed
+    
+    pipeline.fit(X_train, y_train)
+    predicts = pipeline.predict(X_test)
+    
+    mae = mean_absolute_error(predicts, y_test)
+    #mape = np.mean(np.abs((y_test - predicts) / np.abs(y_test)))
+    #print('Mean Absolute Percentage Error (MAPE):', round(mape * 100, 2))
+    #print('Accuracy:', round(100*(1 - mape), 2))
+    
+    print('mae', mae)
+    print('r2',metrics.r2_score(y_test, predicts))
+    
+    #choose metrics to score the fit
+    scoring = ['r2', 'neg_mean_absolute_error']
+    
+    #cross validation (10 fold)
+    cross_val = cross_validate(pipeline['regressor'], df, y, cv = fold, scoring=scoring)
+    
+    r2 = cross_val['test_r2']
+    neg_mae = cross_val['test_neg_mean_absolute_error']
+    print('Fold is', fold)
+    print()
+    print('r2 mean', r2.mean())
+    print('r2 std', r2.std())
+    
+    print()
+    print('neg mae mean', neg_mae.mean())
+    print('neg mae std', neg_mae.std())
 
 
-def bayes(df, featuress, y):
+
+def bayes(df, features, y):
    x = df[features]
    y = df[y]
    y=y.astype('int')

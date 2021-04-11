@@ -9,7 +9,7 @@ from scipy import stats
 import collections
 
 
-ODI_data = pd.read_csv("Ass 1 - basic/Data/ODI-2021.csv")
+ODI_data = pd.read_csv("Data/ODI-2021.csv")
 
 # print(ODI_data.head())
 
@@ -137,6 +137,8 @@ if __name__ == "__main__":
 
     features = ["ML,no" , "ML,yes" ,"IR,no", "IR,yes" ,"IR,uk" ,"Stat,no", "Stat,yes", "Stat,uk" ,"DB,no" , "DB,yes" ,"DB,uk"]
     features = df["Programme_c"].unique()
+    
+    print(features)
     y = "Self esteem_c"
 
 
@@ -144,7 +146,8 @@ if __name__ == "__main__":
     Categorisations.forest(df, features, y)
     Categorisations.bayes(df, features, y)
     
-
+    
+    stress_esteam(df)
     
 
  
