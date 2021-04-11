@@ -6,8 +6,8 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import Data_cleaner
-import Assignment_1_Kamiel
-import Assignment_1_Louky
+# import Assignment_1_Kamiel
+# import Assignment_1_Louky
 import nltk
 nltk.download('vader_lexicon')
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
@@ -25,15 +25,6 @@ ODI_data = pd.read_csv("Ass 1 - basic/Data/ODI-2021.csv")
 
 print("Amount of colomns = ", ODI_data.shape[1])
 print("Amount of answers = ", ODI_data.shape[0])
-
-"""
-TODO
-- Set new colomns labels
-- Filter data and make it neat
-- Show outliers
-- Make neat plots for the categorical colomns
-- 
-"""
 
 # Adding some simple sentiment analyses on both open questions GD1 and 2
 def predict_flair(sentence):
@@ -84,7 +75,7 @@ if __name__ == "__main__":
     Data_cleaner.remove_nan(df)
 
     # Some plots
-    plt.plot(df["Bedtime_Hour"],df["Stress_c"],".")
+    plt.plot(df["Bedtime_Hour_c"],df["Stress_c"],".")
     plt.show()
 
     plt.plot(df["GD1-FLAIR"], df["GD2-FLAIR"], ".")
