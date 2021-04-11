@@ -110,10 +110,42 @@ def pie_charts(df):
     plt.tight_layout()
     plt.savefig("Age.pdf")
     plt.show()
+    
+def RN_cleaner2(df):
+    df["RN_c"] = df["RN"]
 
-if __name__ == "__main__":
+    for i in df["RN"]:
+        if i.isdigit():
+            if float(i)>10:
+                df["RN_c"] = df["RN_c"].replace(i,10)
+            elif float(i)<0:
+                df["RN_c"] = df["RN_c"].replace(i,0)
+        else:
+            df["RN_c"] = df["RN_c"].replace(i,0)
+    df["RN_c"] = pd.to_numeric(df["RN_c"], errors='coerce', downcast='integer')
 
-    # Import data
+    #for i in df["RN_c"]:
+        #print(i)
+    return df
+
+def binarize(df):
+    df = df.replace({'Stat' : { 'mu' : 2, 'sigma' : 0, 'unknown' : 1}})
+    df["Stat"] = pd.to_numeric(df["Stat"])
+    #df = df.replace({'ML' : { 'yes' : 1, 'no' : 0}})
+    df = df.replace({'DB' : { 'ja' : 2, 'nee' : 0, 'unknown' : 1}})
+    df["DB"] = pd.to_numeric(df["DB"])
+    df = df.replace({'ML' : { 'yes' : 2, 'no' : 0, 'unknown' : 1}})
+    df["ML"] = pd.to_numeric(df["ML"])
+    df = df.replace({'Stand up' : { 'yes' : 2, 'no' : 0, 'unknown' : 1}})
+    df["Stand up"] = pd.to_numeric(df["Stand up"])
+    df = df.replace({'Gender' : { 'female' : 2, 'male' : 0, 'unknown' : 1}})
+    df["Gender"] = pd.to_numeric(df["Gender"])
+    
+    return df
+
+
+def main():
+        # Import data
     df = ODI_data
     
 
@@ -127,7 +159,7 @@ if __name__ == "__main__":
     df = df.dropna()
     
 
-    Data_cleaner.RN_cleaner(df)
+    df = RN_cleaner2(df)
     # Activate functions
     # stress_check(df, "IR")
     # stress_esteam(df)
@@ -138,6 +170,9 @@ if __name__ == "__main__":
     Data_cleaner.birth_date_cleaner(df)
     df = Data_cleaner.bedtime_parser(df)
     
+    #time of filling out questionaire 
+    df = Data_cleaner.time(df)
+    
     print(df["Programme_c"].head(100))
     print(df["Programme"].head(100))
     #sns.catplot(x="Programme_c", kind="count", data=df)
@@ -146,11 +181,11 @@ if __name__ == "__main__":
     #df =  Data_cleaner.binarize(df)
     pie_charts(df)
     
-    df = Data_cleaner.binarize(df)
+    #df = binarize(df)
     
     y = df['Stress_c']
     
-    new_df_binary = df[['ML', 'Self esteem_c', 'RN_c', 'Neighbours_c', 'Bedtime_Hour_c', 'Age' ]]
+    new_df_binary = df[['ML', 'Self esteem_c', 'RN_c', 'Neighbors_c', 'Bedtime_Hour_c', 'Age', 'Time_c']]
     
     #one hot encoding
     df_encode = df[['Chocolate', 'Programme', 'Gender', 'IR', 'Stand up', 'Stat', 'DB']]
@@ -158,11 +193,13 @@ if __name__ == "__main__":
     
     new_df = pd.concat([new_df_binary, df_encoded], axis=1)
     
-    X_train, X_test, y_train, y_test = train_test_split(new_df, y, test_size=0.33) #random_state=seed
     
-    rf = RandomForestRegressor(n_estimators = 1000)
-    rf.fit(X_train, y_train)
     # 'Chocolate', programme
     
     
     
+    
+    
+if __name__ == "__main__":
+    main()
+

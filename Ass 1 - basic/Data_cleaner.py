@@ -134,7 +134,10 @@ def neighbors_cleaner(df):
     df.iloc[298, df.columns.get_loc('Neighbors_c')] = 2
     df.iloc[266, df.columns.get_loc('Neighbors_c')] = 0
     
-    df["Neighbours_c"] = pd.to_numeric(df["Neighbors_c"])
+    df = df.replace({'Neighbors_c' : { 8979937 : 0, 300 : 0, 265 : 0, 200: 0}})
+    
+    
+    df["Neighbors_c"] = pd.to_numeric(df["Neighbors_c"])
 
 def birth_date_cleaner(df):
     #column with all full birthdays
@@ -215,11 +218,13 @@ def bedtime_parser(df):
             if hour_int == 12:
                 hour_int = 24
             if hour_int > 24:
-                Hours.append(np.nan)
+                Hours.append(23)
             else:
                 Hours.append(hour_int)
         else:
-            Hours.append(np.nan)
+            Hours.append(23)
+    
+    
             
     df["Bedtime_Hour_c"] = Hours
     return df
@@ -234,14 +239,27 @@ def calc_age(df):
 
 
 def binarize(df):
-    df = df.replace({'Stat' : { 'mu' : 1, 'sigma' : 0}})
+    df = df.replace({'Stat' : { 'mu' : 2, 'sigma' : 0, 'unknown' : 1}})
+    df["Stat"] = pd.to_numeric(df["Stat"])
     #df = df.replace({'ML' : { 'yes' : 1, 'no' : 0}})
-    df = df.replace({'DB' : { 'ja' : 1, 'nee' : 0}})
-    df = df.replace({'ML' : { 'yes' : 1, 'no' : 0}})
-    df = df.replace({'Stand up' : { 'yes' : 1, 'no' : 0}})
-    #df = df.replace({'Gender' : { 'female' : 1, 'male' : 0}})
+    df = df.replace({'DB' : { 'ja' : 2, 'nee' : 0, 'unknown' : 1}})
+    df["DB"] = pd.to_numeric(df["DB"])
+    df = df.replace({'ML' : { 'yes' : 2, 'no' : 0, 'unknown' : 1}})
+    df["ML"] = pd.to_numeric(df["ML"])
+    df = df.replace({'Stand up' : { 'yes' : 2, 'no' : 0, 'unknown' : 1}})
+    df["Stand up"] = pd.to_numeric(df["Stand up"])
+    df = df.replace({'Gender' : { 'female' : 2, 'male' : 0, 'unknown' : 1}})
+    df["Gender"] = pd.to_numeric(df["Gender"])
     
     return df
 
+def time(df):
+    df_temp = pd.to_datetime('3/30/2021 23:59:59') - pd.to_datetime(df['Time'])
+    df['Time_c'] = df_temp.dt.total_seconds()
+    
+    df['Time_c'] = df['Time_c']/86400
+    
+    return(df)
+    
 if __name__ == "__main__":
     pass

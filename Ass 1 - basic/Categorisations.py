@@ -103,24 +103,35 @@ def forest(df, features, y):
       
       predicts = model.predict(val_X)
  
-      # Calculate the mean absolute error of your Random Forest model on the validation data
-      val_mae = mean_absolute_error(predicts, val_y)
-      validation.append(val_mae)
-   d = {'col1': validation}
-
-   df1 = pd.DataFrame(data=d)
-
-
-   sns.histplot(data=df1, x="col1")
-   plt.xlabel("Mae", fontsize=14)
-   plt.ylabel("Count", fontsize=14)
-   plt.xticks(fontsize=14)
-   plt.yticks(fontsize=14)
-   # plt.legend(fontsize=14)
-   plt.tight_layout()
-   plt.savefig("Forest_distribution.pdf")
-   plt.show()
-   print(np.mean(validation))
+   #       good += 1
+   #    else:
+   #       wrong +=1
+      
+      # print(i)
+      # print()
+   # Calculate the mean absolute error of your Random Forest model on the validation data
+   val_mae = mean_absolute_error(predicts, val_y)
+   print('forest mae', val_mae)
+   print('forest, r2;', metrics.r2_score(val_y, predicts))
+   #print(cross_val_score(model, x, y, cv=10))
+   
+   
+def forest_2(df, y, test_size):
+    X_train, X_test, y_train, y_test = train_test_split(df, y, test_size=test_size) #random_state=seed
+    
+    rf = RandomForestRegressor(n_estimators = 1000)
+    rf.fit(X_train, y_train)
+    
+    predicts = rf.predict(X_test)
+    val_mae = mean_absolute_error(predicts, y_test)
+    
+    print(metrics.r2_score(y_test, predicts))
+    
+    print(val_mae)
+    #print(cross_val_score(rf, df, y, cv=10))
+    
+    #return(val_mae)
+    
 
 
 def bayes(df, features, y):
