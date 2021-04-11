@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np 
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.model_selection import StratifiedShuffleSplit
 
 Titan_data = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/train.csv")
 
@@ -24,10 +25,10 @@ def some_plots(Titan_data):
     plt.show()
 
     # Age vs Fare colored on Pclass
-    sns.scatterplot(Titan_data["Age"],Titan_data["Fare"], hue = Titan_data["Pclass"])
+    sns.scatterplot(x=Titan_data["Age"],y=Titan_data["Fare"], hue = Titan_data["Pclass"])
     plt.show()
 
-    sns.scatterplot(Titan_data["Age"],Titan_data["Fare"], hue = Titan_data["Survived"])
+    sns.scatterplot(x=Titan_data["Age"],y=Titan_data["Fare"], hue = Titan_data["Survived"])
     plt.show()
 
     # Frequency tables
@@ -59,7 +60,11 @@ def get_deck(df):
 get_deck(df)
 
 """ 2B """
-
 # Stratified sampling
-Titan_data_test = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/test.csv")
+Titan_data_validation = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/test.csv")
 
+Titan_split_X = Titan_data.drop(columns=["Survived"])
+Titan_split_y = Titan_data["Survived"]
+
+sss = StratifiedShuffleSplit(n_splits=5, test_size=0.5, random_state=0)
+sss.get_n_splits(Titan_split_X, Titan_split_y)
