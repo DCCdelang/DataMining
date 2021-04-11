@@ -28,9 +28,19 @@ def chocolate_gender(df):
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
     # plt.legend(fontsize=14)
-    plt.tight_layout()
-    plt.savefig("chocolate_gender.pdf")
-    plt.show()
+    gender = ['male', 'female']
+    idea = ['fat', 'neither', 'slim']
+
+    for i in gender:
+        for j in idea:
+            x = df[df["Gender"] == i]
+            print(len(x))
+            x1 = x[x["Chocolate"] == j]
+            print(f"{i}, {j} = ",len(x1)/len(x))
+
+    # plt.tight_layout()
+    # plt.savefig("chocolate_gender.pdf")
+    # plt.show()
 
 
 def stress_esteam(df):
@@ -41,6 +51,8 @@ def stress_esteam(df):
 
 
     print(stats.spearmanr(df["Stress_c"], df["Self esteem_c"]))
+    print(round(np.mean(df["Stress_c"]),2), round(np.std(df["Stress_c"]),2))
+    print(round(np.mean(df["Self esteem_c"]),2), round(np.std(df["Self esteem_c"]),2))
     sns.scatterplot(data=df, x="Stress_c", y="Self esteem_c")
     plt.xlabel("Stress", fontsize=14)
     plt.ylabel("Self esteem", fontsize=14)
@@ -120,7 +132,7 @@ if __name__ == "__main__":
 
     # stress_check(df, "IR")
     # stress_esteam(df)
-    # chocolate_gender(df)
+    chocolate_gender(df)
 
   
     
@@ -140,9 +152,9 @@ if __name__ == "__main__":
     y = "Self esteem_c"
 
 
-    Categorisations.tree(df, features, y)
-    Categorisations.forest(df, features, y)
-    Categorisations.bayes(df, features, y)
+    # Categorisations.tree(df, features, y)
+    # Categorisations.forest(df, features, y)
+    # Categorisations.bayes(df, features, y)
     
 
     
