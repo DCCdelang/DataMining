@@ -20,7 +20,7 @@ import Cleaner
 
 df = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/train.csv")
 df = Cleaner.Class(df)
-df = Cleaner.fill_age(df)
+
 
 # df = Cleaner.replace_titles(df)
 df = Cleaner.Class(df)
@@ -28,6 +28,9 @@ df = Cleaner.Binary_Sex(df)
 df = Cleaner.Binary_cabin(df)
 df = Cleaner.SexClass(df)
 df = Cleaner.Embarked(df)
+df = Cleaner.fill_age(df)
+# df = Cleaner.replace_titles(df)
+
 
 print(df.columns)
 new_df = df[["Fare", "Age","SibSp", "Survived","Binary_Sex", "Parch","C1","C2","C3", "Cabin_Binary","SexClass",'C', 'Q', 'S', '0']]

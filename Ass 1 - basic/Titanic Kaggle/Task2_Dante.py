@@ -71,6 +71,8 @@ Cleaner.get_deck(df)
 Cleaner.replace_titles(df)
 Cleaner.family_size(df)
 Cleaner.is_alone(df)
+print(len(df["Age"]))
+
 Cleaner.age_class(df)
 
 print(df.head())
