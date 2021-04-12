@@ -21,11 +21,11 @@ def fill_age(df):
     regr.fit(X_train, y_train)
 
     predict = regr.predict(X_test)
-    print('Mean squared error: %.2f'
-      % mean_squared_error(y_test, predict))
+    # print('Mean squared error: %.2f'
+    #   % mean_squared_error(y_test, predict))
     # The coefficient of determination: 1 is perfect prediction
-    print('Coefficient of determination: %.2f'
-      % r2_score(y_test, predict))
+    # print('Coefficient of determination: %.2f'
+    #   % r2_score(y_test, predict))
 
     intercept = regr.intercept_
     b1 = regr.coef_[0]
@@ -34,8 +34,8 @@ def fill_age(df):
     b4 = regr.coef_[3]
 
     
-    print('Intercept: \n', regr.intercept_)
-    print('Coefficients: \n', regr.coef_)
+    # print('Intercept: \n', regr.intercept_)
+    # print('Coefficients: \n', regr.coef_)
 
     for count, i in enumerate(df["Age"]):
         if math.isnan(i):
@@ -78,7 +78,7 @@ def SexClass(df):
 
 def Embarked(df):
     enc = OneHotEncoder(handle_unknown='ignore')# passing bridge-types-cat column (label encoded values of bridge_types)
-
+    df["Embarked"].fillna(0)
     enc_df = pd.DataFrame(enc.fit_transform(df[["Embarked"]]).toarray())# merge with main df bridge_df on key values
     df = df.join(enc_df)
     em = ["C","Q","S", "0"]
@@ -127,22 +127,22 @@ def replace_titles(df):
         else:
             titles.append(title)
     df['Title'] = titles
-    for i in df['Title']:
-        print(i)
     return df
 
 def title_num(df):
     title_num = []
-    for title in df['Title']:
-        if title == "Mr":
-            title_num.append(1)
-        elif title == "Miss":
-            title_num.append(2)
-        elif title == "Mrs":
-            title_num.append(3)
-        elif title == "Master":
-            title_num.append(4)
-
+    if "Title" in df:
+        for title in df['Title']:
+            if title == "Mr":
+                title_num.append(1)
+            elif title == "Miss":
+                title_num.append(2)
+            elif title == "Mrs":
+                title_num.append(3)
+            elif title == "Master":
+                title_num.append(4)
+    else:
+        raise ValueError("No Title column!!")
     df['Title_num'] = title_num
     return df
 
