@@ -66,14 +66,20 @@ sss = StratifiedShuffleSplit(n_splits=5, test_size=0.33, random_state=0)
 
 df = Titan_data
 
+Cleaner.Embarked(df)
 Cleaner.Binary_Sex(df)
 Cleaner.fill_age(df)
 Cleaner.get_deck(df)
 Cleaner.replace_titles(df)
+Cleaner.title_num(df)
 Cleaner.family_size(df)
 Cleaner.is_alone(df)
 Cleaner.age_class(df)
 df = df.drop(columns=["Name"])
 df = df.drop(columns=["Sex"])
+df = df.drop(columns=["Ticket"])
+df = df.drop(columns=["Cabin"])
+
+print(df["Title"].unique())
 
 print(df.head())

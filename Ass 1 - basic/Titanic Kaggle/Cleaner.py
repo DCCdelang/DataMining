@@ -108,6 +108,21 @@ def replace_titles(df):
     df['Title'] = titles
     return df
 
+def title_num(df):
+    title_num = []
+    for title in df['Title']:
+        if title == "Mr":
+            title_num.append(1)
+        elif title == "Miss":
+            title_num.append(2)
+        elif title == "Mrs":
+            title_num.append(3)
+        elif title == "Master":
+            title_num.append(4)
+
+    df['Title_num'] = title_num
+    return df
+
 def family_size(df):
     df['Family_Size']=df['SibSp']+df['Parch']
     return df
@@ -121,7 +136,7 @@ def is_alone(df):
     return df
  
 def age_class(df):
-    div = [0,21,35,55]
+    div = [0,20,40,60]
     age_class = []
     for age in df["Age"]:
         if age >= div[0] and age <= div[1]:
