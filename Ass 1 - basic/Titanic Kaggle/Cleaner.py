@@ -1,11 +1,31 @@
 from sklearn.preprocessing import OneHotEncoder
 import pandas as pd
 import numpy as np
+from sklearn import linear_model
+import math
 
 def fill_age(df):
-    for i in df["Age"]:
-        if pd.isna(i["Age"]):
-            print("Jpu")
+    new_df = df
+    new_df = new_df.dropna()
+    new_df.dropna
+    X = new_df[["Fare", "Pclass", "SibSp"]]
+    y = new_df["Age"]
+
+    regr = linear_model.LinearRegression()
+    regr.fit(X, y)
+
+    intercept = regr.intercept_
+    fare_co = regr.coef_[0]
+    pclass_co = regr.coef_[1]
+    sib_co = regr.coef_[2]
+    print('Intercept: \n', regr.intercept_)
+    print('Coefficients: \n', regr.coef_)
+
+
+    for count, i in enumerate(df["Age"]):
+        if math.isnan(i):
+            df.loc[df.index[count], 'Age'] = intercept + df.loc[count]["Fare"] * fare_co + df.loc[count]["Pclass"] * pclass_co + df.loc[count]["SibSp"] * sib_co
+    return df
 
 
 def Binary_Sex(df):
