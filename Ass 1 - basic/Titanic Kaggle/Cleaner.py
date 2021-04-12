@@ -49,7 +49,7 @@ def fill_age(df):
 
 def Binary_Sex(df):
     df["Binary_Sex"] = df["Sex"]
-    print(df["Binary_Sex"])
+    # print(df["Binary_Sex"])
     df["Binary_Sex"] = df["Binary_Sex"].replace(["female", "male"], [1, 2])
     return df
 
@@ -112,21 +112,20 @@ def replace_titles(df):
     df['Title']=df['Name'].map(lambda x: substrings_in_string(x, title_list))
 
     titles = []
-    for title in df['Title']:
+    for title, sex in zip(df['Title'],df["Sex"]):
         if title in ['Don', 'Major', 'Capt', 'Jonkheer', 'Rev', 'Col']:
-            return 'Mr'
+            titles.append('Mr')
         elif title in ['Countess', 'Mme']:
-            return 'Mrs'
+            titles.append('Mrs')
         elif title in ['Mlle', 'Ms']:
-            return 'Miss'
+            titles.append('Miss')
         elif title =='Dr':
-            if df['Sex']=='Male':
-                return 'Mr'
+            if sex =='Male':
+                titles.append('Mr')
             else:
-                return 'Mrs'
+                titles.append('Mrs')
         else:
             titles.append(title)
-
     df['Title'] = titles
     for i in df['Title']:
         print(i)
@@ -141,7 +140,7 @@ def is_alone(df):
         df["Is_alone"] = 0
         df.loc[df['Family_Size'] == 1, 'Is_alone'] = 1
     else:
-        print("No family size colomn!")
+        raise ValueError("No family size column!!")
     return df
  
 def age_class(df):
@@ -149,12 +148,18 @@ def age_class(df):
     age_class = []
     for age in df["Age"]:
         if age >= div[0] and age <= div[1]:
-            age_class.append("0")
+            age_class.append(0)
         if age > div[1] and age <= div[2]:
-            age_class.append("1")
+            age_class.append(1)
         if age > div[2] and age <= div[3]:
-            age_class.append("2")
+            age_class.append(2)
         if age > div[3]:
-            age_class.append("3")
+            age_class.append(3)
     df["Age_div"] = age_class
+
+    
+    return df
+
+def AgeClass(df):
+    df["AgeClass"] = df["Pclass"]*df["Age_div"]
     return df

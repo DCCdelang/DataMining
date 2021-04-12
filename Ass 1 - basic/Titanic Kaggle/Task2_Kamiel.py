@@ -19,6 +19,7 @@ from sklearn.ensemble import AdaBoostClassifier
 import Cleaner
 
 df = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/train.csv")
+df = Cleaner.Embarked(df)
 df = Cleaner.Class(df)
 
 
@@ -27,15 +28,17 @@ df = Cleaner.Class(df)
 df = Cleaner.Binary_Sex(df)
 df = Cleaner.Binary_cabin(df)
 df = Cleaner.SexClass(df)
-df = Cleaner.Embarked(df)
+
 df = Cleaner.fill_age(df)
+df = Cleaner.age_class(df)
+df = Cleaner.AgeClass(df)
 # df = Cleaner.replace_titles(df)
 
 
 print(df.columns)
-new_df = df[["Fare", "Age","SibSp", "Survived","Binary_Sex", "Parch","C1","C2","C3", "Cabin_Binary","SexClass",'C', 'Q', 'S', '0']]
-new_df = new_df.dropna()
-print(len(new_df["Age"]))
+new_df = df[["Fare", "Age","SibSp", "Survived","Binary_Sex", "Parch","C1","C2","C3", "Cabin_Binary","SexClass",'C', 'Q', 'S', '0','Age_div',"AgeClass"]]
+# new_df = new_df.dropna()
+
 x = new_df[["Binary_Sex","Age","SexClass"]]
 y = new_df["Survived"]
 
@@ -49,7 +52,7 @@ y_pred = clf .fit(X_train, y_train).predict(X_test)
 # print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
 print(cross_validate(clf , x, y, cv=10)['test_score'].mean())
 
-n_estimators = [50, 100]
+n_estimators = [50, 100, 250, 500]
 
 for n in n_estimators:
     clf = RandomForestClassifier(random_state=10, n_estimators=n, criterion="entropy")
