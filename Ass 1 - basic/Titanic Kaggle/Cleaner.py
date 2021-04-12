@@ -7,7 +7,6 @@ def fill_age(df):
         if pd.isna(i["Age"]):
             print("Jpu")
 
-
 def Binary_Sex(df):
     df["Binary_Sex"] = df["Sex"]
     print(df["Binary_Sex"])
@@ -45,6 +44,72 @@ def Embarked(df):
     em = ["C","Q","S", "0"]
     for i in range(4):
         df = df.rename(columns={i:em[i]})
+    return df
 
+def get_deck(df):
+    floor_list = []
+    for cabin in df["Cabin"]:
+        if str(cabin)[0] != "n":
+            floor_list.append(str(cabin)[0])
+        else:
+            floor_list.append(np.nan)
+    df["deck"] = floor_list
 
+def substrings_in_string(big_string, substrings):
+    for substring in substrings:
+        if big_string.find(substring) != -1:
+            return substring
+    return np.nan
+
+def replace_titles(df):
+    title_list=['Mrs', 'Mr', 'Master', 'Miss', 'Major', 'Rev',
+                    'Dr', 'Ms', 'Mlle','Col', 'Capt', 'Mme', 'Countess',
+                    'Don', 'Jonkheer']
+
+    df['Title']=df['Name'].map(lambda x: substrings_in_string(x, title_list))
+
+    titles = []
+    for title in df['Title']:
+        if title in ['Don', 'Major', 'Capt', 'Jonkheer', 'Rev', 'Col']:
+            return 'Mr'
+        elif title in ['Countess', 'Mme']:
+            return 'Mrs'
+        elif title in ['Mlle', 'Ms']:
+            return 'Miss'
+        elif title =='Dr':
+            if df['Sex']=='Male':
+                return 'Mr'
+            else:
+                return 'Mrs'
+        else:
+            titles.append(title)
+
+    df['Title'] = titles
+    return df
+
+def family_size(df):
+    df['Family_Size']=df['SibSp']+df['Parch']
+    return df
+
+def is_alone(df):
+    if "Family_Size" in df:
+        df["Is_alone"] = 0
+        df.loc[df['Family_Size'] == 1, 'Is_alone'] = 1
+    else:
+        print("No family size colomn!")
+    return df
+ 
+def age_class(df):
+    div = [0,21,35,55]
+    age_class = []
+    for age in df["Age"]:
+        if age > div[0] and age <= div[1]:
+            age_class.append("0")
+        if age > div[1] and age <= div[2]:
+            age_class.append("1")
+        if age > div[2] and age <= div[3]:
+            age_class.append("2")
+        if age > div[3]:
+            age_class.append("3")
+    df["Age_div"] = age_class
     return df
