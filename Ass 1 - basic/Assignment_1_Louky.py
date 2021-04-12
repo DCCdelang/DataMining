@@ -199,19 +199,24 @@ def main():
     df_selection = df[['Chocolate', 'Programme_c', 'Gender']]
     df_encoded = pd.get_dummies(df_selection.astype(str))
     
+    
+    
     #perform forest with chocolate, programme and gender
-    Categorisations.forest_2(df_encoded, y, 0.2, seed = 43, fold = 5)
+    print("Small set")
+    print("")
+    Categorisations.svm_model(df_encoded, y, 0.2, fold = 5)
 
-    Categorisations.forest_2(df_encoded, y, 0.2, seed = 43, fold = 10)
+    Categorisations.svm_model(df_encoded, y, 0.2, fold = 10)
 
     
-    
-    new_df = pd.concat([df[['Self esteem_c', 'RN_c', 'Neighbors_c','Gender', 'DB']], df_encoded],axis = 1)
+    print("Larger set")
+    print()
+    new_df = pd.concat([df[['Self esteem_c', 'RN_c', 'Neighbors_c','DB']], df_encoded],axis = 1)
     
     #random forest
-    Categorisations.forest_2(new_df, y, 0.2, seed = 43, fold = 5)
+    Categorisations.svm_model(new_df, y, 0.2, fold = 5)
 
-    Categorisations.forest_2(new_df, y, 0.2, seed = 43, fold = 10)
+    Categorisations.svm_model(new_df, y, 0.2, fold = 10)
     
     
     
