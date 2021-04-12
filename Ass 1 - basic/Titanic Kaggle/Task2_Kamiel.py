@@ -17,6 +17,21 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import NearestNeighbors
 from sklearn.ensemble import AdaBoostClassifier
 import Cleaner
+from sklearn.model_selection import GridSearchCV
+from sklearn.pipeline import Pipeline
+from scipy.cluster import hierarchy
+from collections import defaultdict
+from collections import defaultdict
+
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats import spearmanr
+from scipy.cluster import hierarchy
+
+from sklearn.datasets import load_breast_cancer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.inspection import permutation_importance
+from sklearn.model_selection import train_test_split
 
 df = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/train.csv")
 df = Cleaner.Embarked(df)
@@ -28,58 +43,100 @@ df = Cleaner.Class(df)
 df = Cleaner.Binary_Sex(df)
 df = Cleaner.Binary_cabin(df)
 df = Cleaner.SexClass(df)
-
+df = Cleaner.family_size(df)
 df = Cleaner.fill_age(df)
 df = Cleaner.age_class(df)
 df = Cleaner.AgeClass(df)
+df = Cleaner.replace_titles(df)
+df = Cleaner.title_num(df)
 # df = Cleaner.replace_titles(df)
 
 
 print(df.columns)
-new_df = df[["Fare", "Age","SibSp", "Survived","Binary_Sex", "Parch","C1","C2","C3", "Cabin_Binary","SexClass",'C', 'Q', 'S', '0','Age_div',"AgeClass"]]
+new_df = df[["Fare", "Age","SibSp", "Survived","Binary_Sex", "Parch","C1","C2","C3", "Cabin_Binary","SexClass",'C', 'Q', 'S', '0','Age_div',"AgeClass","Title_num", "Family_Size"]]
 # new_df = new_df.dropna()
-
-x = new_df[["Binary_Sex","Age","SexClass"]]
-y = new_df["Survived"]
-
-X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.6, test_size=0.2, random_state=11)
+features = ["Fare", "Age","SibSp", "Survived","Binary_Sex", "Parch","C1","C2","C3", "Cabin_Binary","SexClass",'C', 'Q', 'S', '0','Age_div',"AgeClass","Title_num", "Family_Size"]
+x = new_df[["Binary_Sex","Age","SexClass","Title_num","Family_Size", "Fare"]]
 
 
-clf  = GaussianNB()
-y_pred = clf .fit(X_train, y_train).predict(X_test)
-# print(y_pred)
+for i in features:
+    x = new_df[["Title_num", "SibSp", "AgeClass", "Binary_Sex",'Q','0']]
+    y = new_df["Survived"]
+    X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.6, test_size=0.2, random_state=11)
+    pipeline = Pipeline([
+        ('classifier', RandomForestClassifier(random_state = 3,n_estimators = 100 ))
+    ])
+    
+    if cross_validate(pipeline, x, y, cv=3)['test_score'].mean() > 0.8282828282828283:
+        print(i, cross_validate(pipeline, x, y, cv=3)['test_score'].mean())
 
-# print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
-print(cross_validate(clf , x, y, cv=10)['test_score'].mean())
 
-n_estimators = [50, 100, 250, 500]
 
-for n in n_estimators:
-    clf = RandomForestClassifier(random_state=10, n_estimators=n, criterion="entropy")
-    y_pred = clf.fit(X_train, y_train).predict(X_test)
-    # print(clf.score(X_test, y_test))
-    # print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
 
-    print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
 
-clf = ExtraTreesClassifier(n_estimators=50, max_depth=None, min_samples_split=2, random_state=0)
+
+
+clf = RandomForestClassifier()
 y_pred = clf.fit(X_train, y_train).predict(X_test)
-print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
-
-clf = AdaBoostClassifier(n_estimators=50)
-y_pred = clf.fit(X_train, y_train).predict(X_test)
-print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
-
-
-# clf = MLPClassifier(random_state=1, max_iter=300).fit(X_train, y_train)
-# y_pred = clf.predict(X_test)
 # print(clf.score(X_test, y_test))
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
+
+print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
+
+hyperparameters = {                     
+                    'classifier__n_estimators': [50,100, 1000],
+                    'classifier__max_depth': [2, 4],
+                    'classifier__min_samples_leaf': [2, 4],
+                    'classifier__criterion': ['gini', 'entropy'],
+
+                  }
+
+clf = GridSearchCV(pipeline, hyperparameters, cv = 3)
+# Fit and tune model
+clf.fit(X_train, y_train)
+
+print(clf.best_params_)
+
+# refitting on entire training data using best settings
+clf.refit
+
+print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
+
+
+
+
+
+
+
+
+
+
+
+
+# clf = ExtraTreesClassifier(n_estimators=50, max_depth=None, min_samples_split=2, random_state=0)
+# y_pred = clf.fit(X_train, y_train).predict(X_test)
+# print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
+
 # print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
+
+# clf = AdaBoostClassifier(n_estimators=50)
+# y_pred = clf.fit(X_train, y_train).predict(X_test)
+# print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
+
+# print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
+
+
+# # clf = MLPClassifier(random_state=1, max_iter=300).fit(X_train, y_train)
+# # y_pred = clf.predict(X_test)
+# # print(clf.score(X_test, y_test))
+# # print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
 
 # clf = make_pipeline(StandardScaler(),
 #                     LinearSVC(random_state=0))
 # clf = clf.fit(X_train, y_train)
 # y_pred = clf.predict(X_test)
+
+# print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
 # print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
 
 # clf = KNeighborsClassifier(n_neighbors=5)
@@ -87,3 +144,9 @@ print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
 # y_pred = clf.predict(X_test)
 # print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
 
+# clf  = GaussianNB()
+# y_pred = clf .fit(X_train, y_train).predict(X_test)
+# # print(y_pred)
+
+# # print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
+# print(cross_validate(clf , x, y, cv=10)['test_score'].mean())

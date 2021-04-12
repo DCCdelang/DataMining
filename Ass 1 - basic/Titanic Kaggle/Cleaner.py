@@ -21,11 +21,11 @@ def fill_age(df):
     regr.fit(X_train, y_train)
 
     predict = regr.predict(X_test)
-    print('Mean squared error: %.2f'
-      % mean_squared_error(y_test, predict))
-    # The coefficient of determination: 1 is perfect prediction
-    print('Coefficient of determination: %.2f'
-      % r2_score(y_test, predict))
+    # print('Mean squared error: %.2f'
+    #   % mean_squared_error(y_test, predict))
+    # # The coefficient of determination: 1 is perfect prediction
+    # print('Coefficient of determination: %.2f'
+    #   % r2_score(y_test, predict))
 
     intercept = regr.intercept_
     b1 = regr.coef_[0]
@@ -34,8 +34,8 @@ def fill_age(df):
     b4 = regr.coef_[3]
 
     
-    print('Intercept: \n', regr.intercept_)
-    print('Coefficients: \n', regr.coef_)
+    # print('Intercept: \n', regr.intercept_)
+    # print('Coefficients: \n', regr.coef_)
 
     for count, i in enumerate(df["Age"]):
         if math.isnan(i):
@@ -127,8 +127,7 @@ def replace_titles(df):
         else:
             titles.append(title)
     df['Title'] = titles
-    for i in df['Title']:
-        print(i)
+
     return df
 
 def title_num(df):
