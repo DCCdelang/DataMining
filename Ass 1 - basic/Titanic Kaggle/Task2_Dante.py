@@ -55,7 +55,7 @@ Titan_split_X = Titan_data.drop(columns=["Survived"])
 Titan_split_y = Titan_data["Survived"]
 
 sss = StratifiedShuffleSplit(n_splits=5, test_size=0.33, random_state=0)
-print(sss.get_n_splits(Titan_split_X, Titan_split_y))
+# print(sss.get_n_splits(Titan_split_X, Titan_split_y))
 
 # for train_index, test_index in sss.split(Titan_split_X, Titan_split_y):
     # print("TRAIN:", train_index, "TEST:", test_index)
@@ -66,13 +66,14 @@ print(sss.get_n_splits(Titan_split_X, Titan_split_y))
 
 df = Titan_data
 
+Cleaner.Binary_Sex(df)
 Cleaner.fill_age(df)
 Cleaner.get_deck(df)
 Cleaner.replace_titles(df)
 Cleaner.family_size(df)
 Cleaner.is_alone(df)
-print(len(df["Age"]))
-
 Cleaner.age_class(df)
+df = df.drop(columns=["Name"])
+df = df.drop(columns=["Sex"])
 
 print(df.head())

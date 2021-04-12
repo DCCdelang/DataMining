@@ -18,8 +18,8 @@ def fill_age(df):
     fare_co = regr.coef_[0]
     pclass_co = regr.coef_[1]
     sib_co = regr.coef_[2]
-    print('Intercept: \n', regr.intercept_)
-    print('Coefficients: \n', regr.coef_)
+    # print('Intercept: \n', regr.intercept_)
+    # print('Coefficients: \n', regr.coef_)
 
     for count, i in enumerate(df["Age"]):
         if math.isnan(i):
@@ -31,7 +31,7 @@ def fill_age(df):
 
 def Binary_Sex(df):
     df["Binary_Sex"] = df["Sex"]
-    print(df["Binary_Sex"])
+    # print(df["Binary_Sex"])
     df["Binary_Sex"] = df["Binary_Sex"].replace(["female", "male"], [1, 2])
     return df
 
@@ -91,21 +91,20 @@ def replace_titles(df):
     df['Title']=df['Name'].map(lambda x: substrings_in_string(x, title_list))
 
     titles = []
-    for title in df['Title']:
+    for title, sex in zip(df['Title'],df["Sex"]):
         if title in ['Don', 'Major', 'Capt', 'Jonkheer', 'Rev', 'Col']:
-            return 'Mr'
+            titles.append('Mr')
         elif title in ['Countess', 'Mme']:
-            return 'Mrs'
+            titles.append('Mrs')
         elif title in ['Mlle', 'Ms']:
-            return 'Miss'
+            titles.append('Miss')
         elif title =='Dr':
-            if df['Sex']=='Male':
-                return 'Mr'
+            if sex =='Male':
+                titles.append('Mr')
             else:
-                return 'Mrs'
+                titles.append('Mrs')
         else:
             titles.append(title)
-
     df['Title'] = titles
     return df
 
@@ -118,7 +117,7 @@ def is_alone(df):
         df["Is_alone"] = 0
         df.loc[df['Family_Size'] == 1, 'Is_alone'] = 1
     else:
-        print("No family size colomn!")
+        raise ValueError("No family size column!!")
     return df
  
 def age_class(df):
