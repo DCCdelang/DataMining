@@ -6,6 +6,8 @@ from sklearn.model_selection import StratifiedShuffleSplit
 
 Titan_data = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/train.csv")
 
+
+
 """ 2A """
 def some_plots(Titan_data):
     print(Titan_data.dtypes)
@@ -51,7 +53,7 @@ df = Titan_data
 def get_deck(df):
     floor_list = []
     for cabin in df["Cabin"]:
-        if cabin:
+        if str(cabin)[0] != "n":
             floor_list.append(str(cabin)[0])
         else:
             floor_list.append(np.nan)
@@ -59,12 +61,57 @@ def get_deck(df):
 
 get_deck(df)
 
+def substrings_in_string(big_string, substrings):
+    for substring in substrings:
+        if big_string.find(substring) != -1:
+            return substring
+    return np.nan
+
+def replace_titles(df):
+    title_list=['Mrs', 'Mr', 'Master', 'Miss', 'Major', 'Rev',
+                    'Dr', 'Ms', 'Mlle','Col', 'Capt', 'Mme', 'Countess',
+                    'Don', 'Jonkheer']
+
+    df['Title']=df['Name'].map(lambda x: substrings_in_string(x, title_list))
+
+    titles = []
+    for title in df['Title']:
+        if title in ['Don', 'Major', 'Capt', 'Jonkheer', 'Rev', 'Col']:
+            return 'Mr'
+        elif title in ['Countess', 'Mme']:
+            return 'Mrs'
+        elif title in ['Mlle', 'Ms']:
+            return 'Miss'
+        elif title =='Dr':
+            if df['Sex']=='Male':
+                return 'Mr'
+            else:
+                return 'Mrs'
+        else:
+            titles.append(title)
+
+    df['Title'] = titles
+    return df
+
+replace_titles(Titan_data)
+print(Titan_data)
+
 """ 2B """
 # Stratified sampling
-Titan_data_validation = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/test.csv")
-
 Titan_split_X = Titan_data.drop(columns=["Survived"])
 Titan_split_y = Titan_data["Survived"]
 
+<<<<<<< HEAD
 sss = StratifiedShuffleSplit(n_splits=5, test_size=0.5, random_state=0)
 sss.get_n_splits(Titan_split_X, Titan_split_y)
+=======
+sss = StratifiedShuffleSplit(n_splits=5, test_size=0.33, random_state=0)
+print(sss.get_n_splits(Titan_split_X, Titan_split_y))
+
+# for train_index, test_index in sss.split(Titan_split_X, Titan_split_y):
+    # print("TRAIN:", train_index, "TEST:", test_index)
+    # print(len(train_index),len(test_index))
+    # print(Titan_split_X[train_index])
+    # X_train, X_test = Titan_split_X[train_index], Titan_split_X[test_index]
+    # y_train, y_test = Titan_split_y[train_index], Titan_split_y[test_index]
+>>>>>>> 783677baf68618a198c55fc1cb6942aafc8cf1ab
