@@ -5,6 +5,8 @@ from sklearn import linear_model
 import math
 
 def fill_age(df):
+    
+    pass
     new_df = df
     new_df = new_df.dropna()
     new_df.dropna
@@ -24,8 +26,9 @@ def fill_age(df):
 
     for count, i in enumerate(df["Age"]):
         if math.isnan(i):
-            df.loc[df.index[count], 'Age'] = intercept + df.loc[count]["Fare"] * fare_co + df.loc[count]["Pclass"] * pclass_co + df.loc[count]["SibSp"] * sib_co
+            df.loc[df.index[count], 'Age'] = intercept + df.loc[count]["Fare"] * fare_co + df.loc[count]["Pclass"] * pclass_co + df.loc[count]["Fare"] * fare_co
     return df
+
 
 def Binary_Sex(df):
     df["Binary_Sex"] = df["Sex"]
@@ -64,6 +67,8 @@ def Embarked(df):
     em = ["C","Q","S", "0"]
     for i in range(4):
         df = df.rename(columns={i:em[i]})
+
+
     return df
 
 def get_deck(df):

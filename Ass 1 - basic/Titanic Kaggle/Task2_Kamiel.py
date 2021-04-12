@@ -19,9 +19,10 @@ from sklearn.ensemble import AdaBoostClassifier
 import Cleaner
 
 df = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/train.csv")
-
+df = Cleaner.Class(df)
 df = Cleaner.fill_age(df)
 
+# df = Cleaner.replace_titles(df)
 df = Cleaner.Class(df)
 df = Cleaner.Binary_Sex(df)
 df = Cleaner.Binary_cabin(df)
@@ -32,7 +33,7 @@ print(df.columns)
 new_df = df[["Fare", "Age","SibSp", "Survived","Binary_Sex", "Parch","C1","C2","C3", "Cabin_Binary","SexClass",'C', 'Q', 'S', '0']]
 new_df = new_df.dropna()
 print(len(new_df["Age"]))
-x = new_df[["Binary_Sex","Age","SexClass" ]]
+x = new_df[["Binary_Sex","Age","SexClass"]]
 y = new_df["Survived"]
 
 X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.6, test_size=0.2, random_state=11)
