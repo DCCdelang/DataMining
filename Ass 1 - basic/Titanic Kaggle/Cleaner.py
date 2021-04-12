@@ -21,10 +21,12 @@ def fill_age(df):
     print('Intercept: \n', regr.intercept_)
     print('Coefficients: \n', regr.coef_)
 
-
     for count, i in enumerate(df["Age"]):
         if math.isnan(i):
-            df.loc[df.index[count], 'Age'] = intercept + df.loc[count]["Fare"] * fare_co + df.loc[count]["Pclass"] * pclass_co + df.loc[count]["SibSp"] * sib_co
+            if intercept + df.loc[count]["Fare"] * fare_co + df.loc[count]["Pclass"] * pclass_co + df.loc[count]["SibSp"] * sib_co > 0:
+                df.loc[df.index[count], 'Age'] = intercept + df.loc[count]["Fare"] * fare_co + df.loc[count]["Pclass"] * pclass_co + df.loc[count]["SibSp"] * sib_co
+            else:
+                df.loc[df.index[count], 'Age'] = 0
     return df
 
 def Binary_Sex(df):
@@ -123,7 +125,7 @@ def age_class(df):
     div = [0,21,35,55]
     age_class = []
     for age in df["Age"]:
-        if age > div[0] and age <= div[1]:
+        if age >= div[0] and age <= div[1]:
             age_class.append("0")
         if age > div[1] and age <= div[2]:
             age_class.append("1")
