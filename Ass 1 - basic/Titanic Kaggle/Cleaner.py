@@ -1,17 +1,29 @@
+from sklearn.preprocessing import OneHotEncoder
+import pandas as pd
+import numpy as np
 
-def cleaner(df):
+def fill_age(df):
+    for i in df["Age"]:
+        if pd.isna(i["Age"]):
+            print("Jpu")
+
+
+def Binary_Sex(df):
     df["Binary_Sex"] = df["Sex"]
     print(df["Binary_Sex"])
-    df["Binary_Sex"] = df["Binary_Sex"].replace(["female", "male"], [1, 0])
+    df["Binary_Sex"] = df["Binary_Sex"].replace(["female", "male"], [1, 2])
+    return df
+
+def Class(df):
     enc = OneHotEncoder(handle_unknown='ignore')# passing bridge-types-cat column (label encoded values of bridge_types)
 
     enc_df = pd.DataFrame(enc.fit_transform(df[["Pclass"]]).toarray())# merge with main df bridge_df on key values
     df = df.join(enc_df)
     for i in range(3):
         df = df.rename(columns={i:f"C{i+1}"})
+    return df
 
-    
-
+def Binary_cabin(df):
     df["Cabin_Binary"] = df["Cabin"]
     for i in df["Cabin_Binary"]:
 
@@ -21,3 +33,18 @@ def cleaner(df):
             df["Cabin_Binary"] = df["Cabin_Binary"].replace(i,0)
     return df 
 
+def SexClass(df):
+    df["SexClass"] = df["Pclass"]*df["Binary_Sex"]
+    return df
+
+def Embarked(df):
+    enc = OneHotEncoder(handle_unknown='ignore')# passing bridge-types-cat column (label encoded values of bridge_types)
+
+    enc_df = pd.DataFrame(enc.fit_transform(df[["Embarked"]]).toarray())# merge with main df bridge_df on key values
+    df = df.join(enc_df)
+    em = ["C","Q","S", "0"]
+    for i in range(4):
+        df = df.rename(columns={i:em[i]})
+
+
+    return df

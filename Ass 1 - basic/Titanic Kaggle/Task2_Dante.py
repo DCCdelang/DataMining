@@ -68,4 +68,3 @@ Titan_split_y = Titan_data["Survived"]
 
 sss = StratifiedShuffleSplit(n_splits=5, test_size=0.5, random_state=0)
 sss.get_n_splits(Titan_split_X, Titan_split_y)
-some_plots(Titan_data)
