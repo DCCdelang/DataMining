@@ -49,104 +49,93 @@ df = Cleaner.age_class(df)
 df = Cleaner.AgeClass(df)
 df = Cleaner.replace_titles(df)
 df = Cleaner.title_num(df)
+
+Cleaner.family_size(df)
+Cleaner.is_alone(df)
 # df = Cleaner.replace_titles(df)
 
 
 print(df.columns)
-new_df = df[["Fare", "Age","SibSp", "Survived","Binary_Sex", "Parch","C1","C2","C3", "Cabin_Binary","SexClass",'C', 'Q', 'S', '0','Age_div',"AgeClass","Title_num", "Family_Size"]]
+
 # new_df = new_df.dropna()
 features = ["Fare", "Age","SibSp", "Survived","Binary_Sex", "Parch","C1","C2","C3", "Cabin_Binary","SexClass",'C', 'Q', 'S', '0','Age_div',"AgeClass","Title_num", "Family_Size"]
-x = new_df[["Binary_Sex","Age","SexClass","Title_num","Family_Size", "Fare"]]
+# x = new_df[["Binary_Sex","Fare","SexClass","AgeClass","Title_num", "Family_Size","SibSp","Pclass"]]
+x = df[["Pclass","PassengerId","Title_num","Binary_Sex","Family_Size","Age_div","Fare","Is_alone"]]
+y = df["Survived"]
 
 
-for i in features:
-    x = new_df[["Title_num", "SibSp", "AgeClass", "Binary_Sex",'Q','0']]
-    y = new_df["Survived"]
-    X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.6, test_size=0.2, random_state=11)
-    pipeline = Pipeline([
-        ('classifier', RandomForestClassifier(random_state = 3,n_estimators = 100 ))
-    ])
-    
-    if cross_validate(pipeline, x, y, cv=3)['test_score'].mean() > 0.8282828282828283:
-        print(i, cross_validate(pipeline, x, y, cv=3)['test_score'].mean())
+X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.9, test_size=0.1, random_state=11)
+pipeline = Pipeline([
+    ('classifier', RandomForestClassifier(criterion="entropy",  n_estimators=50, min_samples_leaf=2, max_depth=4, random_state=0))
+])
 
 
 
-
-
-
-
-clf = RandomForestClassifier()
-y_pred = clf.fit(X_train, y_train).predict(X_test)
+# clf = RandomForestClassifier()
+# y_pred = clf.fit(X_train, y_train).predict(X_test)
 # print(clf.score(X_test, y_test))
-print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
+# print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
 
-print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
+print(cross_validate(pipeline, X_test, y_test, cv=10)['test_score'].mean())
 
 hyperparameters = {                     
-                    'classifier__n_estimators': [50,100, 1000],
+                    'classifier__n_estimators': [50,100,500, 1000],
                     'classifier__max_depth': [2, 4],
                     'classifier__min_samples_leaf': [2, 4],
                     'classifier__criterion': ['gini', 'entropy'],
 
-                  }
+                }
 
-clf = GridSearchCV(pipeline, hyperparameters, cv = 3)
+clf = GridSearchCV(pipeline, hyperparameters, cv = 5)
 # Fit and tune model
 clf.fit(X_train, y_train)
+
 
 print(clf.best_params_)
 
 # refitting on entire training data using best settings
 clf.refit
 
+print(cross_validate(clf, X_test, y_test, cv=3)['test_score'].mean())
+
+
+
+
+
+clf = ExtraTreesClassifier(n_estimators=50, max_depth=None, min_samples_split=2, random_state=0)
+y_pred = clf.fit(X_train, y_train).predict(X_test)
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
+
+print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
+
+clf = AdaBoostClassifier(n_estimators=1000)
+y_pred = clf.fit(X_train, y_train).predict(X_test)
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
+
 print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
 
 
-
-
-
-
-
-
-
-
-
-
-# clf = ExtraTreesClassifier(n_estimators=50, max_depth=None, min_samples_split=2, random_state=0)
-# y_pred = clf.fit(X_train, y_train).predict(X_test)
-# print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
-
-# print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
-
-# clf = AdaBoostClassifier(n_estimators=50)
-# y_pred = clf.fit(X_train, y_train).predict(X_test)
-# print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
-
-# print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
-
-
-# # clf = MLPClassifier(random_state=1, max_iter=300).fit(X_train, y_train)
-# # y_pred = clf.predict(X_test)
-# # print(clf.score(X_test, y_test))
-# # print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
-
-# clf = make_pipeline(StandardScaler(),
-#                     LinearSVC(random_state=0))
-# clf = clf.fit(X_train, y_train)
+# clf = MLPClassifier(random_state=1, max_iter=300).fit(X_train, y_train)
 # y_pred = clf.predict(X_test)
+# print(clf.score(X_test, y_test))
+# print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
+
+clf = make_pipeline(StandardScaler(),
+                    LinearSVC(random_state=0))
+clf = clf.fit(X_train, y_train)
+y_pred = clf.predict(X_test)
+
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
+print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
+
+clf = KNeighborsClassifier(n_neighbors=5)
+clf = clf.fit(X_train, y_train)
+y_pred = clf.predict(X_test)
+print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
+
+clf  = GaussianNB()
+y_pred = clf .fit(X_train, y_train).predict(X_test)
+# print(y_pred)
 
 # print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
-# print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
-
-# clf = KNeighborsClassifier(n_neighbors=5)
-# clf = clf.fit(X_train, y_train)
-# y_pred = clf.predict(X_test)
-# print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
-
-# clf  = GaussianNB()
-# y_pred = clf .fit(X_train, y_train).predict(X_test)
-# # print(y_pred)
-
-# # print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
-# print(cross_validate(clf , x, y, cv=10)['test_score'].mean())
+print(cross_validate(clf , x, y, cv=10)['test_score'].mean())
