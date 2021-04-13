@@ -108,7 +108,7 @@ print(score/N_splits)
 from scipy.stats import spearmanr
 from scipy.cluster import hierarchy
 from sklearn.inspection import permutation_importance
-from collections import defaultdict
+from collections import defaultdi
 
 clf.fit(X_train, y_train)
 print("Accuracy on test data: {:.2f}".format(clf.score(X_test, y_test)))
