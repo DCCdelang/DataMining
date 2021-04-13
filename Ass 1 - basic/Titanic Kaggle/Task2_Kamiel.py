@@ -22,6 +22,7 @@ from sklearn.pipeline import Pipeline
 from scipy.cluster import hierarchy
 from collections import defaultdict
 from collections import defaultdict
+from sklearn.preprocessing import StandardScaler,MinMaxScaler,MaxAbsScaler,RobustScaler
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -64,9 +65,9 @@ x = df[["Pclass","PassengerId","Title_num","Binary_Sex","Family_Size","Age_div",
 y = df["Survived"]
 
 
-X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.9, test_size=0.1, random_state=11)
-pipeline = Pipeline([
-    ('classifier', RandomForestClassifier(criterion="entropy",  n_estimators=50, min_samples_leaf=2, max_depth=4, random_state=0))
+X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.8, test_size=0.2, random_state=11)
+pipeline = Pipeline([('scale', StandardScaler()),
+    ('classifier', RandomForestClassifier(criterion="entropy",  n_estimators=100, min_samples_leaf=2, max_depth=None, random_state=0))
 ])
 
 
@@ -79,14 +80,14 @@ pipeline = Pipeline([
 print(cross_validate(pipeline, X_test, y_test, cv=10)['test_score'].mean())
 
 hyperparameters = {                     
-                    'classifier__n_estimators': [50,100,500, 1000],
-                    'classifier__max_depth': [2, 4],
+                    'classifier__n_estimators': [25,50,75,100,500],
+                    'classifier__max_depth': [None,2, 4],
                     'classifier__min_samples_leaf': [2, 4],
                     'classifier__criterion': ['gini', 'entropy'],
 
                 }
 
-clf = GridSearchCV(pipeline, hyperparameters, cv = 5)
+clf = GridSearchCV(pipeline, hyperparameters, cv = 10)
 # Fit and tune model
 clf.fit(X_train, y_train)
 
