@@ -89,7 +89,7 @@ from sklearn.model_selection import cross_validate
 x = df[["Pclass","PassengerId","Title_num","Binary_Sex","Family_Size","Age_div","Fare","Is_alone"]]
 y = df["Survived"]
 
-X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.6, test_size=0.2, random_state=5)
+X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.8, test_size=0.2, random_state=5)
 
 clf = make_pipeline(StandardScaler(), SVC(gamma='auto'))
 print(cross_validate(clf, x, y, cv=10)['test_score'].mean())

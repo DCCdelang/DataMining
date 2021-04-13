@@ -23,9 +23,6 @@ def fill_age(df):
     predict = regr.predict(X_test)
     # print('Mean squared error: %.2f'
     #   % mean_squared_error(y_test, predict))
-    # The coefficient of determination: 1 is perfect prediction
-    # print('Coefficient of determination: %.2f'
-    #   % r2_score(y_test, predict))
 
     intercept = regr.intercept_
     b1 = regr.coef_[0]
