@@ -35,6 +35,8 @@ from sklearn.inspection import permutation_importance
 from sklearn.model_selection import train_test_split
 
 df = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/train.csv")
+print(df["Age"].isna().sum())
+print((df["Age"].isna().sum())/len((df["Age"])))
 df = Cleaner.Embarked(df)
 df = Cleaner.Class(df)
 
@@ -65,19 +67,39 @@ x = df[["Pclass","PassengerId","Title_num","Binary_Sex","Family_Size","Age_div",
 y = df["Survived"]
 
 
+
 X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.8, test_size=0.2, random_state=11)
 pipeline = Pipeline([('scale', StandardScaler()),
-    ('classifier', RandomForestClassifier(criterion="entropy",  n_estimators=100, min_samples_leaf=2, max_depth=None, random_state=0))
+    ('classifier', RandomForestClassifier(criterion="gini",  n_estimators=500, min_samples_leaf=2, max_depth=None, random_state=0))
 ])
 
+forest = RandomForestClassifier(criterion="gini",  n_estimators=100, min_samples_leaf=2, max_depth=None, random_state=0)
+forest.fit(x,y)
+importances = forest.feature_importances_
+std = np.std([tree.feature_importances_ for tree in forest.estimators_],
+             axis=0)
+indices = np.argsort(importances)[::-1]
 
+# Print the feature ranking
+print("Feature ranking:")
 
+for f in range(x.shape[1]):
+    print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
+
+# Plot the impurity-based feature importances of the forest
+plt.figure()
+plt.title("Feature importances")
+plt.bar(range(x.shape[1]), importances[indices],
+        color="r", yerr=std[indices], align="center")
+plt.xticks(range(x.shape[1]), indices)
+plt.xlim([-1, x.shape[1]])
+# plt.show()
 # clf = RandomForestClassifier()
 # y_pred = clf.fit(X_train, y_train).predict(X_test)
 # print(clf.score(X_test, y_test))
 # print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
 
-print(cross_validate(pipeline, X_test, y_test, cv=10)['test_score'].mean())
+print(cross_validate(pipeline, X_train, y_train, cv=10)['test_score'].mean())
 
 hyperparameters = {                     
                     'classifier__n_estimators': [25,50,75,100,500],
@@ -95,9 +117,9 @@ clf.fit(X_train, y_train)
 print(clf.best_params_)
 
 # refitting on entire training data using best settings
-clf.refit
+# clf.refit
 
-print(cross_validate(clf, X_test, y_test, cv=3)['test_score'].mean())
+# print(cross_validate(clf, X_test, y_test, cv=3)['test_score'].mean())
 
 
 
