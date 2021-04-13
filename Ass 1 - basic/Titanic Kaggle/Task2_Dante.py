@@ -4,8 +4,18 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.model_selection import StratifiedShuffleSplit
 import Cleaner
+from sklearn.pipeline import make_pipeline
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler,MinMaxScaler,MaxAbsScaler,RobustScaler
+from sklearn.svm import SVC,LinearSVC
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import make_pipeline
+from sklearn.model_selection import cross_validate
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import KFold
 
 Titan_data = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/train.csv")
+Titan_data_test = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/test.csv")
 
 """ 2A """
 def some_plots(Titan_data):
@@ -50,49 +60,85 @@ def some_plots(Titan_data):
 
 
 """ 2B """
-# Stratified sampling
-Titan_split_X = Titan_data.drop(columns=["Survived"])
-Titan_split_y = Titan_data["Survived"]
 
+def total_clean(df):
+    # Cleaner.Embarked(df)
+    Cleaner.Binary_Sex(df)
+    Cleaner.fill_age(df)
+    Cleaner.get_deck(df)
+    Cleaner.replace_titles(df)
+    Cleaner.title_num(df)
+    Cleaner.Binary_cabin(df)
+    Cleaner.family_size(df)
+    Cleaner.is_alone(df)
+    Cleaner.age_class(df)
+    df = df.drop(columns=["Name"])
+    df = df.drop(columns=["Sex"])
+    df = df.drop(columns=["Ticket"])
+    df = df.drop(columns=["Cabin"])
+    df["Fare"] = df["Fare"].fillna(0)
+    return df
 
-
-df = Titan_data
-
-# Cleaner.Embarked(df)
-Cleaner.Binary_Sex(df)
-Cleaner.fill_age(df)
-Cleaner.get_deck(df)
-Cleaner.replace_titles(df)
-Cleaner.title_num(df)
-Cleaner.Binary_cabin(df)
-Cleaner.family_size(df)
-Cleaner.is_alone(df)
-Cleaner.age_class(df)
-df = df.drop(columns=["Name"])
-df = df.drop(columns=["Sex"])
-df = df.drop(columns=["Ticket"])
-df = df.drop(columns=["Cabin"])
+df = total_clean(Titan_data)
+df_test = total_clean(Titan_data_test)
 
 # print(df.columns)
-
-# print(df["Title"].unique())
-
-print(df.head())
-
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler,MinMaxScaler,MaxAbsScaler,RobustScaler
-from sklearn.svm import SVC
-from sklearn.model_selection import train_test_split
-from sklearn.pipeline import make_pipeline
-from sklearn.model_selection import cross_validate
+# print(df.head())
 
 x = df[["Pclass","PassengerId","Title_num","Binary_Sex","Family_Size","Age_div","Fare","Is_alone"]]
 y = df["Survived"]
 
-X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.8, test_size=0.2, random_state=5)
+X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.7, random_state=0)
 
-clf = make_pipeline(StandardScaler(), SVC(gamma='auto'))
-print(cross_validate(clf, x, y, cv=10)['test_score'].mean())
+# Train on everything
+# X_train = x
+# y_train = y
+# X_test = df_test[["Pclass","PassengerId","Title_num","Binary_Sex","Family_Size","Age_div","Fare","Is_alone"]]
+
+# Choose from StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler
+feature_scaler = StandardScaler()
+
+pipeline1 = Pipeline([
+    ("scalar",feature_scaler),("classifier", SVC(kernel="poly",gamma="scale",degree = 1, probability= True, decision_function_shape = 'ovr',random_state=0))
+])
+
+pipeline2 = Pipeline([
+    ("scalar",feature_scaler),("classifier", LinearSVC(random_state=0,max_iter=100000))
+])
+
+# only for test setting
+print(cross_validate(pipeline1, X_test, y_test, cv=10)['test_score'].mean())
+
+hyperparam1 = {
+    'classifier__kernel': ["rbf","poly","sigmoid","linear"],
+    'classifier__gamma': ["scale","auto"],
+    'classifier__degree': [0.1,0.5,1,2,3],
+    'classifier__decision_function_shape': ["ovr","ovo"],
+    'classifier__probability' : [True, False]
+}
+
+hyperparam2 = {
+    # 'classifier__penalty': ["l1","l2"],
+    # 'classifier__loss': ["hinge","squared_hinge"],
+    'classifier__dual' : [True,False],
+    'classifier__C': [0.01,0.1,0.5,1],
+    'classifier__multi_class': ["ovr","crammer_singer"]
+}
+
+cv_test= KFold(n_splits=5)
+clf = GridSearchCV(pipeline1, hyperparam1, cv = cv_test)
+
+# Fit and tune model
+clf.fit(X_train, y_train)
+
+print(clf.best_params_)
+
+# only for test setting
+print(cross_validate(clf, X_test, y_test, cv=10)['test_score'].mean())
+
+# print(clf.predict(X_test))
+
+raise ValueError("You done!")
 
 N_splits = 5
 sss = StratifiedShuffleSplit(n_splits=N_splits, test_size=0.5, random_state=0)
