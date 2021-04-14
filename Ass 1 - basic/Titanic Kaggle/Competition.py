@@ -7,8 +7,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler,MinMaxScaler,MaxAbsScaler,RobustScaler
 
 
-def make_submission(train, test, clf):
-    features = ["Pclass","PassengerId","Title_num","Binary_Sex","Family_Size","Age_div","Fare","Is_alone"]
+def make_submission(train, test, clf, name):
+    features = ['Title_num', 'Sex_2', 'Fare', 'Age', 'Sex_1', 'Pclass_1','Pclass_2','Pclass_3', 'Family_Size']
     x = train[features]
     y = train["Survived"]  
     clf = clf.fit(x, y)
@@ -20,8 +20,10 @@ def make_submission(train, test, clf):
     dataframe = pd.DataFrame()
     dataframe["PassengerId"] = test["PassengerId"]
     dataframe["Survived"] = predictions
+    dataframe["Survived"] = dataframe["Survived"].astype(int)
     
-    dataframe.to_csv("Competition_SVC_2.csv", index=False)
+    print(list(predictions).count(1))
+    dataframe.to_csv(f"Competition_{name}.csv", index=False)
     print(predictions)
 
 
