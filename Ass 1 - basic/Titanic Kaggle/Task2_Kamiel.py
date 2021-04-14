@@ -30,7 +30,7 @@ from sklearn.inspection import permutation_importance
 from sklearn.model_selection import train_test_split
 import numpy as np
 import scipy.stats
-import Competition
+
 
 def mean_confidence_interval(data, confidence=0.95):
     a = 1.0 * np.array(data)
@@ -88,8 +88,9 @@ for feature in cat_features:
 df = pd.concat([df, *encoded_features[:6]], axis=1)
 
 # df = Cleaner.replace_titles(df)
-df_test = df.iloc[891:]
+
 df =  df.iloc[:891]
+df_test = df.iloc[891:]
 
 
 # l = ['Pclass', 'Age', 'SibSp', 'Parch', 'Fare', 'Family_Size', 'Family_Size_grouped', 'Is_alone', 'Title', 'Title_num', 'Binary_Sex', 'Cabin_Binary', 'SexClass', 'Age_div', 'AgeClass', 'Pclass_1', 'Pclass_2', 'Pclass_3', 'Sex_1', 'Sex_2', 'Deck_1', 'Deck_2', 'Deck_3', 'Deck_4', 'Embarked_1', 'Embarked_2', 'Embarked_3', 'Title_1', 'Title_2', 'Title_3', 'Title_4', 'Family_Size_grouped_1', 'Family_Size_grouped_2', 'Family_Size_grouped_3', 'Family_Size_grouped_4']
