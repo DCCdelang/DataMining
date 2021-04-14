@@ -47,8 +47,8 @@ df = pd.concat(frames)
 
 # print(df)
 
-# print(df["Age"].isna().sum())
-# print((df["Age"].isna().sum())/len((df["Age"])))
+print(df["Age"].isna().sum())
+print((df["Age"].isna().sum())/len((df["Age"])))
 
 
 # df = Cleaner.replace_titles(df)
@@ -92,24 +92,30 @@ df_test = df.iloc[891:]
 df =  df.iloc[:891]
 
 
-l = ['Pclass', 'Age', 'SibSp', 'Parch', 'Fare', 'Family_Size', 'Family_Size_grouped', 'Is_alone', 'Title', 'Title_num', 'Binary_Sex', 'Cabin_Binary', 'SexClass', 'Age_div', 'AgeClass', 'Pclass_1', 'Pclass_2', 'Pclass_3', 'Sex_1', 'Sex_2', 'Deck_1', 'Deck_2', 'Deck_3', 'Deck_4', 'Embarked_1', 'Embarked_2', 'Embarked_3', 'Title_1', 'Title_2', 'Title_3', 'Title_4', 'Family_Size_grouped_1', 'Family_Size_grouped_2', 'Family_Size_grouped_3', 'Family_Size_grouped_4']
-# new_df = new_df.dropna()
-features = ["Fare", "Age","SibSp","Binary_Sex", "Parch", "Cabin_Binary","SexClass",'Age_div',"AgeClass","Title_num", "Family_Size"]
+# l = ['Pclass', 'Age', 'SibSp', 'Parch', 'Fare', 'Family_Size', 'Family_Size_grouped', 'Is_alone', 'Title', 'Title_num', 'Binary_Sex', 'Cabin_Binary', 'SexClass', 'Age_div', 'AgeClass', 'Pclass_1', 'Pclass_2', 'Pclass_3', 'Sex_1', 'Sex_2', 'Deck_1', 'Deck_2', 'Deck_3', 'Deck_4', 'Embarked_1', 'Embarked_2', 'Embarked_3', 'Title_1', 'Title_2', 'Title_3', 'Title_4', 'Family_Size_grouped_1', 'Family_Size_grouped_2', 'Family_Size_grouped_3', 'Family_Size_grouped_4']
+# # new_df = new_df.dropna()
+# features = ["Fare", "Age","SibSp","Binary_Sex", "Parch", "Cabin_Binary","SexClass",'Age_div',"AgeClass","Title_num", "Family_Size"]
 # x = new_df[["Binary_Sex","Fare","SexClass","AgeClass","Title_num", "Family_Size","SibSp","Pclass"]]
-x = df[[ 'Deck_1', 'Deck_2', 'Deck_3', 'Deck_4', 'Title_num', 'Sex_2', 'Fare', 'Age', 'Sex_1', 'Pclass_1','Pclass_2','Pclass_3', 'Pclass_3', 'Family_Size']]
+x = df[['Title_num', 'Sex_2', 'Fare', 'Age', 'Sex_1', 'Pclass_1','Pclass_2','Pclass_3', 'Pclass_3', 'Family_Size']]
 y = df["Survived"]
 
 
 X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.8, test_size=0.2, random_state=11)
+
+
 pipeline = Pipeline([('scale', StandardScaler()),
     ('classifier', RandomForestClassifier(criterion="gini",  n_estimators=100, min_samples_leaf=4, max_depth=None, random_state=0))
 ])
+
+Competition.make_submission(df, df_test, pipeline,"Kamiel")
 
 pipeline1 = Pipeline([
     ("scalar",StandardScaler()),("classifier", SVC(kernel="rbf",gamma="scale",degree = 0.1, probability= True, decision_function_shape = 'ovr',random_state=0))
 ])
 
-Competition.make_submission(df, df_test, pipeline)
+Competition.make_submission(df, df_test, pipeline1,"Dante")
+
+
 # forest = RandomForestClassifier(criterion="gini",  n_estimators=75, min_samples_leaf=4, max_depth=None, random_state=0)
 # forest.fit(x,y)
 # importances = forest.feature_importances_
@@ -142,9 +148,14 @@ Competition.make_submission(df, df_test, pipeline)
 
 # print(cross_validate(pipeline, X_train, y_train, cv=10)['test_score'].mean())
 # print(cross_validate(pipeline, X_test, y_test, cv=10)['test_score'].mean())
+print("test, RF", mean_confidence_interval(cross_validate(pipeline, X_test, y_test, cv=10)['test_score']))
+print("train, RF", mean_confidence_interval(cross_validate(pipeline, X_train, y_train, cv=10)['test_score']))
 
-print("test", mean_confidence_interval(cross_validate(pipeline1, X_test, y_test, cv=10)['test_score']))
-print("train", mean_confidence_interval(cross_validate(pipeline1, X_train, y_train, cv=10)['test_score']))
+print("test, SVC", mean_confidence_interval(cross_validate(pipeline1, X_test, y_test, cv=10)['test_score']))
+print("train, SVC", mean_confidence_interval(cross_validate(pipeline1, X_train, y_train, cv=10)['test_score']))
+
+print(scipy.stats.ttest_ind((cross_validate(pipeline1, X_train, y_train, cv=10)['test_score']), cross_validate(pipeline, X_train, y_train, cv=10)['test_score']))
+print(scipy.stats.ttest_ind((cross_validate(pipeline1, X_test, y_test, cv=10)['test_score']), cross_validate(pipeline, X_train, y_train, cv=10)['test_score']))
 hyperparameters = {                     
                     'classifier__n_estimators': [25,50,75,100,500],
                     'classifier__max_depth': [None,2, 4],
@@ -153,16 +164,16 @@ hyperparameters = {
 
                 }
 
-hyperparameters1 = {
-    'classifier__kernel': ["rbf","poly","sigmoid","linear"],
-    'classifier__gamma': ["scale","auto"],
-    'classifier__degree': [0.1,0.5,1,2,3],
-    'classifier__decision_function_shape': ["ovr","ovo"],
-    'classifier__probability' : [True, False]
-}
+# hyperparameters1 = {
+#     'classifier__kernel': ["rbf","poly","sigmoid","linear"],
+#     'classifier__gamma': ["scale","auto"],
+#     'classifier__degree': [0.1,0.5,1,2,3],
+#     'classifier__decision_function_shape': ["ovr","ovo"],
+#     'classifier__probability' : [True, False]
+# }
 
 
-clf = GridSearchCV(pipeline1, hyperparameters1, cv = 10)
+clf = GridSearchCV(pipeline, hyperparameters, cv = 10)
 # Fit and tune model
 clf.fit(X_train, y_train)
 

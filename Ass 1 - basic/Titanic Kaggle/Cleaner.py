@@ -13,7 +13,7 @@ def fill_age(df):
     new_df = df
     new_df = new_df.dropna()
     new_df.dropna
-    X = new_df[[ "Family_Size", "Title_num", "Fare", "Pclass","Title_num", "SibSp"]]
+    X = new_df[[ "Family_Size", "Title_num", "Fare", "Pclass","SibSp"]]
     y = new_df["Age"]
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, train_size = 0.8, test_size=0.2, random_state=5)
@@ -22,14 +22,14 @@ def fill_age(df):
 
     
     predict = regr.predict(X_test)
-    # print('Mean squared error: %.2f'
-    #   % mean_squared_error(y_test, predict))
+    print(r2_score(y_test, predict))
 
     intercept = regr.intercept_
     b1 = regr.coef_[0]
     b2 = regr.coef_[1]
     b3 = regr.coef_[2]
     b4 = regr.coef_[3]
+    b5 = regr.coef_[4]
 
  
     # print('Intercept: \n', regr.intercept_
@@ -40,7 +40,7 @@ def fill_age(df):
     for i in df["Age"]:
         count +=1
         if math.isnan(i):
-            y = intercept + df.iloc[count]["Parch"] * b1 + df.iloc[count]["Binary_Sex"] * b2 + df.iloc[count]["Fare"] * b3 + df.iloc[count]["Pclass"] * b4
+            y = intercept + df.iloc[count]["Family_Size"] * b1 + df.iloc[count]["Title_num"] * b2 + df.iloc[count]["Fare"] * b3 + df.iloc[count]["Pclass"] * b4+ df.iloc[count]["SibSp"] * b5
             if (y) > 0:
                 df.loc[df.index[count], 'Age'] = y 
             else:
