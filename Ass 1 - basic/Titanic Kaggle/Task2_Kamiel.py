@@ -69,20 +69,11 @@ Cleaner.age_class(df)
 Cleaner.AgeClass(df)
 df['Fare'] = df['Fare'].fillna(0)
 
-<<<<<<< HEAD
-df['Fare'] = df['Fare'].fillna(0)
-
-non_num_features = ["Deck","Title","Age","Fare","Embarked"]
-=======
 non_num_features = ["Deck","Title","Age","Fare","Embarked","Family_Size_grouped"]
->>>>>>> ca0ba1b06afc2b0c79d70dcae2cdd81ec9ef8e16
 for feature in non_num_features:
     df[feature] = LabelEncoder().fit_transform(df[feature])
 
 
-<<<<<<< HEAD
-
-=======
 cat_features = ['Pclass', 'Sex', 'Deck', 'Embarked', 'Title', 'Family_Size_grouped']
 encoded_features = []
 
@@ -97,46 +88,51 @@ for feature in cat_features:
 df = pd.concat([df, *encoded_features[:6]], axis=1)
 
 # df = Cleaner.replace_titles(df)
->>>>>>> ca0ba1b06afc2b0c79d70dcae2cdd81ec9ef8e16
 
 df =  df.iloc[:891]
 df_test = df.iloc[891:]
 
+
+l = ['Pclass', 'Age', 'SibSp', 'Parch', 'Fare', 'Family_Size', 'Family_Size_grouped', 'Is_alone', 'Title', 'Title_num', 'Binary_Sex', 'Cabin_Binary', 'SexClass', 'Age_div', 'AgeClass', 'Pclass_1', 'Pclass_2', 'Pclass_3', 'Sex_1', 'Sex_2', 'Deck_1', 'Deck_2', 'Deck_3', 'Deck_4', 'Embarked_1', 'Embarked_2', 'Embarked_3', 'Title_1', 'Title_2', 'Title_3', 'Title_4', 'Family_Size_grouped_1', 'Family_Size_grouped_2', 'Family_Size_grouped_3', 'Family_Size_grouped_4']
 # new_df = new_df.dropna()
 features = ["Fare", "Age","SibSp","Binary_Sex", "Parch", "Cabin_Binary","SexClass",'Age_div',"AgeClass","Title_num", "Family_Size"]
 # x = new_df[["Binary_Sex","Fare","SexClass","AgeClass","Title_num", "Family_Size","SibSp","Pclass"]]
-x = df[["Pclass","Title","Binary_Sex","Family_Size","Age","Fare","Deck","SibSp","SexClass","Title_num"]]
+x = df[[ 'Deck_1', 'Deck_2', 'Deck_3', 'Deck_4', 'Title_num', 'Sex_2', 'Fare', 'Age', 'Sex_1', 'Pclass_1','Pclass_2','Pclass_3', 'Pclass_3', 'Family_Size']]
 y = df["Survived"]
 
 
 X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.8, test_size=0.2, random_state=11)
 pipeline = Pipeline([('scale', StandardScaler()),
-    ('classifier', RandomForestClassifier(criterion="entropy",  n_estimators=75, min_samples_leaf=4, max_depth=None, random_state=0))
+    ('classifier', RandomForestClassifier(criterion="gini",  n_estimators=100, min_samples_leaf=4, max_depth=None, random_state=0))
 ])
 
-forest = RandomForestClassifier(criterion="gini",  n_estimators=75, min_samples_leaf=4, max_depth=None, random_state=0)
-forest.fit(x,y)
-importances = forest.feature_importances_
-std = np.std([tree.feature_importances_ for tree in forest.estimators_],
-             axis=0)
-indices = np.argsort(importances)[::-1]
+# forest = RandomForestClassifier(criterion="gini",  n_estimators=75, min_samples_leaf=4, max_depth=None, random_state=0)
+# forest.fit(x,y)
+# importances = forest.feature_importances_
+# std = np.std([tree.feature_importances_ for tree in forest.estimators_],
+#              axis=0)
+# indices = np.argsort(importances)[::-1]
 
-# Print the feature ranking
-print("Feature ranking:")
+# # Print the feature ranking
+# print("Feature ranking:")
+# s = []
+# for f in range(x.shape[1]):
+#     s.append(l[indices[f]])
+#     if f == 10: 
+#         print(s)
+#         raise ValueError()
 
-for f in range(x.shape[1]):
-    print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
 
-# Plot the impurity-based feature importances of the forest
-plt.figure()
-plt.title("Feature importances")
-plt.bar(range(x.shape[1]), importances[indices],
-        color="r", yerr=std[indices], align="center")
-plt.xticks(range(x.shape[1]), indices)
-plt.xlim([-1, x.shape[1]])
-plt.show()
-clf = RandomForestClassifier()
-y_pred = clf.fit(X_train, y_train).predict(X_test)
+# # Plot the impurity-based feature importances of the forest
+# plt.figure()
+# plt.title("Feature importances")
+# plt.bar(range(x.shape[1]), importances[indices],
+#         color="r", yerr=std[indices], align="center")
+# plt.xticks(range(x.shape[1]), indices)
+# plt.xlim([-1, x.shape[1]])
+# plt.show()
+# clf = RandomForestClassifier()
+# y_pred = clf.fit(X_train, y_train).predict(X_test)
 # print(clf.score(X_test, y_test))
 # print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
 
