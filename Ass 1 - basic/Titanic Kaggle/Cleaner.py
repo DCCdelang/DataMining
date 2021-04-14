@@ -169,7 +169,19 @@ def title_num(df):
     return df
 
 def family_size(df):
-    df['Family_Size']=df['SibSp']+df['Parch']
+    df['Family_Size']=df['SibSp']+df['Parch']+1
+    # print(df["Family_Size"].unique())
+    Fam_grouped = []
+    for size in df["Family_Size"]:
+        if size == 1:
+            Fam_grouped.append("Alone")
+        if size > 1 and size < 5:
+            Fam_grouped.append("Small")
+        if size >= 5 and size < 7:
+            Fam_grouped.append("Medium")
+        if size >= 7:
+            Fam_grouped.append("Large")
+    df["Family_Size_grouped"] = Fam_grouped
     return df
 
 def is_alone(df):
