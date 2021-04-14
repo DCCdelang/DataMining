@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.naive_bayes import CategoricalNB
-from sklearn.svm import LinearSVC
+from sklearn.svm import LinearSVC, SVC
 from sklearn.pipeline import make_pipeline
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
@@ -106,6 +106,10 @@ pipeline = Pipeline([('scale', StandardScaler()),
     ('classifier', RandomForestClassifier(criterion="gini",  n_estimators=100, min_samples_leaf=4, max_depth=None, random_state=0))
 ])
 
+pipeline1 = Pipeline([
+    ("scalar",StandardScaler()),("classifier", SVC(kernel="rbf",gamma="scale",degree = 0.1, probability= True, decision_function_shape = 'ovr',random_state=0))
+])
+
 # forest = RandomForestClassifier(criterion="gini",  n_estimators=75, min_samples_leaf=4, max_depth=None, random_state=0)
 # forest.fit(x,y)
 # importances = forest.feature_importances_
@@ -139,8 +143,8 @@ pipeline = Pipeline([('scale', StandardScaler()),
 # print(cross_validate(pipeline, X_train, y_train, cv=10)['test_score'].mean())
 # print(cross_validate(pipeline, X_test, y_test, cv=10)['test_score'].mean())
 
-print("test", mean_confidence_interval(cross_validate(pipeline, X_test, y_test, cv=10)['test_score']))
-print("train", mean_confidence_interval(cross_validate(pipeline, X_train, y_train, cv=10)['test_score']))
+print("test", mean_confidence_interval(cross_validate(pipeline1, X_test, y_test, cv=10)['test_score']))
+print("train", mean_confidence_interval(cross_validate(pipeline1, X_train, y_train, cv=10)['test_score']))
 hyperparameters = {                     
                     'classifier__n_estimators': [25,50,75,100,500],
                     'classifier__max_depth': [None,2, 4],
@@ -149,7 +153,16 @@ hyperparameters = {
 
                 }
 
-clf = GridSearchCV(pipeline, hyperparameters, cv = 10)
+hyperparameters1 = {
+    'classifier__kernel': ["rbf","poly","sigmoid","linear"],
+    'classifier__gamma': ["scale","auto"],
+    'classifier__degree': [0.1,0.5,1,2,3],
+    'classifier__decision_function_shape': ["ovr","ovo"],
+    'classifier__probability' : [True, False]
+}
+
+
+clf = GridSearchCV(pipeline1, hyperparameters1, cv = 10)
 # Fit and tune model
 clf.fit(X_train, y_train)
 
@@ -159,10 +172,10 @@ print(clf.best_params_)
 # refitting on entire training data using best settings
 # clf.refit
 
-# print(cross_validate(clf, X_test, y_test, cv=3)['test_score'].mean())
+print(cross_validate(clf, X_test, y_test, cv=3)['test_score'].mean())
 
 
-
+# raise ValueError
 
 
 clf = ExtraTreesClassifier(n_estimators=50, max_depth=None, min_samples_split=2, random_state=0)
