@@ -13,14 +13,14 @@ def fill_age(df):
     new_df = df
     new_df = new_df.dropna()
     new_df.dropna
-    X = new_df[[ "Family_Size", "Fare", "Pclass","Title_num", "Is_alone", "SibSp"]]
+    X = new_df[[ "Family_Size", "Title_num", "Fare", "Pclass","Title_num", "SibSp"]]
     y = new_df["Age"]
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, train_size = 0.8, test_size=0.2, random_state=5)
     regr = linear_model.LinearRegression()
     regr.fit(X_train, y_train)
 
-    print(regr.score(X, y, sample_weight=None))
+    
     predict = regr.predict(X_test)
     # print('Mean squared error: %.2f'
     #   % mean_squared_error(y_test, predict))

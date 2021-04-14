@@ -63,10 +63,12 @@ Cleaner.Binary_Sex(df)
 Cleaner.Binary_cabin(df)
 Cleaner.SexClass(df)
 Cleaner.family_size(df)
+
 Cleaner.fill_age(df)
 Cleaner.age_class(df)
 Cleaner.AgeClass(df)
 
+df['Fare'] = df['Fare'].fillna(0)
 
 non_num_features = ["Deck","Title","Age","Fare","Embarked"]
 for feature in non_num_features:
@@ -74,7 +76,7 @@ for feature in non_num_features:
 
 # df = Cleaner.replace_titles(df)
 
-df['Fare'] = df['Fare'].fillna(0)
+
 
 df =  df.iloc[:891]
 df_test = df.iloc[891:]
@@ -88,10 +90,10 @@ y = df["Survived"]
 
 X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.8, test_size=0.2, random_state=11)
 pipeline = Pipeline([('scale', StandardScaler()),
-    ('classifier', RandomForestClassifier(criterion="gini",  n_estimators=75, min_samples_leaf=4, max_depth=None, random_state=0))
+    ('classifier', RandomForestClassifier(criterion="entropy",  n_estimators=75, min_samples_leaf=4, max_depth=None, random_state=0))
 ])
 
-forest = RandomForestClassifier(criterion="gini",  n_estimators=25, min_samples_leaf=4, max_depth=None, random_state=0)
+forest = RandomForestClassifier(criterion="gini",  n_estimators=75, min_samples_leaf=4, max_depth=None, random_state=0)
 forest.fit(x,y)
 importances = forest.feature_importances_
 std = np.std([tree.feature_importances_ for tree in forest.estimators_],
@@ -114,11 +116,11 @@ plt.xlim([-1, x.shape[1]])
 plt.show()
 clf = RandomForestClassifier()
 y_pred = clf.fit(X_train, y_train).predict(X_test)
-print(clf.score(X_test, y_test))
-print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
+# print(clf.score(X_test, y_test))
+# print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
 
-print(cross_validate(pipeline, X_train, y_train, cv=10)['test_score'].mean())
-print(cross_validate(pipeline, X_test, y_test, cv=10)['test_score'].mean())
+# print(cross_validate(pipeline, X_train, y_train, cv=10)['test_score'].mean())
+# print(cross_validate(pipeline, X_test, y_test, cv=10)['test_score'].mean())
 
 print("test", mean_confidence_interval(cross_validate(pipeline, X_test, y_test, cv=10)['test_score']))
 print("train", mean_confidence_interval(cross_validate(pipeline, X_train, y_train, cv=10)['test_score']))
