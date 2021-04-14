@@ -6,8 +6,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler,MinMaxScaler,MaxAbsScaler,RobustScaler
 def make_submission(clf):
-    df = pd.read_csv("Data/test.csv")
-    df = pd.read_csv("Data/train.csv")
+    df = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/test.csv")
+    df = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/train.csv")
 
     df = Cleaner.Class(df)
     df = Cleaner.Binary_Sex(df)
@@ -29,7 +29,7 @@ def make_submission(clf):
 
     clf = clf.fit(x, y)
 
-    df = pd.read_csv("Data/test.csv")
+    df = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/test.csv")
     df = Cleaner.Class(df)
     df = Cleaner.Binary_Sex(df)
     df = Cleaner.Binary_cabin(df)
@@ -53,12 +53,12 @@ def make_submission(clf):
     dataframe["PassengerId"] = df["PassengerId"]
     dataframe["Survived"] = predictions
     
-    dataframe.to_csv("Competition.csv", index=False)
+    dataframe.to_csv("Competition_SVC_2.csv", index=False)
     print(predictions)
 
 
-pipeline = Pipeline([('scale', StandardScaler()),
-    ('classifier', RandomForestClassifier(criterion="entropy",  n_estimators=100, min_samples_leaf=2, max_depth=None, random_state=0))
-])
+# pipeline = Pipeline([('scale', StandardScaler()),
+#     ('classifier', RandomForestClassifier(criterion="entropy",  n_estimators=100, min_samples_leaf=2, max_depth=None, random_state=0))
+# ])
 
-make_submission(pipeline)
+# make_submission(pipeline)

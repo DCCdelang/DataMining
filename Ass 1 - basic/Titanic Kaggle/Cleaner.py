@@ -81,8 +81,10 @@ def Embarked(df):
     em = ["C","Q","S", "0"]
     for i in range(4):
         df = df.rename(columns={i:em[i]})
+    return df
 
-
+def Embarked_2(df):
+    df["Embarked"] = df["Embarked"].fillna('S')
     return df
 
 def get_deck(df):
@@ -91,8 +93,25 @@ def get_deck(df):
         if str(cabin)[0] != "n":
             floor_list.append(str(cabin)[0])
         else:
-            floor_list.append(np.nan)
-    df["deck"] = floor_list
+            floor_list.append(0)
+    
+    floor_combined = []
+    for deck in floor_list:
+        if deck == "A" or deck == "B" or deck == "C" or deck == "T":
+            floor_combined.append("ABC")
+        if deck == "D" or deck == "E":
+            floor_combined.append("DE")
+        if deck == "F" or deck == "G":
+            floor_combined.append("FG")
+        if deck == 0:
+            floor_combined.append("M")
+
+    df["Deck"] = floor_combined
+    
+
+
+
+
 
 def substrings_in_string(big_string, substrings):
     for substring in substrings:
