@@ -111,8 +111,8 @@ clf = SVC(kernel="linear",gamma="scale",degree = 0.1, probability= True, decisio
 
 clf.fit(X_train, y_train)
 
-# plot_confusion_matrix(clf, X_test, y_test)  
-# plt.show()  
+plot_confusion_matrix(clf, X_test, y_test)  
+plt.show()  
 
 # from sklearn.metrics import roc_curve
 # y = np.array([1, 1, 2, 2])
