@@ -55,6 +55,7 @@ def run_forest(df, y, test_size):
                     'classifier__learning_rate': [0.1, 0.2],
                     'classifier__n_estimators': [50,100, 1000],
                     'classifier__max_depth': [2, 4],
+                    'classifier__min_samples_leaf': [2, 4],
                     'classifier__min_samples_leaf': [2, 4]
                   }
     clf = GridSearchCV(pipeline, hyperparameters, cv = 3)
