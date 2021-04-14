@@ -8,7 +8,12 @@ from sklearn.preprocessing import StandardScaler,MinMaxScaler,MaxAbsScaler,Robus
 
 
 def make_submission(clf):
+<<<<<<< HEAD
     df = pd.read_csv("Data/train.csv")
+=======
+    df = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/test.csv")
+    df = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/train.csv")
+>>>>>>> d77004ac4f4a6050e276b49130ab2fcb5739ec8b
 
     df = Cleaner.Class(df)
     df = Cleaner.Binary_Sex(df)
@@ -30,7 +35,7 @@ def make_submission(clf):
 
     clf = clf.fit(x, y)
 
-    df = pd.read_csv("Data/test.csv")
+    df = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/test.csv")
     df = Cleaner.Class(df)
     df = Cleaner.Binary_Sex(df)
     df = Cleaner.Binary_cabin(df)
@@ -53,6 +58,7 @@ def make_submission(clf):
     dataframe["PassengerId"] = df["PassengerId"]
     dataframe["Survived"] = predictions
     
+<<<<<<< HEAD
     dataframe.to_csv("Competition_20.csv", index=False)
     print(list(predictions).count(1))
 
@@ -62,3 +68,14 @@ pipeline = Pipeline([('scale', StandardScaler()),
 ])
 
 make_submission(pipeline)
+=======
+    dataframe.to_csv("Competition_SVC_2.csv", index=False)
+    print(predictions)
+
+
+# pipeline = Pipeline([('scale', StandardScaler()),
+#     ('classifier', RandomForestClassifier(criterion="entropy",  n_estimators=100, min_samples_leaf=2, max_depth=None, random_state=0))
+# ])
+
+# make_submission(pipeline)
+>>>>>>> d77004ac4f4a6050e276b49130ab2fcb5739ec8b

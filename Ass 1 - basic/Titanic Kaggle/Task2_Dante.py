@@ -4,9 +4,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.model_selection import StratifiedShuffleSplit
 import Cleaner
+import Competition
 from sklearn.pipeline import make_pipeline
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler,MinMaxScaler,MaxAbsScaler,RobustScaler
+from sklearn.preprocessing import OneHotEncoder,LabelEncoder,StandardScaler,MinMaxScaler,MaxAbsScaler,RobustScaler
 from sklearn.svm import SVC,LinearSVC
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
@@ -60,14 +61,13 @@ def some_plots(Titan_data):
 
 
 """ 2B """
-
 def total_clean(df):
-    # Cleaner.Embarked(df)
+    Cleaner.Embarked_2(df)
     Cleaner.Binary_Sex(df)
     Cleaner.fill_age(df)
     Cleaner.get_deck(df)
     Cleaner.replace_titles(df)
-    Cleaner.title_num(df)
+    # Cleaner.title_num(df)
     Cleaner.Binary_cabin(df)
     Cleaner.family_size(df)
     Cleaner.is_alone(df)
@@ -82,13 +82,20 @@ def total_clean(df):
 df = total_clean(Titan_data)
 df_test = total_clean(Titan_data_test)
 
+non_num_features = ["Deck","Title","Age","Fare","Embarked"]
+for feature in non_num_features:
+    df[feature] = LabelEncoder().fit_transform(df[feature])
+
 # print(df.columns)
 # print(df.head())
 
-x = df[["Pclass","PassengerId","Title_num","Binary_Sex","Family_Size","Age_div","Fare","Is_alone"]]
+# raise ValueError
+
+x = df[["Pclass","Title","Binary_Sex","Family_Size","Age","Fare","Is_alone", "Deck", "Embarked"]]
+
 y = df["Survived"]
 
-X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.7, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.6, random_state=0)
 
 # Train on everything
 # X_train = x
@@ -98,8 +105,27 @@ X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.7, rand
 # Choose from StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler
 feature_scaler = StandardScaler()
 
+from sklearn.metrics import plot_confusion_matrix
+
+clf = SVC(kernel="linear",gamma="scale",degree = 0.1, probability= True, decision_function_shape = 'ovr',random_state=0)
+
+clf.fit(X_train, y_train)
+
+# plot_confusion_matrix(clf, X_test, y_test)  
+# plt.show()  
+
+# from sklearn.metrics import roc_curve
+# y = np.array([1, 1, 2, 2])
+# scores = np.array([0.1, 0.4, 0.35, 0.8])
+# fpr, tpr, thresholds = roc_curve(y, scores, pos_label=2)
+
+# plt.plot(fpr,tpr)
+# plt.show()
+
+# raise ValueError("You done!")
+
 pipeline1 = Pipeline([
-    ("scalar",feature_scaler),("classifier", SVC(kernel="poly",gamma="scale",degree = 1, probability= True, decision_function_shape = 'ovr',random_state=0))
+    ("scalar",feature_scaler),("classifier", SVC(kernel="linear",gamma="scale",degree = 0.1, probability= True, decision_function_shape = 'ovr',random_state=0))
 ])
 
 pipeline2 = Pipeline([
@@ -138,6 +164,8 @@ print(cross_validate(clf, X_train, y_train, cv=10)['test_score'].mean())
 
 # only for test setting
 print(cross_validate(clf, X_test, y_test, cv=10)['test_score'].mean())
+
+# Competition.make_submission(clf)
 
 # print(clf.predict(X_test))
 
