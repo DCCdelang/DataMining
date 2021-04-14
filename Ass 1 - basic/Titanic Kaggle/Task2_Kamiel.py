@@ -33,39 +33,56 @@ from sklearn.datasets import load_breast_cancer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.inspection import permutation_importance
 from sklearn.model_selection import train_test_split
+import numpy as np
+import scipy.stats
 
-df = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/train.csv")
-print(df["Age"].isna().sum())
-print((df["Age"].isna().sum())/len((df["Age"])))
-df = Cleaner.Embarked(df)
-df = Cleaner.Class(df)
+
+def mean_confidence_interval(data, confidence=0.95):
+    a = 1.0 * np.array(data)
+    n = len(a)
+    m, se = np.mean(a), scipy.stats.sem(a)
+    h = se * scipy.stats.t.ppf((1 + confidence) / 2., n-1)
+    return round(m,3), round(m-h,3), round(m+h,3)
+    
+df1 = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/train.csv")
+df2 = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/test.csv")
+
+frames = [df1, df2]
+df = pd.concat(frames)
+
+# print(df)
+
+# print(df["Age"].isna().sum())
+# print((df["Age"].isna().sum())/len((df["Age"])))
 
 
 # df = Cleaner.replace_titles(df)
-df = Cleaner.Class(df)
-df = Cleaner.Binary_Sex(df)
-df = Cleaner.Binary_cabin(df)
-df = Cleaner.SexClass(df)
-df = Cleaner.family_size(df)
-df = Cleaner.fill_age(df)
-df = Cleaner.age_class(df)
-df = Cleaner.AgeClass(df)
-df = Cleaner.replace_titles(df)
-df = Cleaner.title_num(df)
-
 Cleaner.family_size(df)
 Cleaner.is_alone(df)
+Cleaner.replace_titles(df)
+Cleaner.title_num(df)
+Cleaner.Class(df)
+Cleaner.Binary_Sex(df)
+Cleaner.Binary_cabin(df)
+Cleaner.SexClass(df)
+Cleaner.family_size(df)
+Cleaner.fill_age(df)
+Cleaner.age_class(df)
+Cleaner.AgeClass(df)
+
+
 # df = Cleaner.replace_titles(df)
 
+df['Fare'] = df['Fare'].fillna(0)
 
-print(df.columns)
+df =  df.iloc[:891]
+df_test = df.iloc[891:]
 
 # new_df = new_df.dropna()
-features = ["Fare", "Age","SibSp", "Survived","Binary_Sex", "Parch","C1","C2","C3", "Cabin_Binary","SexClass",'C', 'Q', 'S', '0','Age_div',"AgeClass","Title_num", "Family_Size"]
+features = ["Fare", "Age","SibSp","Binary_Sex", "Parch", "Cabin_Binary","SexClass",'Age_div',"AgeClass","Title_num", "Family_Size"]
 # x = new_df[["Binary_Sex","Fare","SexClass","AgeClass","Title_num", "Family_Size","SibSp","Pclass"]]
-x = df[["Pclass","PassengerId","Title_num","Binary_Sex","Family_Size","Age_div","Fare","Is_alone"]]
+x = df[["Pclass","Title_num","Binary_Sex","Family_Size","Age_div","Fare","Is_alone"]]
 y = df["Survived"]
-
 
 
 X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.8, test_size=0.2, random_state=11)
@@ -73,26 +90,26 @@ pipeline = Pipeline([('scale', StandardScaler()),
     ('classifier', RandomForestClassifier(criterion="gini",  n_estimators=500, min_samples_leaf=2, max_depth=None, random_state=0))
 ])
 
-forest = RandomForestClassifier(criterion="gini",  n_estimators=100, min_samples_leaf=2, max_depth=None, random_state=0)
-forest.fit(x,y)
-importances = forest.feature_importances_
-std = np.std([tree.feature_importances_ for tree in forest.estimators_],
-             axis=0)
-indices = np.argsort(importances)[::-1]
+# forest = RandomForestClassifier(criterion="gini",  n_estimators=100, min_samples_leaf=2, max_depth=None, random_state=0)
+# forest.fit(x,y)
+# importances = forest.feature_importances_
+# std = np.std([tree.feature_importances_ for tree in forest.estimators_],
+#              axis=0)
+# indices = np.argsort(importances)[::-1]
 
 # Print the feature ranking
-print("Feature ranking:")
+# print("Feature ranking:")
 
-for f in range(x.shape[1]):
-    print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
+# for f in range(x.shape[1]):
+#     print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
 
 # Plot the impurity-based feature importances of the forest
-plt.figure()
-plt.title("Feature importances")
-plt.bar(range(x.shape[1]), importances[indices],
-        color="r", yerr=std[indices], align="center")
-plt.xticks(range(x.shape[1]), indices)
-plt.xlim([-1, x.shape[1]])
+# plt.figure()
+# plt.title("Feature importances")
+# plt.bar(range(x.shape[1]), importances[indices],
+#         color="r", yerr=std[indices], align="center")
+# plt.xticks(range(x.shape[1]), indices)
+# plt.xlim([-1, x.shape[1]])
 # plt.show()
 # clf = RandomForestClassifier()
 # y_pred = clf.fit(X_train, y_train).predict(X_test)
@@ -100,7 +117,10 @@ plt.xlim([-1, x.shape[1]])
 # print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
 
 print(cross_validate(pipeline, X_train, y_train, cv=10)['test_score'].mean())
+print(cross_validate(pipeline, X_test, y_test, cv=10)['test_score'].mean())
 
+print("test", mean_confidence_interval(cross_validate(pipeline, X_test, y_test, cv=10)['test_score']))
+print("train", mean_confidence_interval(cross_validate(pipeline, X_train, y_train, cv=10)['test_score']))
 hyperparameters = {                     
                     'classifier__n_estimators': [25,50,75,100,500],
                     'classifier__max_depth': [None,2, 4],
