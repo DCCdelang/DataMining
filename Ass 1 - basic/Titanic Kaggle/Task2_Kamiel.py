@@ -31,6 +31,8 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import scipy.stats
 
+import Competition
+
 
 def mean_confidence_interval(data, confidence=0.95):
     a = 1.0 * np.array(data)
@@ -110,11 +112,11 @@ pipeline = Pipeline([('scale', StandardScaler()),
 
 Competition.make_submission(df, df_test, pipeline,"Kamiel")
 
-pipeline1 = Pipeline([
-    ("scalar",StandardScaler()),("classifier", SVC(kernel="rbf",gamma="scale",degree = 0.1, probability= True, decision_function_shape = 'ovr',random_state=0))
-])
+# pipeline1 = Pipeline([
+#     ("scalar",StandardScaler()),("classifier", SVC(kernel="rbf",gamma="scale",degree = 0.1, probability= True, decision_function_shape = 'ovr',random_state=0))
+# ])
 
-Competition.make_submission(df, df_test, pipeline1,"Dante")
+# Competition.make_submission(df, df_test, pipeline1,"Dante")
 
 
 # forest = RandomForestClassifier(criterion="gini",  n_estimators=75, min_samples_leaf=4, max_depth=None, random_state=0)
