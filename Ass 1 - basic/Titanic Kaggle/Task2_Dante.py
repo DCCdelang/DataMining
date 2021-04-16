@@ -4,7 +4,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.model_selection import StratifiedShuffleSplit
 
-Titan_data = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/train.csv")
+Titan_data = pd.read_csv("Data/train.csv")
 
 """ 2A """
 def some_plots(Titan_data):
@@ -42,7 +42,7 @@ def some_plots(Titan_data):
     Freq_table3 = pd.crosstab(index=Titan_data['Pclass'], columns=Titan_data['Embarked'])
     print(Freq_table3,"\n")
 
-# some_plots(Titan_data)
+some_plots(Titan_data)
 
 """ Transformation on original dataset """
 
@@ -61,7 +61,7 @@ get_deck(df)
 
 """ 2B """
 # Stratified sampling
-Titan_data_validation = pd.read_csv("Ass 1 - basic/Titanic Kaggle/Data/test.csv")
+Titan_data_validation = pd.read_csv("Data/test.csv")
 
 Titan_split_X = Titan_data.drop(columns=["Survived"])
 Titan_split_y = Titan_data["Survived"]
