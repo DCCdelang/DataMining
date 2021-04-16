@@ -223,10 +223,16 @@ def bedtime_parser(df):
                 Hours.append(hour_int)
         else:
             Hours.append(23)
+    New_hours = []
+    for hour in Hours:
+        if hour <12:
+            New_hours.append(hour+12)
+        if hour >=12:
+            New_hours.append(hour-12)
     
-    
-            
-    df["Bedtime_Hour_c"] = Hours
+
+    df["Bedtime_Hour_c1"] = Hours
+    df["Bedtime_Hour_c2"] = New_hours
     return df
 
 def calc_age(df):

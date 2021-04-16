@@ -78,7 +78,7 @@ if __name__ == "__main__":
     Data_cleaner.neighbors_cleaner(df)
     Data_cleaner.birth_date_cleaner(df)
     Data_cleaner.calc_age(df)
-    # Data_cleaner.binarize(df)
+    Data_cleaner.binarize(df)
     Assignment_1_Louky.RN_cleaner2(df)
 
     print("Amount of colomns = ", df.shape[1])
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     df.to_csv("Task 1/Data/ODI-Clean.csv")
 
     # print(df.head())
-    raise ValueError
+
     # Some plots
     plt.plot(df["Bedtime_Hour_c"],df["Stress_c"],".")
     plt.show()
