@@ -12,7 +12,7 @@ Mostly build upon info from:
 https://stackabuse.com/python-for-nlp-creating-bag-of-words-model-from-scratch/
 """
 
-df = pd.read_csv("Ass 1 - basic/Task 3/Sms_new.csv")
+df = pd.read_csv("Task 3/Sms_new.csv")
 
 for count, text in enumerate(df["text"]):
     text = str(text)
@@ -65,7 +65,7 @@ df_wordvec["Label"] = label_vec
 
 print(df_wordvec.head())
 
-df_wordvec.to_csv("Ass 1 - basic/Task 3/sms_vec.csv")
+# df_wordvec.to_csv("Ass 1 - basic/Task 3/sms_vec.csv")
 
 
 

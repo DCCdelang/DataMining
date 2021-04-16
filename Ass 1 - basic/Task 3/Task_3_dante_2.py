@@ -16,27 +16,26 @@ y = df["Label"]
 
 X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.6, random_state=0)
 
-clf = SVC()
+clf = SVC(degree=1,gamma="scale",kernel="sigmoid")
 
 clf.fit(X_train, y_train)
 
 feature_scaler = StandardScaler()
 pipeline1 = Pipeline([
-    ("scalar",feature_scaler),("classifier", SVC())
+    ("scalar",feature_scaler),("classifier", SVC(degree=1,gamma="scale",kernel="sigmoid"))
 ])
 
 print(cross_validate(pipeline1, X_test, y_test, cv=10)['test_score'].mean())
 
+raise ValueError
+
 hyperparam1 = {
-    'classifier__kernel': ["rbf","poly","sigmoid","linear"],
+    'classifier__kernel': ["rbf","poly","sigmoid"],
     'classifier__gamma': ["scale","auto"],
-    'classifier__degree': [0.1,0.5,1,2,3],
-    'classifier__decision_function_shape': ["ovr","ovo"],
-    'classifier__probability' : [True, False]
+    'classifier__degree': [0.1,0.5,1,2,3]
 }
 
-cv_test= KFold(n_splits=5)
-clf = GridSearchCV(pipeline1, hyperparam1, cv = cv_test, verbose=2)
+clf = GridSearchCV(pipeline1, hyperparam1, cv = 5, verbose=3)
 
 # Fit and tune model
 clf.fit(X_train, y_train)

@@ -127,12 +127,12 @@ def programme_cleaner(df):
 
 def neighbors_cleaner(df):
     df['Neighbors_c'] = df['Neighbours'].fillna(0)
-    df.iloc[32, df.columns.get_loc('Neighbors_c')] = 0
-    df.iloc[79, df.columns.get_loc('Neighbors_c')] = 0  
-    df.iloc[218, df.columns.get_loc('Neighbors_c')] = 1
-    df.iloc[219, df.columns.get_loc('Neighbors_c')] = 0
-    df.iloc[298, df.columns.get_loc('Neighbors_c')] = 2
-    df.iloc[266, df.columns.get_loc('Neighbors_c')] = 0
+    df.iloc[33, df.columns.get_loc('Neighbors_c')] = 0
+    df.iloc[80, df.columns.get_loc('Neighbors_c')] = 0  
+    df.iloc[221, df.columns.get_loc('Neighbors_c')] = 1
+    df.iloc[222, df.columns.get_loc('Neighbors_c')] = 0
+    df.iloc[304, df.columns.get_loc('Neighbors_c')] = 2
+    df.iloc[267, df.columns.get_loc('Neighbors_c')] = 0
     
     df = df.replace({'Neighbors_c' : { 8979937 : 0, 300 : 0, 265 : 0, 200: 0}})
     

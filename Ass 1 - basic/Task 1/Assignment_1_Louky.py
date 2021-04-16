@@ -20,12 +20,12 @@ pd.options.mode.chained_assignment = None  # default='warn'
 
 
 # ODI_data = pd.read_csv("Data/ODI-2021.csv")
-ODI_data = pd.read_csv("Data/ODI-2021.csv")
+# ODI_data = pd.read_csv("Data/ODI-2021.csv")
 
 # print(ODI_data.head())
 
-print("Amount of colomns = ", ODI_data.shape[1])
-print("Amount of answers = ", ODI_data.shape[0])
+# print("Amount of colomns = ", ODI_data.shape[1])
+# print("Amount of answers = ", ODI_data.shape[0])
 
 
 def chocolate_gender(df):    

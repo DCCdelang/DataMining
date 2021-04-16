@@ -7,16 +7,17 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import Data_cleaner
 # import Assignment_1_Kamiel
-# import Assignment_1_Louky
+import Assignment_1_Louky
 import nltk
-nltk.download('vader_lexicon')
+# nltk.download('vader_lexicon')
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 sid = SentimentIntensityAnalyzer()
 import flair
 flair_sentiment = flair.models.TextClassifier.load('en-sentiment')
 import re
 
-ODI_data = pd.read_csv("Ass 1 - basic/Data/ODI-2021.csv")
+ODI_data = pd.read_csv("Task 1/Data/ODI-2021.csv")
+
 
 """ Properties of dataset """
 
@@ -73,7 +74,20 @@ if __name__ == "__main__":
     Data_cleaner.stress_cleaner(df)
     Data_cleaner.se_cleaner(df)
     Data_cleaner.remove_nan(df)
+    Data_cleaner.programme_cleaner(df)
+    Data_cleaner.neighbors_cleaner(df)
+    Data_cleaner.birth_date_cleaner(df)
+    Data_cleaner.calc_age(df)
+    # Data_cleaner.binarize(df)
+    Assignment_1_Louky.RN_cleaner2(df)
 
+    print("Amount of colomns = ", df.shape[1])
+    print("Amount of answers = ", df.shape[0])
+    print(df.columns)
+    df.to_csv("Task 1/Data/ODI-Clean.csv")
+
+    # print(df.head())
+    raise ValueError
     # Some plots
     plt.plot(df["Bedtime_Hour_c"],df["Stress_c"],".")
     plt.show()
