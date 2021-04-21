@@ -1,4 +1,0 @@
-.git 
-.gitignore
-
-\Ass 2\Data
