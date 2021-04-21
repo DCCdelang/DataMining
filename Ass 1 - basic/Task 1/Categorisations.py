@@ -22,6 +22,8 @@ from sklearn import linear_model
 
 from sklearn import svm
 
+import scipy.stats as stats
+
 def tree(df, features, y):
    x = df[features]
    y = df[y]
@@ -139,8 +141,8 @@ def forest_2(df, y, test_size, seed = 43, fold = 10):
     #print('Mean Absolute Percentage Error (MAPE):', round(mape * 100, 2))
     #print('Accuracy:', round(100*(1 - mape), 2))
     
-    print('mae', mae)
-    print('r2',metrics.r2_score(y_test, predicts))
+    #print('mae', mae)
+    #print('r2',metrics.r2_score(y_test, predicts))
     
     #choose metrics to score the fit
     scoring = ['r2', 'neg_mean_absolute_error']
@@ -151,13 +153,17 @@ def forest_2(df, y, test_size, seed = 43, fold = 10):
     r2 = cross_val['test_r2']
     neg_mae = cross_val['test_neg_mean_absolute_error']
     print('Fold is', fold)
-    print()
+    
+    print("MAE")
+    print('neg mae mean', neg_mae.mean())
+    print('neg mae std', neg_mae.std())
+    
+    print("R2")
     print('r2 mean', r2.mean())
     print('r2 std', r2.std())
     
-    print()
-    print('neg mae mean', neg_mae.mean())
-    print('neg mae std', neg_mae.std())
+    return r2
+
     
 def svm_model(df, y, test_size, fold = 10):
     pipeline = Pipeline([
@@ -186,14 +192,17 @@ def svm_model(df, y, test_size, fold = 10):
     r2 = cross_val['test_r2']
     neg_mae = cross_val['test_neg_mean_absolute_error']
     print('Fold is', fold)
-    print()
+    print("MAE")
+    print('neg mae mean', neg_mae.mean())
+    print('neg mae std', neg_mae.std())
+    
+    print("R2")
     print('r2 mean', r2.mean())
     print('r2 std', r2.std())
     
-    print()
-    print('neg mae mean', neg_mae.mean())
-    print('neg mae std', neg_mae.std())
-
+    print(cross_val['test_r2'])
+    
+    return r2
 
 
 def bayes(df, features, y):

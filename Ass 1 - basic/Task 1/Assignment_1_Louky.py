@@ -18,9 +18,10 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 pd.options.mode.chained_assignment = None  # default='warn'
 
+import scipy.stats as stats
 
-# ODI_data = pd.read_csv("Data/ODI-2021.csv")
-# ODI_data = pd.read_csv("Data/ODI-2021.csv")
+ODI_data = pd.read_csv("Data/ODI-2021.csv")
+ODI_data_2 = pd.read_csv("Data/ODI-clean.csv")
 
 # print(ODI_data.head())
 
@@ -158,7 +159,7 @@ def main():
     df = Data_cleaner.se_cleaner(df)
     df = df.dropna()
     
-
+    """
     df = RN_cleaner2(df)
     # Activate functions
     # stress_check(df, "IR")
@@ -186,6 +187,7 @@ def main():
     y = df['Stress_c']
     
     new_df_binary = df[['ML', 'Self esteem_c', 'RN_c', 'Neighbors_c', 'Bedtime_Hour_c', 'Age', 'Time_c']]
+    """
     
     #one hot encoding
     
@@ -196,29 +198,63 @@ def main():
     new_df = pd.concat([new_df_binary, df_encoded], axis=1)
     """
     
-    df_selection = df[['Chocolate', 'Programme_c', 'Gender']]
-    df_encoded = pd.get_dummies(df_selection.astype(str))
+    df = ODI_data_2 
+    print(ODI_data_2.columns)
+    df = df.dropna()
     
+    y = df['Stress_c']
     
+    # flair 2, neighbors, flair1, self esteem, random number
     
+    df_sel = df[['GD2-FLAIR', 'GD1-FLAIR', 'Neighbors_c', 'Self esteem_c', 'RN_c']]
+
+    #df_selection = df[['Chocolate', 'Programme_c', 'Gender']]
+    #df_encoded = pd.get_dummies(df_selection.astype(str))
+    
+
     #perform forest with chocolate, programme and gender
     print("Small set")
     print("")
-    Categorisations.svm_model(df_encoded, y, 0.2, fold = 5)
+    small = Categorisations.forest_2(df_sel, y, 0.2, fold = 10)
 
-    Categorisations.svm_model(df_encoded, y, 0.2, fold = 10)
+    small2 = Categorisations.svm_model(df_sel, y, 0.2, fold = 10)
+
+    #Categorisations.svm_model(df_encoded, y, 0.2, fold = 10)
 
     
     print("Larger set")
     print()
-    new_df = pd.concat([df[['Self esteem_c', 'RN_c', 'Neighbors_c','DB']], df_encoded],axis = 1)
+    df_new = df[['GD1-NLTK', 'GD1-FLAIR',
+       'GD2-NLTK', 'GD2-FLAIR', 'Bedtime_Hour_c2',
+       'Self esteem_c', 'Neighbors_c', 'Age', 'RN_c']]
+    df_hot = df[[ 'Programme', 'ML', 'IR', 'Stat', 'DB', 'Gender', "Stand up"]]
+    df_encoded = pd.get_dummies(df_hot.astype(str))
+    
+    new_df = pd.concat([df_new, df_encoded],axis = 1)
     
     #random forest
-    Categorisations.svm_model(new_df, y, 0.2, fold = 5)
+   # Categorisations.svm_model(new_df, y, 0.2, fold = 5)
 
-    Categorisations.svm_model(new_df, y, 0.2, fold = 10)
+    large = Categorisations.forest_2(new_df, y, 0.2, fold = 10)
+    
+    large2 = Categorisations.svm_model(new_df, y, 0.2, fold = 10)
     
     
+    
+
+    
+    
+    result = stats.ttest_ind(small, small2)
+    
+    
+    result2 = stats.ttest_ind(large, large2)
+    
+    print(result)
+    
+    
+    print()
+    
+    print(result2)
     
     
     

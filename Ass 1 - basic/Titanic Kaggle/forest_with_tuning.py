@@ -25,8 +25,6 @@ from sklearn.ensemble import GradientBoostingClassifier
 
 from sklearn.model_selection import GridSearchCV
 
-
-
 def run_forest(df, y, test_size):
     pipeline = Pipeline([
 
@@ -52,12 +50,11 @@ def run_forest(df, y, test_size):
     
 
     #tuning the model  
-    hyperparameters = { 'features__text__tfidf__max_df': [0.9, 0.95],
-                    'features__text__tfidf__ngram_range': [(1,1), (1,2)],
-                    'classifier__learning_rate': [0.1, 0.2],
+    hyperparameters = { #'features__text__tfidf__max_df': [0.9, 0.95],
+                    #'features__text__tfidf__ngram_range': [(1,1), (1,2)],
+                    #'classifier__learning_rate': [0.1, 0.2],
                     'classifier__n_estimators': [50,100, 1000],
                     'classifier__max_depth': [2, 4],
-                    'classifier__min_samples_leaf': [2, 4],
                     'classifier__min_samples_leaf': [2, 4]
                   }
     clf = GridSearchCV(pipeline, hyperparameters, cv = 3)
