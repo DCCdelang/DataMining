@@ -7,8 +7,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_validate
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import KFold
+import scipy
 
-df = pd.read_csv("Ass 1 - basic/Task 3/sms_vec.csv")
+df = pd.read_csv("Task 3/sms_vec.csv")
 
 x = df.drop(["Label"],axis=1)
 
@@ -18,14 +19,28 @@ X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = 0.6, rand
 
 clf = SVC(degree=1,gamma="scale",kernel="sigmoid")
 
+clf = SVC()
+
 clf.fit(X_train, y_train)
+
+# print(cross_validate(clf, X_test, y_test, cv=10)['test_score'].mean())
+
 
 feature_scaler = StandardScaler()
 pipeline1 = Pipeline([
-    ("scalar",feature_scaler),("classifier", SVC(degree=1,gamma="scale",kernel="sigmoid"))
+    ("scalar",feature_scaler),("classifier", clf)
 ])
 
 print(cross_validate(pipeline1, X_test, y_test, cv=10)['test_score'].mean())
+
+def mean_confidence_interval(data, confidence=0.95):
+    a = 1.0 * np.array(data)
+    n = len(a)
+    m, se = np.mean(a), scipy.stats.sem(a)
+    h = se * scipy.stats.t.ppf((1 + confidence) / 2., n-1)
+    return round(m,3), round(m-h,3), round(m+h,3)
+
+print(mean_confidence_interval(cross_validate(pipeline1, X_test, y_test, cv=10)['test_score']))
 
 raise ValueError
 
