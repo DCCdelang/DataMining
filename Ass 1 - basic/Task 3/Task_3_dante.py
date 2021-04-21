@@ -34,6 +34,12 @@ for text in df["text"]:
 
 print(len(wordfreq))
 
+
+wordfreq_sort = dict(sorted(wordfreq.items(), key=lambda item: item[1]))
+wordfreq_items = wordfreq_sort.items()
+print(list(wordfreq_items)[-500:])
+raise ValueError
+
 most_freq = heapq.nlargest(500, wordfreq, key=wordfreq.get)
 
 # print(most_freq)
