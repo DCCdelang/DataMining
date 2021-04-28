@@ -78,11 +78,96 @@ def hotels_per_id(df):
 def price_per_day(df):
     # df = booking_Filter(df).copy()
     df["gross_bookings_per_day"] = df["gross_bookings_usd"]/df["srch_length_of_stay"]
-
     df["price_per_day"] = df["price_usd"]/df["srch_length_of_stay"]
     return df
 
-summary(df)    
 
-# df = price_per_day(df)
+# Convert to usd prices and difference
+def exp_historical_price_dif(df):
+    df["historical_price"] = np.exp(df["prop_log_historical_price"])
+    df["hist_price_dif"] = df["historical_price"] - df["price_usd"]
+    return df
+
+# Convert to log prices and difference
+def log_historical_price_dif(df):
+    df["log_price_usd"] = np.log(df["price_usd"])
+    df["log_hist_price_dif"] = df["prop_log_historical_price"] - df["log_price_usd"]
+    return df
+
+def starrating_diff(df):
+    df["starrating_diff"]=np.abs(df["visitor_hist_starrating"]-df["prop_starrating"])
+
+# position_click(df)
+# prop_loc_plot(df)
+# # exp_historical_price_dif(df)
+# plot_corr(df)
 # print(df.head())
+
+def prop_quality(df):
+    df["count"] = 1
+    df = df.join(df.groupby(["prop_id"])["booking_bool"].sum(), on="prop_id",rsuffix="_tot")
+    df = df.join(df.groupby(["prop_id"])["count"].sum(), on="prop_id",rsuffix="_tot")
+    df["prob_book"] = df["booking_bool_tot"]/df["count_tot"]
+    df.drop(["count"],axis=1)
+    
+    # print(set(df["prob_book"]))
+    return df
+
+# prop_quality(df)
+
+"""Average functies maken! Worden prop_ids duidelijker"""
+
+# Function to average out numerical values per property, can be done in combination with test set. Should be done at beginning?!
+def averages_per_prop(df):
+    df["count"] = 1
+    df = df.join(df.groupby(["prop_id"])["prop_starrating"].mean(), on="prop_id",rsuffix="_avg")
+
+    df = df.join(df.groupby(["prop_id"])["prop_review_score"].mean(), on="prop_id",rsuffix="_avg")
+
+    df = df.join(df.groupby(["prop_id"])["prop_location_score1"].mean(), on="prop_id",rsuffix="_avg")
+
+    df = df.join(df.groupby(["prop_id"])["prop_location_score2"].mean(), on="prop_id",rsuffix="_avg")
+
+    df = df.join(df.groupby(["prop_id"])["prop_log_historical_price"].mean(), on="prop_id",rsuffix="_avg")
+
+    df = df.join(df.groupby(["prop_id"])["price_usd"].mean(), on="prop_id",rsuffix="_avg")
+
+    df.drop(["count"],axis=1)
+    return df
+
+def std_per_prop(df):
+    df["count"] = 1
+    df = df.join(df.groupby(["prop_id"])["prop_starrating"].std(), on="prop_id",rsuffix="_std")
+
+    df = df.join(df.groupby(["prop_id"])["prop_review_score"].std(), on="prop_id",rsuffix="_std")
+
+    df = df.join(df.groupby(["prop_id"])["prop_location_score1"].std(), on="prop_id",rsuffix="_std")
+
+    df = df.join(df.groupby(["prop_id"])["prop_location_score2"].std(), on="prop_id",rsuffix="_std")
+
+    df = df.join(df.groupby(["prop_id"])["prop_log_historical_price"].std(), on="prop_id",rsuffix="_std")
+
+    df = df.join(df.groupby(["prop_id"])["price_usd"].std(), on="prop_id",rsuffix="_std")
+
+    df.drop(["count"],axis=1)
+    return df
+
+def median_per_prop(df):
+    df["count"] = 1
+    df = df.join(df.groupby(["prop_id"])["prop_starrating"].median(), on="prop_id",rsuffix="_median")
+
+    df = df.join(df.groupby(["prop_id"])["prop_review_score"].median(), on="prop_id",rsuffix="_median")
+
+    df = df.join(df.groupby(["prop_id"])["prop_location_score1"].median(), on="prop_id",rsuffix="_median")
+
+    df = df.join(df.groupby(["prop_id"])["prop_location_score2"].median(), on="prop_id",rsuffix="_median")
+
+    df = df.join(df.groupby(["prop_id"])["prop_log_historical_price"].median(), on="prop_id",rsuffix="_median")
+
+    df = df.join(df.groupby(["prop_id"])["price_usd"].median(), on="prop_id",rsuffix="_median")
+
+    df.drop(["count"],axis=1)
+    return df
+
+df = averages_per_prop(df)
+print(df.head())
