@@ -96,12 +96,7 @@ def log_historical_price_dif(df):
 
 def starrating_diff(df):
     df["starrating_diff"]=np.abs(df["visitor_hist_starrating"]-df["prop_starrating"])
-
-# position_click(df)
-# prop_loc_plot(df)
-# # exp_historical_price_dif(df)
-# plot_corr(df)
-# print(df.head())
+    return df
 
 def prop_quality(df):
     df["count"] = 1
@@ -112,10 +107,6 @@ def prop_quality(df):
     
     # print(set(df["prob_book"]))
     return df
-
-# prop_quality(df)
-
-"""Average functies maken! Worden prop_ids duidelijker"""
 
 # Function to average out numerical values per property, can be done in combination with test set. Should be done at beginning?!
 def averages_per_prop(df):
@@ -169,5 +160,15 @@ def median_per_prop(df):
     df.drop(["count"],axis=1)
     return df
 
+df = log_historical_price_dif(df)
 df = averages_per_prop(df)
+# position_click(df)
+# prop_loc_plot(df)
+# # exp_historical_price_dif(df)
+# plot_corr(df)
+# print(df.head())
+# prop_quality(df)
+
+sns.histplot(df["log_price_usd"])
+plt.show()
 print(df.head())
