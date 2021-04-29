@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from numba import jit
 import time
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -105,3 +104,51 @@ def median_per_prop(df):
 
     df.drop(["count"],axis=1)
     return df
+
+def drop_nan_columns(df, threshhold=0.1):
+
+    df1 = df.dropna(axis=1, thresh= threshhold * df.shape[0])
+
+    for i in list(df.columns):
+        if i not in (df1.columns):
+            print(i)
+
+    return df1
+
+
+if __name__ == "__main__":
+    start = time.time()
+
+    df = pd.read_csv('Data/training_set_VU_DM.csv')
+    drop_nan_columns(df, threshhold=0.05)
+
+    print(time.time() - start)
+    extract_date_time(df)
+
+    print(time.time() - start)
+    price_per_day(df)
+
+    print(time.time() - start)
+    exp_historical_price_dif(df)
+
+    print(time.time() - start)
+    log_historical_price_dif(df)
+
+    print(time.time() - start)
+    starrating_diff(df)
+
+    print(time.time() - start)
+    prop_quality(df)
+
+    print(time.time() - start)
+    averages_per_prop(df)
+
+    print(time.time() - start)
+    std_per_prop(df)
+
+    print(time.time() - start)
+    median_per_prop(df)
+
+    print(time.time() - start)
+
+    df.to_csv('Data/preprocessed.csv')
