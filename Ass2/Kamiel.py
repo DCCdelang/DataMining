@@ -1,9 +1,11 @@
 import pandas as pd
 import numpy as np
+import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.inspection import permutation_importance
 from sklearn.ensemble import GradientBoostingRegressor,GradientBoostingClassifier
 from sklearn.metrics import ndcg_score
+from sklearn.model_selection import GridSearchCV 
 
 def make_files():
 
@@ -33,9 +35,21 @@ def train_model():
     features = ['price_usd', 'prop_review_score', 'prop_starrating','promotion_flag', 'prop_starrating','srch_saturday_night_bool','srch_room_count','srch_children_count']
     X = train[features]
     y = train["value"]  
-    reg = GradientBoostingRegressor(n_estimators=100, learning_rate=1.0,
-    max_depth=1, random_state=0)
+    reg = GradientBoostingRegressor(n_estimators=100, learning_rate=1.0, max_depth=1, random_state=0)
     reg = reg.fit(X, y)
+    hyperparameters = {                     
+                    'classifier__n_estimators': [50,100,150],
+                    'classifier__max_depth': [2, 4],
+                    'classifier__min_samples_leaf': [2, 4],
+                    'classifier__criterion': ['gini', 'entropy'],
+                }
+
+    reg = GridSearchCV(reg, hyperparameters, )
+    # Fit and tune model
+    clf.fit(X_train, y_train)
+
+
+    print(clf.best_params_)
     return reg
 
 def test_model(reg):
@@ -48,7 +62,7 @@ def test_model(reg):
 
     for i in ids:
         test1 = test.loc[test['ra'] == i]
-        # print(test)
+
         features = ['price_usd', 'prop_review_score', 'prop_starrating','promotion_flag', 'prop_starrating','srch_saturday_night_bool','srch_room_count','srch_children_count']
         X = test1[features]
         y = test1["value"]  
@@ -131,12 +145,47 @@ def make_submission_file():
 
     df_sub.to_csv('Data/submission1.csv', index=False)
 
+def plot(df):
     
+    df['price_usd'] = df['price_usd'].clip(0, 1500)
+    # df = df.head(5000)
+    sns.histplot(data=df, x = 'price_usd')
+    plt.show()
 
+    sns.histplot(data=df, x = 'visitor_hist_starrating')
+    plt.show()
+
+    sns.histplot(data=df, x ='prop_starrating')
+    plt.show()
+
+    sns.histplot(data=df, x = 'promotion_flag')
+    plt.show()
+
+def drop_nan_columns():
+    df = pd.read_csv('Data/training_set_VU_DM.csv')
+    # plot(df)
+    print(df.shape)
+    df1 = df.dropna(axis=1, thresh= 0.1 * df.shape[0])
+    print(df1.shape)
+    for i in list(df.columns):
+        if i not in (df1.columns):
+            print(i)
+    df1.to_csv('Data/training_set_VU_DM_deleted.csv', index=False)
+    # print(df.columns,df1.columns)
+def check_same_values():
+    train = pd.read_csv('Data/training_set_VU_DM.csv')
+    test = pd.read_csv('Data/test_set_VU_DM.csv')
+    prop_train = set(train['prop_id'])
+    prop_test = set(test['prop_id'])
+    print(len(list(prop_train - prop_test)))
+   
 # feature_importance()
 # df = pd.read_csv('Data/test_data.csv')
 # add_values(df, 'Data/test_data.csv')
 # df = pd.read_csv('Data/train_data.csv')
 # add_values(df, 'Data/train_data.csv')
-test_model(train_model())
+# test_model(train_model())
+# drop_nan_columns()
+# check_same_values()
 # make_files()
+
