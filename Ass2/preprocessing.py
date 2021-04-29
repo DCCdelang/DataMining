@@ -41,15 +41,18 @@ def starrating_diff(df):
     df["starrating_diff"]=np.abs(df["visitor_hist_starrating"]-df["prop_starrating"])
     return df
 
-def prop_quality(df):
+def prop_quality_book(df):
     df["count"] = 1
     df = df.join(df.groupby(["prop_id"])["booking_bool"].sum(), on="prop_id",rsuffix="_tot")
     df = df.join(df.groupby(["prop_id"])["count"].sum(), on="prop_id",rsuffix="_tot")
     df["prob_book"] = df["booking_bool_tot"]/df["count_tot"]
     df.drop(["count"],axis=1)
-    
-    # print(set(df["prob_book"]))
     return df
+
+def prop_quality_book_test(df_train, df_test):
+    df_train = prop_quality(df_train)
+    df_test.loc[df_test["prop_id"]==df_train["prop_id"], "prob_book"] = df_train["prob_book"]
+    return df_test
 
 # Function to average out numerical values per property, can be done in combination with test set. Should be done at beginning?!
 def averages_per_prop(df):
