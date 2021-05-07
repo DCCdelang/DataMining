@@ -49,8 +49,19 @@ def prop_quality_book(df):
     return df
 
 def prop_quality_book_test(df_train, df_test):
-    df_train = prop_quality(df_train)
-    df_test.loc[df_test["prop_id"]==df_train["prop_id"], "prob_book"] = df_train["prob_book"]
+    df_test["prob_book"] = 0
+    df_full = pd.concat([df_train,df_test])
+
+    df_full = df_full.join(df_full.groupby(["prop_id"])["prob_book"].max(), on="prop_id",rsuffix="_tot")
+
+
+    df_train = df_full.iloc[:,:df_train.shape[1]]
+    df_test = df_full.iloc[:,df_train.shape[1]:]
+    # df_train = df_train.groupby(["prop_id"])["prob_book"].mean()
+    # df_test.loc[df_test["prop_id"]==df_train["prop_id"], "prob_book"] = df_train["prob_book"]
+    
+    # df_test["prob_book"] = df_test["prop_id"].map(df_train.reindex("prop_id")["prob_book"])
+
     return df_test
 
 # Function to average out numerical values per property, can be done in combination with test set. Should be done at beginning?!
@@ -118,8 +129,19 @@ def drop_nan_columns(df, threshhold=0.1):
 
 if __name__ == "__main__":
     start = time.time()
+    df = pd.read_csv('Ass2/Data/training_set_VU_DM.csv')
+    
+    print(time.time() - start)
 
-    df = pd.read_csv('Data/training_set_VU_DM.csv')
+    df_test = pd.read_csv('Ass2/Data/test_set_VU_DM.csv')
+    print(time.time() - start)
+
+    df_test = prop_quality_book_test(df, df_test)
+    
+    print(time.time() - start)
+    print(df_test.head(100))
+
+    exit()
     drop_nan_columns(df, threshhold=0.05)
 
     print(time.time() - start)
@@ -138,7 +160,7 @@ if __name__ == "__main__":
     starrating_diff(df)
 
     print(time.time() - start)
-    prop_quality(df)
+    prop_quality_book(df)
 
     print(time.time() - start)
     averages_per_prop(df)
@@ -151,4 +173,4 @@ if __name__ == "__main__":
 
     print(time.time() - start)
 
-    df.to_csv('Data/preprocessed.csv')
+    # df.to_csv('Data/preprocessed.csv')
