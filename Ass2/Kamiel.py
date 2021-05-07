@@ -4,20 +4,20 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.inspection import permutation_importance
 from sklearn.ensemble import GradientBoostingRegressor,GradientBoostingClassifier
-from sklearn.metrics import ndcg_score
+from sklearn.metrics import ndcg_score, make_scorer, SCORERS
+
 from sklearn.model_selection import GridSearchCV 
 
 def make_files():
 
-    df = pd.read_csv('Data/clicked_data.csv')
+    df = pd.read_csv('Data/preprocessed.csv')
 
     df = df.tail(100000)
-    df.to_csv('Data/train_data.csv', index=False)
+    df.to_csv('Data/test_data.csv', index=False)
 
 def add_values(df, name):
-
     values = []
-    for i in range(len(df['ra'])):
+    for i in range(len(df['click_bool'])):
         value = 0
         if df.iloc[i]['click_bool'] != 0:
             value +=1
@@ -26,30 +26,53 @@ def add_values(df, name):
         values.append(value)
 
     df['value'] = values
-    df.to_csv('Data/test_data.csv', index=False)
+    df.to_csv(name, index=False)
        
 def train_model():
     train = pd.read_csv('Data/train_data.csv')
     train = train.fillna(0)
 
-    features = ['price_usd', 'prop_review_score', 'prop_starrating','promotion_flag', 'prop_starrating','srch_saturday_night_bool','srch_room_count','srch_children_count']
+    features = list(train.columns)
+  
+    features.remove('position')
+    features.remove('click_bool')
+    features.remove('gross_bookings_usd')
+    features.remove('value')
+    features.remove('date_time')
+    features.remove('date')
+    features.remove('time')
+    features.remove('hour')
+    features.remove('log_hist_price_dif')
+    features.remove('log_price_usd')
+    features.remove('price_per_day')
+    features.remove('booking_bool')
+    features.remove('gross_bookings_per_day')
+    # features.remove('prob_book')
+    # features.remove('value')
+    
     X = train[features]
     y = train["value"]  
-    reg = GradientBoostingRegressor(n_estimators=100, learning_rate=1.0, max_depth=1, random_state=0)
+    reg = GradientBoostingRegressor(n_estimators=50, learning_rate=1.0, max_depth=2, random_state=0)
     reg = reg.fit(X, y)
-    hyperparameters = {                     
-                    'classifier__n_estimators': [50,100,150],
-                    'classifier__max_depth': [2, 4],
-                    'classifier__min_samples_leaf': [2, 4],
-                    'classifier__criterion': ['gini', 'entropy'],
-                }
 
-    reg = GridSearchCV(reg, hyperparameters, )
-    # Fit and tune model
-    clf.fit(X_train, y_train)
+    
+    # hyperparameters = {                     
+    #                 'n_estimators': [50,100,150],
+    #                 'max_depth': [2, 4],
+    #                 'learning_rate': [1, 2],
+    #                 'criterion': ['friedman_mse', 'mse', 'mae']
+    #             }
+
+    # print(SCORERS.keys())
+    # reg = GridSearchCV(reg, hyperparameters, scoring='neg_mean_squared_error')
+    # # Fit and tune model
+    # print(reg.get_params().keys())
+    # reg.fit(X, y)
 
 
-    print(clf.best_params_)
+    # print(reg.best_params_)
+
+    print("Training is done!")
     return reg
 
 def test_model(reg):
@@ -59,11 +82,29 @@ def test_model(reg):
     test = test.fillna(0)
     scores = []
     ids = list(set(test['ra']))
+    features = list(test.columns)
+    
+    features.remove('position')
+    features.remove('click_bool')
+    features.remove('booking_bool')
+    features.remove('gross_bookings_usd')
+    features.remove('value')
+    features.remove('date_time')
+    features.remove('date')
+    features.remove('time')
+    features.remove('hour')
+    features.remove('log_hist_price_dif')
+    features.remove('log_price_usd')
+    features.remove('price_per_day')
+    features.remove('gross_bookings_per_day')
+    # features.remove('prob_book')
+
+    
 
     for i in ids:
         test1 = test.loc[test['ra'] == i]
 
-        features = ['price_usd', 'prop_review_score', 'prop_starrating','promotion_flag', 'prop_starrating','srch_saturday_night_bool','srch_room_count','srch_children_count']
+   
         X = test1[features]
         y = test1["value"]  
         
@@ -86,13 +127,16 @@ def feature_importance():
     feat.remove('click_bool')
     feat.remove('gross_bookings_usd')
     feat.remove('value')
-    feat.remove('booking_bool')
-    feat.remove('srch_saturday_night_bool')
-    feat.remove('srch_room_count')
-    feat.remove('srch_children_count')
-        
+    feat.remove('date_time')
+    feat.remove('date')
+    feat.remove('time')
+    feat.remove('hour')
+    feat.remove('log_hist_price_dif')
+    
+
   
-    features = feat[3:-1]
+    features = feat[1:-1]
+
     X = train[features]
     y = train["value"]  
 
@@ -122,15 +166,30 @@ def feature_importance():
 def make_submission_file():
     train = pd.read_csv('Data/clicked_data.csv')
     train = train.fillna(0)
+    features = list(train.columns)
 
-    features = ['price_usd', 'prop_review_score', 'prop_starrating','promotion_flag', 'prop_starrating','srch_saturday_night_bool']
+    features.remove('position')
+    features.remove('click_bool')
+    
+    features.remove('gross_bookings_usd')
+    features.remove('value')
+    features.remove('date_time')
+    features.remove('date')
+    features.remove('time')
+    features.remove('hour')
+    features.remove('log_hist_price_dif')
+    features.remove('log_price_usd')
+    features.remove('price_per_day')
+    features.remove('booking_bool')
+    features.remove('gross_bookings_per_day')
+    # features = ['price_usd', 'prop_review_score', 'prop_starrating','promotion_flag', 'prop_starrating','srch_saturday_night_bool']
     X = train[features]
     y = train["value"]  
     reg = GradientBoostingRegressor(n_estimators=100, learning_rate=1.0,
     max_depth=1, random_state=0)
     reg = reg.fit(X, y)
     
-    test = pd.read_csv('Data/test_set_VU_DM.csv')
+    test = pd.read_csv('Data/processed_end_data.csv')
     test = test.fillna(0)
     df_sub = test
     
@@ -178,14 +237,25 @@ def check_same_values():
     prop_train = set(train['prop_id'])
     prop_test = set(test['prop_id'])
     print(len(list(prop_train - prop_test)))
-   
+
+def random():
+    df = pd.read_csv('Data/clicked_data.csv')
+    print(df['random_bool'].sum())
+
+
 # feature_importance()
+
+
+# make_files()
 # df = pd.read_csv('Data/test_data.csv')
 # add_values(df, 'Data/test_data.csv')
-# df = pd.read_csv('Data/train_data.csv')
-# add_values(df, 'Data/train_data.csv')
 # test_model(train_model())
+
 # drop_nan_columns()
+
 # check_same_values()
-# make_files()
+make_submission_file()
+
+# train_model()
+# random()
 

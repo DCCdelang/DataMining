@@ -49,7 +49,7 @@ def prop_quality_book(df):
     return df
 
 def prop_quality_book_test(df_train, df_test):
-    df_train = prop_quality(df_train)
+    df_train = prop_quality_book(df_train)
     df_test.loc[df_test["prop_id"]==df_train["prop_id"], "prob_book"] = df_train["prob_book"]
     return df_test
 
@@ -119,14 +119,14 @@ def drop_nan_columns(df, threshhold=0.1):
 if __name__ == "__main__":
     start = time.time()
 
-    df = pd.read_csv('Data/training_set_VU_DM.csv')
+    df = pd.read_csv('Data/test_set_VU_DM.csv')
     drop_nan_columns(df, threshhold=0.05)
 
     print(time.time() - start)
     extract_date_time(df)
 
     print(time.time() - start)
-    price_per_day(df)
+    # price_per_day(df)
 
     print(time.time() - start)
     exp_historical_price_dif(df)
@@ -138,7 +138,9 @@ if __name__ == "__main__":
     starrating_diff(df)
 
     print(time.time() - start)
-    prop_quality(df)
+    # prop_quality_book(df)
+
+
 
     print(time.time() - start)
     averages_per_prop(df)
@@ -151,4 +153,4 @@ if __name__ == "__main__":
 
     print(time.time() - start)
 
-    df.to_csv('Data/preprocessed.csv')
+    df.to_csv('Data/processed_end_data.csv')
