@@ -56,21 +56,21 @@ def train_model():
     reg = reg.fit(X, y)
 
     
-    # hyperparameters = {                     
-    #                 'n_estimators': [50,100,150],
-    #                 'max_depth': [2, 4],
-    #                 'learning_rate': [1, 2],
-    #                 'criterion': ['friedman_mse', 'mse', 'mae']
-    #             }
+    hyperparameters = {                     
+                    'n_estimators': [50,100,150],
+                    'max_depth': [2, 4],
+                    'learning_rate': [1, 2],
+                    'criterion': ['friedman_mse', 'mse', 'mae']
+                }
 
-    # print(SCORERS.keys())
-    # reg = GridSearchCV(reg, hyperparameters, scoring='neg_mean_squared_error')
-    # # Fit and tune model
-    # print(reg.get_params().keys())
-    # reg.fit(X, y)
+    print(SCORERS.keys())
+    reg = GridSearchCV(reg, hyperparameters, scoring='neg_mean_squared_error')
+    # Fit and tune model
+    print(reg.get_params().keys())
+    reg.fit(X, y)
 
 
-    # print(reg.best_params_)
+    print(reg.best_params_)
 
     print("Training is done!")
     return reg
@@ -249,12 +249,12 @@ def random():
 # make_files()
 # df = pd.read_csv('Data/test_data.csv')
 # add_values(df, 'Data/test_data.csv')
-# test_model(train_model())
+test_model(train_model())
 
 # drop_nan_columns()
 
 # check_same_values()
-make_submission_file()
+# make_submission_file()
 
 # train_model()
 # random()
