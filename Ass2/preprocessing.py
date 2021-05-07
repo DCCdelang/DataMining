@@ -36,10 +36,12 @@ def log_historical_price_dif(df):
     df["log_hist_price_dif"] = df["prop_log_historical_price"] - df["log_price_usd"]
     return df
 
+# Difference in starrating
 def starrating_diff(df):
     df["starrating_diff"]=np.abs(df["visitor_hist_starrating"]-df["prop_starrating"])
     return df
 
+# Property quality probability based on averages amount of bookings
 def prop_quality_book(df):
     df["count"] = 1
     df = df.join(df.groupby(["prop_id"])["booking_bool"].sum(), on="prop_id",rsuffix="_tot")
@@ -48,6 +50,7 @@ def prop_quality_book(df):
     df.drop(["count"],axis=1)
     return df
 
+# Transfer quality probability of bookings to test set
 def prop_quality_book_test(df_train, df_test):
     df_test["prob_book"] = 0
     df_full = pd.concat([df_train,df_test])
@@ -82,6 +85,7 @@ def averages_per_prop(df):
     df.drop(["count"],axis=1)
     return df
 
+# Function to std out numerical values per property, can be done in combination with test set. Should be done at beginning?!
 def std_per_prop(df):
     df["count"] = 1
     df = df.join(df.groupby(["prop_id"])["prop_starrating"].std(), on="prop_id",rsuffix="_std")
@@ -99,6 +103,7 @@ def std_per_prop(df):
     df.drop(["count"],axis=1)
     return df
 
+# Function to median out numerical values per property, can be done in combination with test set. Should be done at beginning?!
 def median_per_prop(df):
     df["count"] = 1
     df = df.join(df.groupby(["prop_id"])["prop_starrating"].median(), on="prop_id",rsuffix="_median")
@@ -126,6 +131,15 @@ def drop_nan_columns(df, threshhold=0.1):
 
     return df1
 
+"""
+Filosofie: Karakteristieken per property duidelijker maken zodat het algoritme
+sneller/beter snapt waar een property in de lijst moet komen.
+Aannames: Gemiddelde over tijd, kwaliteit property altijd hetzelfde
+- Feature maken waarbij position gemiddeld genomen wordt berekend per propertie
+om vervolgens over te hevelen naar de test data. 
+- probabilities berekenen hoevaak een property voorkomt en hoevaak er op geklikt/
+gebooked wordt. ook overhevelen naar test data.
+"""
 
 if __name__ == "__main__":
     start = time.time()
