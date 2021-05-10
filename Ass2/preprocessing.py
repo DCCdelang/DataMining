@@ -40,12 +40,37 @@ def starrating_diff(df):
     df["starrating_diff"]=np.abs(df["visitor_hist_starrating"]-df["prop_starrating"])
     return df
 
+def prob_quality_click(df):
+    df["count"] = 1
+    df = df.join(df.groupby(["prop_id"])["clicking_bool"].sum(), on="prop_id",rsuffix="_tot")
+    df = df.join(df.groupby(["prop_id"])["count"].sum(), on="prop_id",rsuffix="_tot")
+    df["prob_book"] = df["clicking_bool_tot"]/df["count_tot"]
+    df.drop(["count"],axis=1)
+    df.drop(["clicking_bool_tot"],axis=1)
+    df.drop(["count_tot"],axis=1)
+    return df
+
+def prob_quality_click_test(df_train, df_test):
+    df_test["prob_book"] = 0
+    train_sub = df_train[["prop_id","prob_book"]]
+    test_sub = df_test[["prop_id","prob_book"]]
+
+    df_full = pd.concat([train_sub,test_sub])
+
+    df_full = df_full.join(df_full.groupby(["prop_id"])["prob_book"].max(), on="prop_id",rsuffix="_extend")
+
+    df_test["prob_book"] = df_full["prob_book_extend"].tail(df_test.shape[0])
+
+    return df_test
+
 def prob_quality_book(df):
     df["count"] = 1
     df = df.join(df.groupby(["prop_id"])["booking_bool"].sum(), on="prop_id",rsuffix="_tot")
     df = df.join(df.groupby(["prop_id"])["count"].sum(), on="prop_id",rsuffix="_tot")
     df["prob_book"] = df["booking_bool_tot"]/df["count_tot"]
     df.drop(["count"],axis=1)
+    df.drop(["booking_bool_tot"],axis=1)
+    df.drop(["count_tot"],axis=1)
     return df
 
 def prob_quality_book_test(df_train, df_test):
@@ -172,6 +197,10 @@ if __name__ == "__main__":
 
     df_test = prob_quality_book_test(df_train, df_test)
 
+    df_train = prob_quality_click(df_train)
+
+    df_test = prob_quality_click_test(df_train, df_test)
+
     df_train = price_per_day(df_train)
 
     df_test = price_per_day(df_test)
@@ -182,6 +211,8 @@ if __name__ == "__main__":
 
     df_test = exp_historical_price_dif(df_test)
     
+    # drop_nan_columns(df, threshhold=0.1)
+
     # print(len(df_test.loc[df_test["prob_book"] == 1]))
     # print(len(df_train.loc[df_train["prob_book"] == 1]))
     # print(df_test.shape)
