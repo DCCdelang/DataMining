@@ -42,12 +42,14 @@ def starrating_diff(df):
 
 def prob_quality_click(df):
     df["count"] = 1
-    df = df.join(df.groupby(["prop_id"])["clicking_bool"].sum(), on="prop_id",rsuffix="_tot")
+    df = df.join(df.groupby(["prop_id"])["click_bool"].sum(), on="prop_id",rsuffix="_tot")
     df = df.join(df.groupby(["prop_id"])["count"].sum(), on="prop_id",rsuffix="_tot")
-    df["prob_book"] = df["clicking_bool_tot"]/df["count_tot"]
-    df.drop(["count"],axis=1)
-    df.drop(["clicking_bool_tot"],axis=1)
-    df.drop(["count_tot"],axis=1)
+    # print(df["click_bool_tot"].unique())
+    # print(df["count_tot"].unique())
+    df["prob_book"] = df["click_bool_tot"]/df["count_tot"]
+    df = df.drop(["count"],axis=1)
+    df = df.drop(["click_bool_tot"],axis=1)
+    df = df.drop(["count_tot"],axis=1)
     return df
 
 def prob_quality_click_test(df_train, df_test):
@@ -68,9 +70,9 @@ def prob_quality_book(df):
     df = df.join(df.groupby(["prop_id"])["booking_bool"].sum(), on="prop_id",rsuffix="_tot")
     df = df.join(df.groupby(["prop_id"])["count"].sum(), on="prop_id",rsuffix="_tot")
     df["prob_book"] = df["booking_bool_tot"]/df["count_tot"]
-    df.drop(["count"],axis=1)
-    df.drop(["booking_bool_tot"],axis=1)
-    df.drop(["count_tot"],axis=1)
+    df = df.drop(["count"],axis=1)
+    df = df.drop(["booking_bool_tot"],axis=1)
+    df = df.drop(["count_tot"],axis=1)
     return df
 
 def prob_quality_book_test(df_train, df_test):
@@ -85,6 +87,16 @@ def prob_quality_book_test(df_train, df_test):
     df_test["prob_book"] = df_full["prob_book_extend"].tail(df_test.shape[0])
 
     return df_test
+
+def position_average(df_train,df_test):
+    # Filter random positions
+    print(df_train.shape[0])
+    print(len(df_train.loc[df_train["random_bool"] == 0]))
+    df_train_ranked = df_train.loc[df_train["random_bool"] == 0]
+    df_train_ranked = df_train_ranked.join(df_train_ranked.groupby(["prop_id"])["position"].mean(),on="prop_id",rsuffix="_mean")
+    
+    return 
+
 
 # Function to average out numerical values per property, can be done in combination with test set. Should be done at beginning?!
 def averages_per_prop(df_train, df_test):
@@ -103,7 +115,7 @@ def averages_per_prop(df_train, df_test):
 
     df = df.join(df.groupby(["prop_id"])["price_usd"].mean(), on="prop_id",rsuffix="_avg")
 
-    df.drop(["count"],axis=1)
+    df = df.drop(["count"],axis=1)
     df_train = df.head(df_train.shape[0])
     df_test = df.head(df_test.shape[0])
     return df_train,df_test
@@ -125,7 +137,7 @@ def std_per_prop(df_train, df_test):
 
     df = df.join(df.groupby(["prop_id"])["price_usd"].std(), on="prop_id",rsuffix="_std")
 
-    df.drop(["count"],axis=1)
+    df = df.drop(["count"],axis=1)
     df_train = df.head(df_train.shape[0])
     df_test = df.head(df_test.shape[0])
     return df_train,df_test
@@ -146,7 +158,7 @@ def median_per_prop(df_train, df_test):
 
     df = df.join(df.groupby(["prop_id"])["price_usd"].median(), on="prop_id",rsuffix="_median")
 
-    df.drop(["count"],axis=1)
+    df = df.drop(["count"],axis=1)
     df_train = df.head(df_train.shape[0])
     df_test = df.head(df_test.shape[0])
     return df_train,df_test
@@ -161,6 +173,12 @@ def drop_nan_columns(df, threshhold=0.1):
 
     return df1
 
+def drop_kkcolumns(df):
+    kut_columns = ['click_bool', 'gross_bookings_usd', 'booking_bool','srch_saturday_night_bool', 'srch_query_affinity_score', 'orig_destination_distance', 'random_bool', 'comp1_rate', 'comp1_inv', 'comp1_rate_percent_diff', 'comp2_rate', 'comp2_inv', 'comp2_rate_percent_diff', 'comp3_rate', 'comp3_inv', 'comp3_rate_percent_diff', 'comp4_rate', 'comp4_inv', 'comp4_rate_percent_diff', 'comp5_rate', 'comp5_inv', 'comp5_rate_percent_diff', 'comp6_rate', 'comp6_inv', 'comp6_rate_percent_diff', 'comp7_rate', 'comp7_inv', 'comp7_rate_percent_diff', 'comp8_rate', 'comp8_inv', 'comp8_rate_percent_diff','date_time','Unnamed: 0']
+    
+    df = df.drop(kut_columns, axis=1)
+
+    return df
 
 """
 Filosofie: Karakteristieken per property duidelijker maken zodat het algoritme
@@ -214,7 +232,6 @@ if __name__ == "__main__":
     df_test = exp_historical_price_dif(df_test)
     
     # drop_nan_columns(df, threshhold=0.1)
-
     # print(len(df_test.loc[df_test["prob_book"] == 1]))
     # print(len(df_train.loc[df_train["prob_book"] == 1]))
     # print(df_test.shape)
@@ -268,5 +285,5 @@ if __name__ == "__main__":
 
     # print(time.time() - start)
 
-    df_train.to_csv('Data/processed_train.csv')
-    df.to_csv('Data/processed_test.csv')
+    df_train.to_csv('Data/prepro_train.csv')
+    df_test.to_csv('Data/prepro_test.csv')

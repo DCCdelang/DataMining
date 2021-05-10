@@ -14,7 +14,10 @@ def train_model():
 
     features = list(train.columns)
     features.remove('value')
-    features.remove('srch_id')
+    features.remove('click_bool')
+    features.remove('gross_bookings_usd')
+    features.remove('booking_bool')
+
     X = train[features]
     y = train["value"]  
     # estimators = [
@@ -54,9 +57,12 @@ def test_model(reg):
     scores = []
     ids = list(set(test['ra']))
     features = list(test.columns)
-    
     features.remove('value')
-    features.remove('ra')
+    features.remove('click_bool')
+    features.remove('gross_bookings_usd')
+    features.remove('booking_bool')
+    features.remove('value')
+    
     print(features)
 
     
@@ -112,76 +118,3 @@ def make_submission_file():
 
     # print(df.columns,df1.columns)
 
-# feature_importance()
-
-# make_clicked_file()
-
-# print("1")
-# df = pd.read_csv('Data/processed_train.csv')
-# df = make_files(df, 'test')
-# df.to_csv('Data/validation_test.csv', index=False)
-
-# print("2")
-# df = pd.read_csv('Data/clicked_data.csv')
-# df = make_files(df,'train')
-# df.to_csv('Data/validation_train.csv', index=False)
-
-# print("2")
-# df = pd.read_csv('Data/validation_train.csv')
-# add_values(df, 'Data/validation_train.csv')
-
-# print("2")
-# df = pd.read_csv('Data/validation_test.csv')
-# add_values(df, 'Data/validation_test.csv')
-
-# df = pd.read_csv('Data/validation_test.csv')
-# print(df.shape)
-# df = drop_columns(df)
-# df.to_csv('Data/validation_test_1.csv', index=False)
-
-# df = pd.read_csv('Data/validation_train.csv')
-# print(df.shape)
-# df = drop_columns(df)
-# df.to_csv('Data/validation_train_1.csv', index=False)
-
-# test_model(train_model())
-
-# drop_nan_columns()
-
-# check_same_values()
-
-
-# test_model(train_model())
-# random()
-
-# df = pd.read_csv('Data/processed_train.csv')
-# print(df.shape)
-# df = drop_columns(df)
-# df.to_csv('Data/validation_train.csv', index=False)
-
-# print(df.shape)
-
-# df = pd.read_csv('Data/validation_test.csv')
-# df = drop_columns(df)
-# df.to_csv('Data/validation_test.csv', index=False)
-
-
-# print(df.shape)
-
-# df = pd.read_csv('Data/clicked_data.csv')
-# add_values(df, 'Data/clicked_data.csv')
-
-df = pd.read_csv('Data/clicked_data.csv')
-print(df.shape)
-df = drop_columns(df)
-df.to_csv('Data/clicked_data_1.csv', index=False)
-
-print(df.shape)
-
-df = pd.read_csv('Data/processed_test.csv')
-print(df.shape)
-df = drop_columns(df)
-df.to_csv('Data/processed_test_1.csv', index=False)
-print(df.shape)
-
-make_submission_file()
