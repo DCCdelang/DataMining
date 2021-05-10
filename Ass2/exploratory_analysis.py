@@ -58,8 +58,33 @@ def analyze():
     plt.tight_layout()
     #plt.savefig('Star_diff.pdf')
     plt.show()
+    
+    
+    """Competitor plot"""
+    comps = ['comp1_rate','comp2_rate','comp3_rate','comp4_rate','comp5_rate','comp6_rate','comp7_rate','comp8_rate','booking_bool','click_bool', 'srch_id']
+    df_comps = df_clicked[comps]
+    df_comps.columns = ['comp1','comp2', 'comp3',  'comp4',  'comp5', 'comp6',  'comp7','comp8', 'booking_bool', 'click_bool', 'srch_id']
+    
+    df_comps = df_comps.reset_index()
+    df_comps['id'] = df_comps.index
+    #turn into wide format
+    df_comps =pd.wide_to_long(df_comps, ['comp'], i = ['id'] , j = 'competitor')
+    df_comps = df_comps.reset_index()
+    df_comps = df_comps.reset_index()
+    df_comps = df_comps.dropna()
   
+    df_comps['comp2'] = df_comps[['comp']].replace([-1,0,1], ['L', 'M', 'B'])
+    df_comps['comp_new'] = df_comps['competitor'].astype(str) + df_comps['comp2']
+    
+    fig = plt.figure(figsize=(12,5))
+    sns.countplot(x = 'comp_new', hue= 'booking_bool', data=df_comps, order = ['1L', '1M', '1B', '2L', '2M', '2B','3L', '3M', '3B', '4L', '4M', '4B', '5L', '5M', '5B', '6L', '6M', '6B', '7L', '7M', '7B', '8L', '8M', '8B'])
+    plt.tight_layout()
+    plt.savefig('Competitors.pdf')
+
+    
 def correlation_plot():
+    
+    #BTW:  pandas.correlation plot needs to be in a backend that supports rendering HTML (so I plotted it in jupyter notebook)
     search_criteria = df[['srch_length_of_stay', 'srch_booking_window','srch_adults_count', 'srch_children_count', 'srch_room_count',
        'srch_saturday_night_bool']]
     Hotel_stats = df[ [ 'prop_starrating', 'prop_review_score', 'prop_brand_bool',
