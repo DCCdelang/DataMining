@@ -9,7 +9,7 @@ from sklearn.ensemble import RandomForestRegressor, StackingRegressor
 from sklearn.model_selection import GridSearchCV 
 
 def train_model():
-    train = pd.read_csv('Data/validation_train_1.csv')
+    train = pd.read_csv('Data/validation_train.csv')
     train = train.fillna(0)
 
     features = list(train.columns)
@@ -17,16 +17,22 @@ def train_model():
     features.remove('click_bool')
     features.remove('gross_bookings_usd')
     features.remove('booking_bool')
+    features.remove('Unnamed: 0')
+    features.remove('Unnamed: 0.1')
+    features.remove('Unnamed: 0.1.1')
+    features.remove('ra')
+    features.remove('srch_id')
 
     X = train[features]
     y = train["value"]  
-    # estimators = [
-    # ('rf', RandomForestRegressor(n_estimators = 50, random_state=0))]
+    estimators = [
+    ('rf', RandomForestRegressor(n_estimators = 50, random_state=0))]
    
-    # reg = StackingRegressor(
-    # estimators=estimators,
-    # final_estimator=GradientBoostingRegressor(n_estimators=50, learning_rate=1.0, max_depth=2, random_state=0))
-    reg = GradientBoostingRegressor(n_estimators=50, learning_rate=1.0, max_depth=2, random_state=0)
+    reg = StackingRegressor(
+    estimators=estimators,
+    final_estimator=GradientBoostingRegressor(n_estimators=50, learning_rate=1.0, max_depth=2, random_state=0))
+    
+    # reg = GradientBoostingRegressor(n_estimators=50, learning_rate=1.0, max_depth=2, random_state=0)
     reg = reg.fit(X, y)
 
     
@@ -51,21 +57,23 @@ def train_model():
 
 def test_model(reg):
     
-    test = pd.read_csv('Data/validation_test_1.csv')
+    test = pd.read_csv('Data/validation_test.csv')
     
     test = test.fillna(0)
     scores = []
+
     ids = list(set(test['ra']))
     features = list(test.columns)
     features.remove('value')
     features.remove('click_bool')
     features.remove('gross_bookings_usd')
     features.remove('booking_bool')
-    features.remove('value')
-    
+    features.remove('Unnamed: 0')
+    features.remove('Unnamed: 0.1')
+    features.remove('Unnamed: 0.1.1')
+    features.remove('ra')
+    features.remove('srch_id')
     print(features)
-
-    
 
     for i in ids:
         test1 = test.loc[test['ra'] == i]
@@ -84,10 +92,16 @@ def test_model(reg):
     print(np.mean(scores))
 
 def make_submission_file():
-    train = pd.read_csv('Data/clicked_data_1.csv')
+    train = pd.read_csv('Data/clicked_data.csv')
     train = train.fillna(0)
     features = list(train.columns)
     features.remove('value')
+    features.remove('click_bool')
+    features.remove('gross_bookings_usd')
+    features.remove('booking_bool')
+    features.remove('Unnamed: 0')
+    features.remove('ra')
+    features.remove('srch_id')
     
     X = train[features]
     y = train["value"]
@@ -97,10 +111,10 @@ def make_submission_file():
    
     reg = StackingRegressor(
     estimators=estimators,
-    final_estimator=GradientBoostingRegressor(n_estimators=10, learning_rate=1.0, max_depth=2, random_state=0))
+    final_estimator=GradientBoostingRegressor(n_estimators=50, learning_rate=1.0, max_depth=2, random_state=0))
     reg = reg.fit(X, y)
     
-    test = pd.read_csv('Data/processed_test_1.csv')
+    test = pd.read_csv('Data/prepro_test.csv')
     test = test.fillna(0)
     df_sub = test
     
@@ -118,3 +132,4 @@ def make_submission_file():
 
     # print(df.columns,df1.columns)
 
+test_model(train_model())

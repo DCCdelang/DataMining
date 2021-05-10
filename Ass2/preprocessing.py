@@ -46,22 +46,22 @@ def prob_quality_click(df):
     df = df.join(df.groupby(["prop_id"])["count"].sum(), on="prop_id",rsuffix="_tot")
     # print(df["click_bool_tot"].unique())
     # print(df["count_tot"].unique())
-    df["prob_book"] = df["click_bool_tot"]/df["count_tot"]
+    df["prob_click"] = df["click_bool_tot"]/df["count_tot"]
     df = df.drop(["count"],axis=1)
     df = df.drop(["click_bool_tot"],axis=1)
     df = df.drop(["count_tot"],axis=1)
     return df
 
 def prob_quality_click_test(df_train, df_test):
-    df_test["prob_book"] = 0
-    train_sub = df_train[["prop_id","prob_book"]]
-    test_sub = df_test[["prop_id","prob_book"]]
+    df_test["prob_click"] = 0
+    train_sub = df_train[["prop_id","prob_click"]]
+    test_sub = df_test[["prop_id","prob_click"]]
 
     df_full = pd.concat([train_sub,test_sub])
 
-    df_full = df_full.join(df_full.groupby(["prop_id"])["prob_book"].max(), on="prop_id",rsuffix="_extend")
+    df_full = df_full.join(df_full.groupby(["prop_id"])["prob_click"].max(), on="prop_id",rsuffix="_extend")
 
-    df_test["prob_book"] = df_full["prob_book_extend"].tail(df_test.shape[0])
+    df_test["prob_click"] = df_full["prob_click_extend"].tail(df_test.shape[0])
 
     return df_test
 
@@ -90,12 +90,23 @@ def prob_quality_book_test(df_train, df_test):
 
 def position_average(df_train,df_test):
     # Filter random positions
-    print(df_train.shape[0])
-    print(len(df_train.loc[df_train["random_bool"] == 0]))
+    # print(df_train.shape[0])
+    # print(len(df_train.loc[df_train["random_bool"] == 0]))
+    # df_train["position_mean"] = 0
+    df_test["position_mean"] = 0
     df_train_ranked = df_train.loc[df_train["random_bool"] == 0]
     df_train_ranked = df_train_ranked.join(df_train_ranked.groupby(["prop_id"])["position"].mean(),on="prop_id",rsuffix="_mean")
+
+    df = pd.concat([df_train,df_train_ranked, df_test])
+    df = df.join(df.groupby(["prop_id"])["position_mean"].max(),on="prop_id",rsuffix="_extend")
+
+    df_train = df.head(df_train.shape[0])
+    df_test = df.tail(df_test.shape[0])
     
-    return 
+    # print(df_train["position_mean"].unique())
+    # print(df_train[["position","random_bool","position_mean_extend"]].head())
+
+    return df_train, df_test
 
 
 # Function to average out numerical values per property, can be done in combination with test set. Should be done at beginning?!
@@ -212,6 +223,8 @@ if __name__ == "__main__":
     # df_train = pd.read_csv('Ass2/Data/training_head.csv')
     # df_test = pd.read_csv('Ass2/Data/test_head.csv')
 
+    # position_average(df_train,df_test)
+
     # print(time.time() - start)
     df_train = prob_quality_book(df_train)
 
@@ -285,5 +298,8 @@ if __name__ == "__main__":
 
     # print(time.time() - start)
 
-    df_train.to_csv('Data/prepro_train.csv')
-    df_test.to_csv('Data/prepro_test.csv')
+    print('1')
+    df_train.to_csv('prepro_train.csv')
+    print('2')
+    df_test.to_csv('prepro_test.csv')
+    print('3')
