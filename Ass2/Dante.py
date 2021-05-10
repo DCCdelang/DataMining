@@ -162,7 +162,15 @@ def median_per_prop(df):
 # df = pd.read_csv("Ass2/Data/train_data.csv")
 
 start = time.time()
-df = pd.read_csv("Ass2/Data/training_set_VU_DM.csv")
+# df = pd.read_csv("Ass2/Data/training_set_VU_DM.csv")
+
+
+df_train = pd.read_csv('Ass2/Data/training_set_VU_DM.csv')
+df_train.head(100000).to_csv("Data/training_head.csv")
+
+df_test = pd.read_csv('Ass2/Data/test_set_VU_DM.csv')
+df_test.head(100000).to_csv("Data/test_head.csv")
+
 
 start2 = time.time()
 print("loading:",start2-start)
