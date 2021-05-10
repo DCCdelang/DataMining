@@ -42,12 +42,14 @@ def starrating_diff(df):
 
 def prob_quality_click(df):
     df["count"] = 1
-    df = df.join(df.groupby(["prop_id"])["clicking_bool"].sum(), on="prop_id",rsuffix="_tot")
+    df = df.join(df.groupby(["prop_id"])["click_bool"].sum(), on="prop_id",rsuffix="_tot")
     df = df.join(df.groupby(["prop_id"])["count"].sum(), on="prop_id",rsuffix="_tot")
-    df["prob_book"] = df["clicking_bool_tot"]/df["count_tot"]
-    df.drop(["count"],axis=1)
-    df.drop(["clicking_bool_tot"],axis=1)
-    df.drop(["count_tot"],axis=1)
+    print(df["click_bool_tot"].unique())
+    print(df["count_tot"].unique())
+    df["prob_book"] = df["click_bool_tot"]/df["count_tot"]
+    df = df.drop(["count"],axis=1)
+    df = df.drop(["click_bool_tot"],axis=1)
+    df = df.drop(["count_tot"],axis=1)
     return df
 
 def prob_quality_click_test(df_train, df_test):
@@ -68,9 +70,9 @@ def prob_quality_book(df):
     df = df.join(df.groupby(["prop_id"])["booking_bool"].sum(), on="prop_id",rsuffix="_tot")
     df = df.join(df.groupby(["prop_id"])["count"].sum(), on="prop_id",rsuffix="_tot")
     df["prob_book"] = df["booking_bool_tot"]/df["count_tot"]
-    df.drop(["count"],axis=1)
-    df.drop(["booking_bool_tot"],axis=1)
-    df.drop(["count_tot"],axis=1)
+    df = df.drop(["count"],axis=1)
+    df = df.drop(["booking_bool_tot"],axis=1)
+    df = df.drop(["count_tot"],axis=1)
     return df
 
 def prob_quality_book_test(df_train, df_test):
@@ -85,6 +87,16 @@ def prob_quality_book_test(df_train, df_test):
     df_test["prob_book"] = df_full["prob_book_extend"].tail(df_test.shape[0])
 
     return df_test
+
+def position_average(df_train,df_test):
+    # Filter random positions
+    print(df_train.shape[0])
+    print(len(df_train.loc[df_train["random_bool"] == 0]))
+    df_train_ranked = df_train.loc[df_train["random_bool"] == 0]
+    df_train_ranked = df_train_ranked.join(df_train_ranked.groupby(["prop_id"])["position"].mean(),on="prop_id",rsuffix="_mean")
+    
+    return 
+
 
 # Function to average out numerical values per property, can be done in combination with test set. Should be done at beginning?!
 def averages_per_prop(df_train, df_test):
@@ -103,7 +115,7 @@ def averages_per_prop(df_train, df_test):
 
     df = df.join(df.groupby(["prop_id"])["price_usd"].mean(), on="prop_id",rsuffix="_avg")
 
-    df.drop(["count"],axis=1)
+    df = df.drop(["count"],axis=1)
     df_train = df.head(df_train.shape[0])
     df_test = df.head(df_test.shape[0])
     return df_train,df_test
@@ -125,7 +137,7 @@ def std_per_prop(df_train, df_test):
 
     df = df.join(df.groupby(["prop_id"])["price_usd"].std(), on="prop_id",rsuffix="_std")
 
-    df.drop(["count"],axis=1)
+    df = df.drop(["count"],axis=1)
     df_train = df.head(df_train.shape[0])
     df_test = df.head(df_test.shape[0])
     return df_train,df_test
@@ -146,7 +158,7 @@ def median_per_prop(df_train, df_test):
 
     df = df.join(df.groupby(["prop_id"])["price_usd"].median(), on="prop_id",rsuffix="_median")
 
-    df.drop(["count"],axis=1)
+    df = df.drop(["count"],axis=1)
     df_train = df.head(df_train.shape[0])
     df_test = df.head(df_test.shape[0])
     return df_train,df_test
@@ -186,11 +198,11 @@ if __name__ == "__main__":
 
 
 
-    df_train = pd.read_csv('Ass2/Data/training_set_VU_DM.csv')
-    df_test = pd.read_csv('Ass2/Data/test_set_VU_DM.csv')
+    # df_train = pd.read_csv('Ass2/Data/training_set_VU_DM.csv')
+    # df_test = pd.read_csv('Ass2/Data/test_set_VU_DM.csv')
 
-    # df_train = pd.read_csv('Ass2/Data/training_head.csv')
-    # df_test = pd.read_csv('Ass2/Data/test_head.csv')
+    df_train = pd.read_csv('Ass2/Data/training_head.csv')
+    df_test = pd.read_csv('Ass2/Data/test_head.csv')
 
     # print(time.time() - start)
     df_train = prob_quality_book(df_train)
@@ -212,7 +224,6 @@ if __name__ == "__main__":
     df_test = exp_historical_price_dif(df_test)
     
     # drop_nan_columns(df, threshhold=0.1)
-
     # print(len(df_test.loc[df_test["prob_book"] == 1]))
     # print(len(df_train.loc[df_train["prob_book"] == 1]))
     # print(df_test.shape)
@@ -266,5 +277,5 @@ if __name__ == "__main__":
 
     # print(time.time() - start)
 
-    # df.to_csv('Data/processed_end_data.csv')
-    # # df.to_csv('Data/preprocessed.csv')
+    df_train.to_csv('prepro_train.csv')
+    df_test.to_csv('prepro_test.csv')
