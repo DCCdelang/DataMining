@@ -100,6 +100,8 @@ def position_average(df_train,df_test):
     df = pd.concat([df_train,df_train_ranked, df_test])
     df = df.join(df.groupby(["prop_id"])["position_mean"].max(),on="prop_id",rsuffix="_extend")
 
+    df = df.drop(["position_mean"], axis = 1)
+    # print(df[df["position_mean_extend"]<1].count())
     df_train = df.head(df_train.shape[0])
     df_test = df.tail(df_test.shape[0])
     
@@ -209,13 +211,13 @@ if __name__ == "__main__":
 
 
 
-    # df_train = pd.read_csv('Ass2/Data/training_set_VU_DM.csv')
-    # df_test = pd.read_csv('Ass2/Data/test_set_VU_DM.csv')
+    df_train = pd.read_csv('Ass2/Data/training_set_VU_DM.csv')
+    df_test = pd.read_csv('Ass2/Data/test_set_VU_DM.csv')
 
-    df_train = pd.read_csv('Ass2/Data/training_head.csv')
-    df_test = pd.read_csv('Ass2/Data/test_head.csv')
+    # df_train = pd.read_csv('Ass2/Data/training_head.csv')
+    # df_test = pd.read_csv('Ass2/Data/test_head.csv')
 
-    # position_average(df_train,df_test)
+    df_train,df_test = position_average(df_train,df_test)
 
     # print(time.time() - start)
     df_train = prob_quality_book(df_train)
@@ -290,5 +292,5 @@ if __name__ == "__main__":
 
     # print(time.time() - start)
 
-    df_train.to_csv('prepro_train.csv')
-    df_test.to_csv('prepro_test.csv')
+    df_train.to_csv('prepro_train.csv',index = False)
+    df_test.to_csv('prepro_test.csv', index = False)
