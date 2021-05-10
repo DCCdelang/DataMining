@@ -20,7 +20,9 @@ def extract_date_time(df, plot = False):
 # Gross price divided by days of stay
 def price_per_day(df):
     # df = booking_Filter(df).copy()
-    df["gross_bookings_per_day"] = df["gross_bookings_usd"]/df["srch_length_of_stay"]
+
+    # df["gross_bookings_per_day"] = df["gross_bookings_usd"]/df["srch_length_of_stay"]
+
     df["price_per_day"] = df["price_usd"]/df["srch_length_of_stay"]
     return df
 
@@ -30,7 +32,7 @@ def exp_historical_price_dif(df):
     df["hist_price_dif"] = df["historical_price"] - df["price_usd"]
     return df
 
-# Convert to log prices and difference
+# Convert to log prices and difference NIET HANDIG VOOR FS
 def log_historical_price_dif(df):
     df["log_price_usd"] = np.log(df["price_usd"])
     df["log_hist_price_dif"] = df["prop_log_historical_price"] - df["log_price_usd"]
@@ -40,7 +42,7 @@ def starrating_diff(df):
     df["starrating_diff"]=np.abs(df["visitor_hist_starrating"]-df["prop_starrating"])
     return df
 
-def prop_quality_book(df):
+def prob_quality_book(df):
     df["count"] = 1
     df = df.join(df.groupby(["prop_id"])["booking_bool"].sum(), on="prop_id",rsuffix="_tot")
     df = df.join(df.groupby(["prop_id"])["count"].sum(), on="prop_id",rsuffix="_tot")
@@ -48,9 +50,9 @@ def prop_quality_book(df):
     df.drop(["count"],axis=1)
     return df
 
-def prop_quality_book_test(df_train, df_test):
+def prob_quality_book_test(df_train, df_test):
     df_test["prob_book"] = 0
-    df_full = pd.concat([df_train,df_test])
+    df_full = pd.concat([df_train,df_test] )
 
     df_full = df_full.join(df_full.groupby(["prop_id"])["prob_book"].max(), on="prop_id",rsuffix="_tot")
 
@@ -125,6 +127,9 @@ def drop_nan_columns(df, threshhold=0.1):
             print(i)
 
     return df1
+
+
+
 """
 Filosofie: Karakteristieken per property duidelijker maken zodat het algoritme
 sneller/beter snapt waar een property in de lijst moet komen.
@@ -152,10 +157,10 @@ if __name__ == "__main__":
     
     print(time.time() - start)
 
-    df_test = pd.read_csv('Ass2/Data/test_set_VU_DM.csv')
+    # df_test = pd.read_csv('Ass2/Data/test_set_VU_DM.csv')
     print(time.time() - start)
 
-    df_test = prop_quality_book_test(df, df_test)
+    # df_test = prop_quality_book_test(df, df_test)
     
     print(time.time() - start)
     print(df_test.head(100))
@@ -179,10 +184,10 @@ if __name__ == "__main__":
     starrating_diff(df)
 
     print(time.time() - start)
-    # prop_quality_book(df)
+    # prob_quality_book(df)
 
 
-    prop_quality_book(df)
+    prob_quality_book(df)
 
     print(time.time() - start)
     averages_per_prop(df)

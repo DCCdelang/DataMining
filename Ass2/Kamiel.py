@@ -5,15 +5,14 @@ import matplotlib.pyplot as plt
 from sklearn.inspection import permutation_importance
 from sklearn.ensemble import GradientBoostingRegressor,GradientBoostingClassifier
 from sklearn.metrics import ndcg_score, make_scorer, SCORERS
-
+from sklearn.ensemble import RandomForestRegressor, StackingRegressor
 from sklearn.model_selection import GridSearchCV 
 
 def make_files():
-
-    df = pd.read_csv('Data/preprocessed.csv')
+    df = pd.read_csv('Data/training_set_VU_DM.csv')
 
     df = df.tail(100000)
-    df.to_csv('Data/test_data.csv', index=False)
+    df.to_csv('Data/train_head.csv', index=False)
 
 def add_values(df, name):
     values = []
@@ -50,27 +49,32 @@ def train_model():
     # features.remove('prob_book')
     # features.remove('value')
     
+    estimators = [
+    ('rf', RandomForestRegressor(n_estimators = 50, random_state=0))]
     X = train[features]
     y = train["value"]  
-    reg = GradientBoostingRegressor(n_estimators=50, learning_rate=1.0, max_depth=2, random_state=0)
+    reg = StackingRegressor(
+    estimators=estimators,
+    final_estimator=GradientBoostingRegressor(n_estimators=50, learning_rate=1.0, max_depth=2, random_state=0))
+    # reg = GradientBoostingRegressor(n_estimators=50, learning_rate=1.0, max_depth=2, random_state=0)
     reg = reg.fit(X, y)
 
     
-    hyperparameters = {                     
-                    'n_estimators': [50,100,150],
-                    'max_depth': [2, 4],
-                    'learning_rate': [1, 2],
-                    'criterion': ['friedman_mse', 'mse', 'mae']
-                }
+    # hyperparameters = {                     
+    #                 'n_estimators': [50,100,150],
+    #                 'max_depth': [2, 4],
+    #                 'learning_rate': [1, 2],
+    #                 'criterion': ['friedman_mse', 'mse', 'mae']
+    #             }
 
-    print(SCORERS.keys())
-    reg = GridSearchCV(reg, hyperparameters, scoring='neg_mean_squared_error')
-    # Fit and tune model
-    print(reg.get_params().keys())
-    reg.fit(X, y)
+    # print(SCORERS.keys())
+    # reg = GridSearchCV(reg, hyperparameters, scoring='neg_mean_squared_error')
+    # # Fit and tune model
+    # print(reg.get_params().keys())
+    # reg.fit(X, y)
 
 
-    print(reg.best_params_)
+    # print(reg.best_params_)
 
     print("Training is done!")
     return reg
@@ -95,7 +99,6 @@ def test_model(reg):
     features.remove('hour')
     features.remove('log_hist_price_dif')
     features.remove('log_price_usd')
-    features.remove('price_per_day')
     features.remove('gross_bookings_per_day')
     # features.remove('prob_book')
 
@@ -140,7 +143,7 @@ def feature_importance():
     X = train[features]
     y = train["value"]  
 
-    reg = GradientBoostingRegressor(n_estimators=100, learning_rate=1.0,
+    reg = GradientBoostingRegressor(n_estimators=1000, learning_rate=1.0,
     max_depth=1, random_state=0)
 
     reg = reg.fit(X, y)
@@ -179,13 +182,12 @@ def make_submission_file():
     features.remove('hour')
     features.remove('log_hist_price_dif')
     features.remove('log_price_usd')
-    features.remove('price_per_day')
     features.remove('booking_bool')
     features.remove('gross_bookings_per_day')
     # features = ['price_usd', 'prop_review_score', 'prop_starrating','promotion_flag', 'prop_starrating','srch_saturday_night_bool']
     X = train[features]
     y = train["value"]  
-    reg = GradientBoostingRegressor(n_estimators=100, learning_rate=1.0,
+    reg = GradientBoostingRegressor(n_estimators=1000, learning_rate=1.0,
     max_depth=1, random_state=0)
     reg = reg.fit(X, y)
     
@@ -246,10 +248,10 @@ def random():
 # feature_importance()
 
 
-# make_files()
+make_files()
 # df = pd.read_csv('Data/test_data.csv')
 # add_values(df, 'Data/test_data.csv')
-test_model(train_model())
+# test_model(train_model())
 
 # drop_nan_columns()
 
