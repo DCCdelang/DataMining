@@ -165,12 +165,13 @@ start = time.time()
 # df = pd.read_csv("Ass2/Data/training_set_VU_DM.csv")
 
 
-df_train = pd.read_csv('Ass2/Data/training_set_VU_DM.csv')
-df_train.head(100000).to_csv("Data/training_head.csv")
+df_train = pd.read_csv('Ass2/Data/training_head.csv')
+df_train.head(1000).to_csv("Ass2/Data/training_head_s.csv",index=False)
 
-df_test = pd.read_csv('Ass2/Data/test_set_VU_DM.csv')
-df_test.head(100000).to_csv("Data/test_head.csv")
+df_test = pd.read_csv('Ass2/Data/training_head.csv')
+df_test.head(1000).to_csv("Ass2/Data/test_head_s.csv",index=False)
 
+exit()
 
 start2 = time.time()
 print("loading:",start2-start)
