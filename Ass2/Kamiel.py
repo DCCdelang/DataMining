@@ -10,37 +10,31 @@ from sklearn.model_selection import GridSearchCV
 
 def train_model():
     train = pd.read_csv('Data/validation_train.csv')
-    train = train.fillna(0)
+    train = train.fillna(-2)
 
     features = list(train.columns)
     features.remove('value')
     features.remove('click_bool')
     features.remove('gross_bookings_usd')
     features.remove('booking_bool')
-    features.remove('Unnamed: 0')
-    features.remove('Unnamed: 0.1')
-    features.remove('Unnamed: 0.1.1')
-    features.remove('ra')
     features.remove('srch_id')
+    features.remove('position')
 
     X = train[features]
     y = train["value"]  
     estimators = [
-    ('rf', RandomForestRegressor(n_estimators = 50, random_state=0))]
+    ('rf', RandomForestRegressor(n_estimators = 200, random_state=0))]
    
     reg = StackingRegressor(
     estimators=estimators,
-    final_estimator=GradientBoostingRegressor(n_estimators=50, learning_rate=1.0, max_depth=2, random_state=0))
+    final_estimator=GradientBoostingRegressor(n_estimators=10, learning_rate=1.0, max_depth=2, random_state=0))
     
-    # reg = GradientBoostingRegressor(n_estimators=50, learning_rate=1.0, max_depth=2, random_state=0)
+    # reg = GradientBoostingRegressor(n_estimators=100, learning_rate=1.0, max_depth=2, random_state=0)
     reg = reg.fit(X, y)
 
     
     # hyperparameters = {                     
-    #                 'n_estimators': [50,100,150],
-    #                 'max_depth': [2, 4],
-    #                 'learning_rate': [1, 2],
-    #                 'criterion': ['friedman_mse', 'mse', 'mae']
+    #                 'n_estimators': [10,20,30,40,50],
     #             }
 
     # print(SCORERS.keys())
@@ -59,24 +53,21 @@ def test_model(reg):
     
     test = pd.read_csv('Data/validation_test.csv')
     
-    test = test.fillna(0)
+    test = test.fillna(-2)
     scores = []
 
-    ids = list(set(test['ra']))
+    ids = list(set(test['srch_id']))
     features = list(test.columns)
     features.remove('value')
     features.remove('click_bool')
     features.remove('gross_bookings_usd')
     features.remove('booking_bool')
-    features.remove('Unnamed: 0')
-    features.remove('Unnamed: 0.1')
-    features.remove('Unnamed: 0.1.1')
-    features.remove('ra')
     features.remove('srch_id')
+    features.remove('position')
     print(features)
 
     for i in ids:
-        test1 = test.loc[test['ra'] == i]
+        test1 = test.loc[test['srch_id'] == i]
 
    
         X = test1[features]
@@ -92,30 +83,32 @@ def test_model(reg):
     print(np.mean(scores))
 
 def make_submission_file():
-    train = pd.read_csv('Data/clicked_data.csv')
+    train = pd.read_csv('Data/clicked_data_submission.csv')
     train = train.fillna(0)
     features = list(train.columns)
     features.remove('value')
     features.remove('click_bool')
     features.remove('gross_bookings_usd')
     features.remove('booking_bool')
-    features.remove('Unnamed: 0')
-    features.remove('ra')
     features.remove('srch_id')
+    features.remove('position')
+    # features.remove('Unnamed: 0')
     
     X = train[features]
     y = train["value"]
 
-    estimators = [
-    ('rf', RandomForestRegressor(n_estimators = 50, random_state=0))]
+    # estimators = [
+    # ('rf', RandomForestRegressor(n_estimators = 50, random_state=0))]
    
-    reg = StackingRegressor(
-    estimators=estimators,
-    final_estimator=GradientBoostingRegressor(n_estimators=50, learning_rate=1.0, max_depth=2, random_state=0))
+    # reg = StackingRegressor(
+    # estimators=estimators,
+    # final_estimator=GradientBoostingRegressor(n_estimators=50, learning_rate=1.0, max_depth=2, random_state=0))
+
+    reg = GradientBoostingRegressor(n_estimators=5, learning_rate=1.0, max_depth=2, random_state=0)
     reg = reg.fit(X, y)
     
     test = pd.read_csv('Data/prepro_test.csv')
-    test = test.fillna(0)
+    test = test.fillna(-2)
     df_sub = test
     
     X = test[features] 
@@ -133,3 +126,5 @@ def make_submission_file():
     # print(df.columns,df1.columns)
 
 test_model(train_model())
+# make_submission_file()
+

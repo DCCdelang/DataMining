@@ -100,6 +100,8 @@ def position_average(df_train,df_test):
     df = pd.concat([df_train,df_train_ranked, df_test])
     df = df.join(df.groupby(["prop_id"])["position_mean"].max(),on="prop_id",rsuffix="_extend")
 
+    df = df.drop(["position_mean"], axis = 1)
+    # print(df[df["position_mean_extend"]<1].count())
     df_train = df.head(df_train.shape[0])
     df_test = df.tail(df_test.shape[0])
     
@@ -217,13 +219,13 @@ if __name__ == "__main__":
 
 
 
-    df_train = pd.read_csv('Ass2/Data/training_set_VU_DM.csv')
-    df_test = pd.read_csv('Ass2/Data/test_set_VU_DM.csv')
+    df_train = pd.read_csv('Data/training_set_VU_DM.csv')
+    df_test = pd.read_csv('Data/test_set_VU_DM.csv')
 
     # df_train = pd.read_csv('Ass2/Data/training_head.csv')
     # df_test = pd.read_csv('Ass2/Data/test_head.csv')
 
-    # position_average(df_train,df_test)
+    df_train,df_test = position_average(df_train,df_test)
 
     # print(time.time() - start)
     df_train = prob_quality_book(df_train)
@@ -244,62 +246,32 @@ if __name__ == "__main__":
 
     df_test = exp_historical_price_dif(df_test)
     
-    # drop_nan_columns(df, threshhold=0.1)
-    # print(len(df_test.loc[df_test["prob_book"] == 1]))
-    # print(len(df_train.loc[df_train["prob_book"] == 1]))
-    # print(df_test.shape)
-    # print(df_train.shape)
-    # print(df_train.head(10))
-    # print(df_test.head(10))
+   
 
-    # sns.histplot(df_test["prob_book"])
-    # plt.xlim(0.00001,1)
-    # plt.show()
+  
+    drop_nan_columns(df_test, threshhold=0.05)
+    drop_nan_columns(df_train, threshhold=0.05)
 
-    # sns.histplot(df_train["prob_book"])
-    # plt.xlim(0.00001,1)
-    # plt.show()
-    
-    # print(time.time() - start)
-    # print(df_test.head(100))
-
-    # exit()
-    # drop_nan_columns(df, threshhold=0.05)
-
-    # print(time.time() - start)
+    print(time.time() - start)
     # extract_date_time(df)
 
     # print(time.time() - start)
-    # # price_per_day(df)
-
-    # print(time.time() - start)
-    # exp_historical_price_dif(df)
-
-    # print(time.time() - start)
-    # log_historical_price_dif(df)
-
-    # print(time.time() - start)
-    # starrating_diff(df)
-
-    # print(time.time() - start)
-    # # prop_quality_book(df)
+    price_per_day(df_test)
+    price_per_day(df_train)
+    print(time.time() - start)
 
 
-    # prop_quality_book(df)
+    exp_historical_price_dif(df_test)
+    exp_historical_price_dif(df_train)
+    print(time.time() - start)
 
-    # print(time.time() - start)
-    # averages_per_prop(df)
+    starrating_diff(df_test)
+    starrating_diff(df_train)
+    print(time.time() - start)
 
-    # print(time.time() - start)
-    # std_per_prop(df)
-
-    # print(time.time() - start)
-    # median_per_prop(df)
-
-    # print(time.time() - start)
 
     print('1')
-    df_train.to_csv('prepro_train.csv')
+    df_train.to_csv('Data/prepro_train.csv', index=False)
     print('2')
-    df_test.to_csv('prepro_test.csv')
+    df_test.to_csv('Data/prepro_test.csv', index=False)
     print('3')

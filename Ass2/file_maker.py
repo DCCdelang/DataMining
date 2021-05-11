@@ -1,6 +1,6 @@
 import pandas as pd
 
-def make_files(df, kind, test=120000, train=300000):
+def make_files(df, kind, test=120000, train=30000):
     if kind == 'test':
         df = df.tail(test)
     else:
@@ -36,26 +36,29 @@ def make_clicked_file():
     df.to_csv('Data/clicked_data.csv', index=False)
 
 def drop_columns(df):
-    kut_columns = ['date_time','Unnamed: 0']
+    kut_columns = ['date_time']
     
     df = df.drop(kut_columns, axis=1)
     return df
 
 
 if __name__ == "__main__":
-
-    # Deletes all the stupid features of the pre processed files
-    df = pd.read_csv('prepro_test.csv')
+    
+    # # Deletes all the stupid features of the pre processed files
+    df = pd.read_csv('Data/prepro_test.csv')
+    print("-2")
     df = drop_columns(df)
-    df.to_csv('prepro_test.csv', index=False)
+    df.to_csv('Data/prepro_test.csv', index=False)
 
-    df = pd.read_csv('prepro_train.csv')
+    df = pd.read_csv('Data/prepro_train.csv')
     df = drop_columns(df)
-    df.to_csv('prepro_train.csv', index=False)
+    df.to_csv('Data/prepro_train.csv', index=False)
 
+    print("-1")
     # Makes file with all clicked values for training
     make_clicked_file()
 
+    print('1')
     # Makes validation test and train set
     df = pd.read_csv('Data/prepro_train.csv')
 
@@ -67,6 +70,7 @@ if __name__ == "__main__":
     df = make_files(df, 'train')
     df.to_csv('Data/validation_train.csv', index=False)
 
+    print('2')
     # adds values to the validation sets (5 for booking, 1 for clicking)
     df = pd.read_csv('Data/validation_test.csv')
     df = add_values(df)
@@ -75,3 +79,11 @@ if __name__ == "__main__":
     df = pd.read_csv('Data/validation_train.csv')
     df = add_values(df)
     df.to_csv('Data/validation_train.csv', index=False)
+    print('3')
+
+    # makes submission_train set
+    df = pd.read_csv('Data/clicked_data.csv')
+    df = add_values(df)
+    df.to_csv('Data/clicked_data_submission.csv', index=False)
+    print('3')
+
