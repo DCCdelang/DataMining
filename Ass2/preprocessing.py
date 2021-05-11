@@ -173,6 +173,14 @@ def drop_nan_columns(df, threshhold=0.1):
     #         print(i)
 
     return df1
+
+def drop_kkcolumns(df):
+    kut_columns = ['click_bool', 'gross_bookings_usd', 'booking_bool','srch_saturday_night_bool', 'srch_query_affinity_score', 'orig_destination_distance', 'random_bool', 'comp1_rate', 'comp1_inv', 'comp1_rate_percent_diff', 'comp2_rate', 'comp2_inv', 'comp2_rate_percent_diff', 'comp3_rate', 'comp3_inv', 'comp3_rate_percent_diff', 'comp4_rate', 'comp4_inv', 'comp4_rate_percent_diff', 'comp5_rate', 'comp5_inv', 'comp5_rate_percent_diff', 'comp6_rate', 'comp6_inv', 'comp6_rate_percent_diff', 'comp7_rate', 'comp7_inv', 'comp7_rate_percent_diff', 'comp8_rate', 'comp8_inv', 'comp8_rate_percent_diff','date_time','Unnamed: 0']
+    
+    df = df.drop(kut_columns, axis=1)
+
+    return df
+
 """
 Filosofie: Karakteristieken per property duidelijker maken zodat het algoritme
 sneller/beter snapt waar een property in de lijst moet komen.
@@ -232,37 +240,26 @@ if __name__ == "__main__":
     df_train = df_train.round(2)
     df_test = df_test.round(2)
 
-    # print(time.time() - start)
+    print(time.time() - start)
     # extract_date_time(df)
 
     # print(time.time() - start)
-    # # price_per_day(df)
-
-    # print(time.time() - start)
-    # exp_historical_price_dif(df)
-
-    # print(time.time() - start)
-    # log_historical_price_dif(df)
-
-    # print(time.time() - start)
-    # starrating_diff(df)
-
-    # print(time.time() - start)
-    # # prop_quality_book(df)
+    price_per_day(df_test)
+    price_per_day(df_train)
+    print(time.time() - start)
 
 
-    # prop_quality_book(df)
+    exp_historical_price_dif(df_test)
+    exp_historical_price_dif(df_train)
+    print(time.time() - start)
 
-    # print(time.time() - start)
-    # averages_per_prop(df)
+    starrating_diff(df_test)
+    starrating_diff(df_train)
+    print(time.time() - start)
 
-    # print(time.time() - start)
-    # std_per_prop(df)
 
-    # print(time.time() - start)
-    # median_per_prop(df)
-
-    # print(time.time() - start)
-
-    df_train.to_csv('prepro_train.csv',index = False)
-    df_test.to_csv('prepro_test.csv', index = False)
+    print('1')
+    df_train.to_csv('Data/prepro_train.csv', index=False)
+    print('2')
+    df_test.to_csv('Data/prepro_test.csv', index=False)
+    print('3')
