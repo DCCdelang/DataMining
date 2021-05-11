@@ -31,28 +31,28 @@ def drop_nan_columns(df):
     return df
 
 def make_clicked_file():
-    df = pd.read_csv('Data/prepro_train.csv')
+    df = pd.read_csv('Data/prepro_train2.csv')
     df = df.loc[df['click_bool'] == 1]
     df.to_csv('Data/clicked_data.csv', index=False)
 
-def drop_columns(df):
-    kut_columns = ['date_time']
+# def drop_columns(df):
+#     kut_columns = ['date_time']
     
-    df = df.drop(kut_columns, axis=1)
-    return df
+#     df = df.drop(kut_columns, axis=1)
+#     return df
 
 
 if __name__ == "__main__":
     
     # # Deletes all the stupid features of the pre processed files
-    df = pd.read_csv('Data/prepro_test.csv')
-    print("-2")
-    df = drop_columns(df)
-    df.to_csv('Data/prepro_test.csv', index=False)
+    # df = pd.read_csv('Data/prepro_test.csv')
+    # print("-2")
+    # df = drop_columns(df)
+    # df.to_csv('Data/prepro_test.csv', index=False)
 
-    df = pd.read_csv('Data/prepro_train.csv')
-    df = drop_columns(df)
-    df.to_csv('Data/prepro_train.csv', index=False)
+    # df = pd.read_csv('Data/prepro_train.csv')
+    # df = drop_columns(df)
+    # df.to_csv('Data/prepro_train.csv', index=False)
 
     print("-1")
     # Makes file with all clicked values for training
@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
     print('1')
     # Makes validation test and train set
-    df = pd.read_csv('Data/prepro_train.csv')
+    df = pd.read_csv('Data/prepro_train2.csv')
 
     df = make_files(df, 'test')
     df.to_csv('Data/validation_test.csv', index=False)

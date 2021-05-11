@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 from sklearn.inspection import permutation_importance
 from sklearn.ensemble import GradientBoostingRegressor,GradientBoostingClassifier
 from sklearn.metrics import ndcg_score, make_scorer, SCORERS
-from sklearn.ensemble import RandomForestRegressor, StackingRegressor
+from sklearn.ensemble import RandomForestRegressor, StackingRegressor, AdaBoostRegressor
 from sklearn.model_selection import GridSearchCV 
 
 def train_model():
     train = pd.read_csv('Data/validation_train.csv')
-    train = train.fillna(-2)
+    train = train.fillna(-1)
 
     features = list(train.columns)
     features.remove('value')
@@ -22,19 +22,23 @@ def train_model():
 
     X = train[features]
     y = train["value"]  
-    estimators = [
-    ('rf', RandomForestRegressor(n_estimators = 200, random_state=0))]
+    # estimators = [
+    # ('rf', RandomForestRegressor(n_estimators = 100, random_state=0)), 
+    # ('gb',GradientBoostingRegressor(n_estimators=10, learning_rate=1.0, max_depth=2, random_state=0))
+    # ]
    
-    reg = StackingRegressor(
-    estimators=estimators,
-    final_estimator=GradientBoostingRegressor(n_estimators=10, learning_rate=1.0, max_depth=2, random_state=0))
+    # reg = StackingRegressor(
+    # estimators=estimators,
+    # final_estimator=AdaBoostRegressor(random_state=0, n_estimators=100, loss='linear'))
     
-    # reg = GradientBoostingRegressor(n_estimators=100, learning_rate=1.0, max_depth=2, random_state=0)
+    # reg = GradientBoostingRegressor(n_estimators=100, learning_rate=0.05, max_depth=2, random_state=0)
+    # reg = RandomForestRegressor(n_estimators = 100, random_state=0)
+    reg = AdaBoostRegressor(random_state=0, n_estimators=200, loss='linear', learning_rate=0.05 )
     reg = reg.fit(X, y)
 
     
     # hyperparameters = {                     
-    #                 'n_estimators': [10,20,30,40,50],
+    #                 'n_estimators': [10, 50, 100, 200],
     #             }
 
     # print(SCORERS.keys())
@@ -53,7 +57,7 @@ def test_model(reg):
     
     test = pd.read_csv('Data/validation_test.csv')
     
-    test = test.fillna(-2)
+    test = test.fillna(-1)
     scores = []
 
     ids = list(set(test['srch_id']))

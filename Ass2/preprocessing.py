@@ -248,7 +248,13 @@ if __name__ == "__main__":
     
    
 
-  
+    kut_columns = ['date_time']
+    
+    df_test = df_test.drop(kut_columns, axis=1)
+    df_train = df_train.drop(kut_columns, axis=1)
+
+    df_test = df_test.round(2)
+    df_train = df_train.round(2)
     drop_nan_columns(df_test, threshhold=0.05)
     drop_nan_columns(df_train, threshhold=0.05)
 
@@ -271,7 +277,7 @@ if __name__ == "__main__":
 
 
     print('1')
-    df_train.to_csv('Data/prepro_train.csv', index=False)
+    df_train.to_csv('Data/prepro_train2.csv', index=False)
     print('2')
-    df_test.to_csv('Data/prepro_test.csv', index=False)
+    df_test.to_csv('Data/prepro_test2.csv', index=False)
     print('3')
