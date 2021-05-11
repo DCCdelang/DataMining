@@ -25,11 +25,11 @@ def train_model():
     estimators = [
     ('rf', RandomForestRegressor(n_estimators = 200, random_state=0))]
    
-    reg = StackingRegressor(
-    estimators=estimators,
-    final_estimator=GradientBoostingRegressor(n_estimators=10, learning_rate=1.0, max_depth=2, random_state=0))
+    # reg = StackingRegressor(
+    # estimators=estimators,
+    # final_estimator=GradientBoostingRegressor(n_estimators=10, learning_rate=1.0, max_depth=2, random_state=0))
     
-    # reg = GradientBoostingRegressor(n_estimators=100, learning_rate=1.0, max_depth=2, random_state=0)
+    reg = GradientBoostingRegressor(n_estimators=10, learning_rate=1.0, max_depth=2, random_state=0)
     reg = reg.fit(X, y)
 
     

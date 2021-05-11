@@ -44,8 +44,6 @@ def prob_quality_click(df):
     df["count"] = 1
     df = df.join(df.groupby(["prop_id"])["click_bool"].sum(), on="prop_id",rsuffix="_tot")
     df = df.join(df.groupby(["prop_id"])["count"].sum(), on="prop_id",rsuffix="_tot")
-    # print(df["click_bool_tot"].unique())
-    # print(df["count_tot"].unique())
     df["prob_click"] = df["click_bool_tot"]/df["count_tot"]
     df = df.drop(["count"],axis=1)
     df = df.drop(["click_bool_tot"],axis=1)
@@ -83,19 +81,68 @@ def prob_quality_book_test(df_train, df_test):
     return df_test
 
 def position_average(df_train,df_test):
-    df_test["position_mean"] = 0
     df_train_ranked = df_train.loc[df_train["random_bool"] == 0]
     df_train_ranked = df_train_ranked.join(df_train_ranked.groupby(["prop_id"])["position"].mean(),on="prop_id",rsuffix="_mean")
 
-    df = pd.concat([df_train,df_train_ranked, df_test])
-    df = df.join(df.groupby(["prop_id"])["position_mean"].max(),on="prop_id",rsuffix="_extend")
-    df = df.drop(["position_mean"], axis = 1)
+    df_test["position_mean"] = 0
+    df_test_ranked = df_test.loc[df_test["random_bool"] == 0]
+
+    df_train_ranked = df_train_ranked[["prop_id","train_bool","position_mean"]]
+    df_test_ranked = df_test_ranked[["prop_id","train_bool","position_mean"]]
+
+    df_ranked = pd.concat([df_train_ranked, df_test_ranked])
+    df_ranked = df_ranked.join(df_ranked.groupby(["prop_id"])["position_mean"].max(),on="prop_id",rsuffix="_ex")
+
+    df_ranked = df_ranked.drop(["position_mean"],axis=1)
+
+    df_ranked = pd.concat([df_train, df_test,df_ranked])
+    df = df_ranked.join(df_ranked.groupby(["prop_id"])["position_mean_ex"].max(),on="prop_id",rsuffix="tend")    
+
+    df = df.drop(["position_mean_ex","position_mean"],axis=1)
 
     df_train = df[df["train_bool"]==1]
     df_test = df[df["train_bool"]==0]
 
+    df_test = df_test.drop(["gross_bookings_usd","click_bool","booking_bool"],axis=1)
+
+    df_train.loc[df_train.random_bool == 1, 'position_mean_extend'] = 0
+    df_test.loc[df_test.random_bool == 1, 'position_mean_extend'] = 0
+
     return df_train, df_test
 
+def position_average_simple(df_train,df_test):
+    print(df_test.shape)
+    print(df_train.shape)
+    df_train_ranked = df_train.loc[df_train["random_bool"] == 0]
+    df_train_ranked = df_train_ranked.join(df_train_ranked.groupby(["prop_id"])["position"].mean(),on="prop_id",rsuffix="_mean")
+
+    # df_test["position_mean"] = 0
+    # df_test_ranked = df_test.loc[df_test["random_bool"] == 0]
+
+    # df_train_ranked = df_train_ranked[["prop_id","train_bool","position_mean"]]
+    # df_test_ranked = df_test_ranked[["prop_id","train_bool","position_mean"]]
+
+    df_ranked = pd.concat([df_train, df_train_ranked, df_test])
+    df_ranked = df_ranked.join(df_ranked.groupby(["prop_id"])["position_mean"].max(),on="prop_id",rsuffix="_ex")
+
+    df = df_ranked.drop(["position_mean"],axis=1)
+
+    # df_ranked = pd.concat([df_train, df_test,df_ranked])
+    # df = df_ranked.join(df_ranked.groupby(["prop_id"])["position_mean_ex"].max(),on="prop_id",rsuffix="tend")    
+
+    # df = df.drop(["position_mean_ex","position_mean"],axis=1)
+
+    df_train = df[df["train_bool"]==1]
+    df_test = df[df["train_bool"]==0]
+
+    df_test = df_test.drop(["position","gross_bookings_usd","click_bool","booking_bool"],axis=1)
+
+    df_train.loc[df_train.random_bool == 1, 'position_mean_extend'] = 0
+    df_test.loc[df_test.random_bool == 1, 'position_mean_extend'] = 0
+
+    print(df_test.shape)
+    print(df_train.shape)
+    return df_train, df_test
 
 # Function to average out numerical values per property, can be done in combination with test set. Should be done at beginning?!
 def averages_per_prop(df_train, df_test):
@@ -164,14 +211,7 @@ def median_per_prop(df_train, df_test):
     return df_train,df_test
 
 def drop_nan_columns(df, threshhold=0.1):
-
     df1 = df.dropna(axis=1, thresh= threshhold * df.shape[0])
-
-    # print("Deleted colomns:")
-    # for i in list(df.columns):
-    #     if i not in (df1.columns):
-    #         print(i)
-
     return df1
 
 def drop_kkcolumns(df):
@@ -189,10 +229,7 @@ Aannames: Gemiddelde over tijd, kwaliteit property altijd hetzelfde
 om vervolgens over te hevelen naar de test data. 
 - probabilities berekenen hoevaak een property voorkomt en hoevaak er op geklikt/
 gebooked wordt. ook overhevelen naar test data.
-"""
 
-
-"""
 Functie aanmaken die training set en test set samenvoegt en vervolgens gemiddelde etc.
 pakt en vervolgens weer uitelkaar haalt.
 
@@ -203,14 +240,17 @@ Kijken naar negatieve waardes (en niet alleen clicked_data)
 if __name__ == "__main__":
     start = time.time()
 
-    df_train = pd.read_csv('Ass2/Data/training_set_VU_DM.csv')
-    df_test = pd.read_csv('Ass2/Data/test_set_VU_DM.csv')
-
-    print("OG Shape train",df_train.shape)
-    print("OG Shape test",df_test.shape)
+    df_train = pd.read_csv('Data/training_set_VU_DM.csv')
+    df_test = pd.read_csv('Data/test_set_VU_DM.csv')
    
-    # df_train = pd.read_csv('Ass2/Data/training_head_s.csv')
-    # df_test = pd.read_csv('Ass2/Data/test_head_s.csv')
+    # df_train = pd.read_csv('Data/training_head.csv')
+    # df_test = pd.read_csv('Data/test_head.csv')
+
+    # df_train = df_train.drop(["Unnamed: 0"],axis = 1)
+    # df_test = df_test.drop(["Unnamed: 0"],axis = 1)
+
+    # print("OG Shape train",df_train.shape)
+    # print("OG Shape test",df_test.shape)
 
     df_train["train_bool"] = 1
     df_test["train_bool"] = 0
@@ -221,7 +261,9 @@ if __name__ == "__main__":
     df_train = df_train.drop(["date_time"],axis=1)
     df_test = df_test.drop(["date_time"],axis=1)
 
+    """WERKEN ALLEBEI NOG NIET GVD"""
     # df_train,df_test = position_average(df_train,df_test)
+    # df_train,df_test = position_average_simple(df_train,df_test)
 
     df_train = prob_quality_book(df_train)
     df_test = prob_quality_book_test(df_train, df_test)
@@ -237,26 +279,11 @@ if __name__ == "__main__":
     df_train = exp_historical_price_dif(df_train)
     df_test = exp_historical_price_dif(df_test)
 
+    df_train = starrating_diff(df_train)
+    df_test = starrating_diff(df_test)
+
     df_train = df_train.round(2)
     df_test = df_test.round(2)
-
-    print(time.time() - start)
-    # extract_date_time(df)
-
-    # print(time.time() - start)
-    price_per_day(df_test)
-    price_per_day(df_train)
-    print(time.time() - start)
-
-
-    exp_historical_price_dif(df_test)
-    exp_historical_price_dif(df_train)
-    print(time.time() - start)
-
-    starrating_diff(df_test)
-    starrating_diff(df_train)
-    print(time.time() - start)
-
 
     print('1')
     df_train.to_csv('Data/prepro_train.csv', index=False)
