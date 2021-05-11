@@ -26,8 +26,8 @@ def price_per_day(df):
 
 # Convert to usd prices and difference
 def exp_historical_price_dif(df):
-    df["historical_price"] = np.exp(df["prop_log_historical_price"])
-    df["hist_price_dif"] = df["historical_price"] - df["price_usd"]
+    df["historical_price"] = np.exp(df["prop_log_historical_price_avg"])
+    df["hist_price_dif_avg"] = df["historical_price"] - df["price_per_day_avg"]
     return df
 
 # Convert to log prices and difference
@@ -54,15 +54,12 @@ def prob_quality_click(df):
 
 def prob_quality_click_test(df_train, df_test):
     df_test["prob_click"] = 0
-    train_sub = df_train[["prop_id","prob_click"]]
-    test_sub = df_test[["prop_id","prob_click"]]
 
-    df_full = pd.concat([train_sub,test_sub])
+    df_full = pd.concat([df_train,df_test])
 
     df_full = df_full.join(df_full.groupby(["prop_id"])["prob_click"].max(), on="prop_id",rsuffix="_extend")
 
-    df_test["prob_click"] = df_full["prob_click_extend"].tail(df_test.shape[0])
-
+    df_test["prob_click"]  = df_full[df_full["train_bool"]==0]["prob_click_extend"]
     return df_test
 
 def prob_quality_book(df):
@@ -73,40 +70,29 @@ def prob_quality_book(df):
     df = df.drop(["count"],axis=1)
     df = df.drop(["booking_bool_tot"],axis=1)
     df = df.drop(["count_tot"],axis=1)
+
     return df
 
 def prob_quality_book_test(df_train, df_test):
     df_test["prob_book"] = 0
-    train_sub = df_train[["prop_id","prob_book"]]
-    test_sub = df_test[["prop_id","prob_book"]]
-
-    df_full = pd.concat([train_sub,test_sub])
+    df_full = pd.concat([df_train,df_test])
 
     df_full = df_full.join(df_full.groupby(["prop_id"])["prob_book"].max(), on="prop_id",rsuffix="_extend")
 
-    df_test["prob_book"] = df_full["prob_book_extend"].tail(df_test.shape[0])
-
+    df_test["prob_book"]  = df_full[df_full["train_bool"]==0]["prob_book_extend"]
     return df_test
 
 def position_average(df_train,df_test):
-    # Filter random positions
-    # print(df_train.shape[0])
-    # print(len(df_train.loc[df_train["random_bool"] == 0]))
-    # df_train["position_mean"] = 0
     df_test["position_mean"] = 0
     df_train_ranked = df_train.loc[df_train["random_bool"] == 0]
     df_train_ranked = df_train_ranked.join(df_train_ranked.groupby(["prop_id"])["position"].mean(),on="prop_id",rsuffix="_mean")
 
     df = pd.concat([df_train,df_train_ranked, df_test])
     df = df.join(df.groupby(["prop_id"])["position_mean"].max(),on="prop_id",rsuffix="_extend")
-
     df = df.drop(["position_mean"], axis = 1)
-    # print(df[df["position_mean_extend"]<1].count())
-    df_train = df.head(df_train.shape[0])
-    df_test = df.tail(df_test.shape[0])
-    
-    # print(df_train["position_mean"].unique())
-    # print(df_train[["position","random_bool","position_mean_extend"]].head())
+
+    df_train = df[df["train_bool"]==1]
+    df_test = df[df["train_bool"]==0]
 
     return df_train, df_test
 
@@ -126,11 +112,12 @@ def averages_per_prop(df_train, df_test):
 
     df = df.join(df.groupby(["prop_id"])["prop_log_historical_price"].mean(), on="prop_id",rsuffix="_avg")
 
-    df = df.join(df.groupby(["prop_id"])["price_usd"].mean(), on="prop_id",rsuffix="_avg")
+    df = df.join(df.groupby(["prop_id"])["price_per_day"].mean(), on="prop_id",rsuffix="_avg")
+    df.round(2)
 
     df = df.drop(["count"],axis=1)
-    df_train = df.head(df_train.shape[0])
-    df_test = df.head(df_test.shape[0])
+    df_train = df[df["train_bool"]==1]
+    df_test = df[df["train_bool"]==0]
     return df_train,df_test
 
 def std_per_prop(df_train, df_test):
@@ -148,7 +135,7 @@ def std_per_prop(df_train, df_test):
 
     df = df.join(df.groupby(["prop_id"])["prop_log_historical_price"].std(), on="prop_id",rsuffix="_std")
 
-    df = df.join(df.groupby(["prop_id"])["price_usd"].std(), on="prop_id",rsuffix="_std")
+    df = df.join(df.groupby(["prop_id"])["price_per_day"].std(), on="prop_id",rsuffix="_std")
 
     df = df.drop(["count"],axis=1)
     df_train = df.head(df_train.shape[0])
@@ -169,7 +156,7 @@ def median_per_prop(df_train, df_test):
 
     df = df.join(df.groupby(["prop_id"])["prop_log_historical_price"].median(), on="prop_id",rsuffix="_median")
 
-    df = df.join(df.groupby(["prop_id"])["price_usd"].median(), on="prop_id",rsuffix="_median")
+    df = df.join(df.groupby(["prop_id"])["price_per_day"].median(), on="prop_id",rsuffix="_median")
 
     df = df.drop(["count"],axis=1)
     df_train = df.head(df_train.shape[0])
@@ -180,9 +167,10 @@ def drop_nan_columns(df, threshhold=0.1):
 
     df1 = df.dropna(axis=1, thresh= threshhold * df.shape[0])
 
-    for i in list(df.columns):
-        if i not in (df1.columns):
-            print(i)
+    # print("Deleted colomns:")
+    # for i in list(df.columns):
+    #     if i not in (df1.columns):
+    #         print(i)
 
     return df1
 
@@ -207,9 +195,7 @@ gebooked wordt. ook overhevelen naar test data.
 """
 Functie aanmaken die training set en test set samenvoegt en vervolgens gemiddelde etc.
 pakt en vervolgens weer uitelkaar haalt.
-"""
 
-"""
 Kijken naar negatieve waardes (en niet alleen clicked_data)
 """
 
@@ -217,46 +203,44 @@ Kijken naar negatieve waardes (en niet alleen clicked_data)
 if __name__ == "__main__":
     start = time.time()
 
-
-
     df_train = pd.read_csv('Data/training_set_VU_DM.csv')
     df_test = pd.read_csv('Data/test_set_VU_DM.csv')
 
-    # df_train = pd.read_csv('Ass2/Data/training_head.csv')
-    # df_test = pd.read_csv('Ass2/Data/test_head.csv')
+    print("OG Shape train",df_train.shape)
+    print("OG Shape test",df_test.shape)
+   
+    # df_train = pd.read_csv('Ass2/Data/training_head_s.csv')
+    # df_test = pd.read_csv('Ass2/Data/test_head_s.csv')
 
-    df_train,df_test = position_average(df_train,df_test)
+    df_train["train_bool"] = 1
+    df_test["train_bool"] = 0
 
-    # print(time.time() - start)
+    # df_train = drop_nan_columns(df_train, threshhold=0.7)
+    # df_test = drop_nan_columns(df_test, threshhold=0.7)
+
+    df_train = df_train.drop(["date_time"],axis=1)
+    df_test = df_test.drop(["date_time"],axis=1)
+
+    # df_train,df_test = position_average(df_train,df_test)
+
     df_train = prob_quality_book(df_train)
-
     df_test = prob_quality_book_test(df_train, df_test)
 
     df_train = prob_quality_click(df_train)
-
     df_test = prob_quality_click_test(df_train, df_test)
 
     df_train = price_per_day(df_train)
-
     df_test = price_per_day(df_test)
 
     df_train,df_test = averages_per_prop(df_train, df_test)
 
     df_train = exp_historical_price_dif(df_train)
-
     df_test = exp_historical_price_dif(df_test)
-    
-   
 
-    kut_columns = ['date_time']
-    
-    df_test = df_test.drop(kut_columns, axis=1)
-    df_train = df_train.drop(kut_columns, axis=1)
-
-    df_test = df_test.round(2)
-    df_train = df_train.round(2)
     drop_nan_columns(df_test, threshhold=0.05)
     drop_nan_columns(df_train, threshhold=0.05)
+    df_train = df_train.round(2)
+    df_test = df_test.round(2)
 
     print(time.time() - start)
     # extract_date_time(df)
