@@ -240,11 +240,11 @@ Kijken naar negatieve waardes (en niet alleen clicked_data)
 if __name__ == "__main__":
     start = time.time()
 
-    df_train = pd.read_csv('Data/training_set_VU_DM.csv')
-    df_test = pd.read_csv('Data/test_set_VU_DM.csv')
+    # df_train = pd.read_csv('Data/training_set_VU_DM.csv')
+    # df_test = pd.read_csv('Data/test_set_VU_DM.csv')
    
-    # df_train = pd.read_csv('Data/training_head.csv')
-    # df_test = pd.read_csv('Data/test_head.csv')
+    df_train = pd.read_csv('Data/training_head.csv')
+    df_test = pd.read_csv('Data/test_head.csv')
 
     # df_train = df_train.drop(["Unnamed: 0"],axis = 1)
     # df_test = df_test.drop(["Unnamed: 0"],axis = 1)
