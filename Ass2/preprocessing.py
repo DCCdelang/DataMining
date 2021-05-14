@@ -240,11 +240,11 @@ Kijken naar negatieve waardes (en niet alleen clicked_data)
 if __name__ == "__main__":
     start = time.time()
 
-    # df_train = pd.read_csv('Data/training_set_VU_DM.csv')
-    # df_test = pd.read_csv('Data/test_set_VU_DM.csv')
+    df_train = pd.read_csv('Data/training_set_VU_DM.csv')
+    df_test = pd.read_csv('Data/test_set_VU_DM.csv')
    
-    df_train = pd.read_csv('Data/training_head.csv')
-    df_test = pd.read_csv('Data/test_head.csv')
+    # df_train = pd.read_csv('Data/training_head.csv')
+    # df_test = pd.read_csv('Data/test_head.csv')
 
     # df_train = df_train.drop(["Unnamed: 0"],axis = 1)
     # df_test = df_test.drop(["Unnamed: 0"],axis = 1)
@@ -262,7 +262,7 @@ if __name__ == "__main__":
     df_test = df_test.drop(["date_time"],axis=1)
 
     """WERKEN ALLEBEI NOG NIET GVD"""
-    # df_train,df_test = position_average(df_train,df_test)
+    df_train,df_test = position_average(df_train,df_test)
     # df_train,df_test = position_average_simple(df_train,df_test)
 
     df_train = prob_quality_book(df_train)
@@ -288,7 +288,7 @@ if __name__ == "__main__":
     df_test = df_test.round(2)
 
     print('1')
-    df_train.to_csv('Data/prepro_train2.csv', index=False)
+    df_train.to_csv('Data/prepro_train.csv', index=False)
     print('2')
-    df_test.to_csv('Data/prepro_test2.csv', index=False)
+    df_test.to_csv('Data/prepro_test.csv', index=False)
     print('3')
