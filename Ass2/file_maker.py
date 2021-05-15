@@ -29,6 +29,16 @@ def make_clicked_file():
     df = df.loc[df['click_bool'] == 1]
     df.to_csv('Data/clicked_data.csv', index=False)
 
+def make_50_50_file():
+    df = pd.read_csv('Data/prepro_train2.csv')
+    clicked = df.loc[df['click_bool'] == 1]
+    
+    non_clicked = df.loc[df['click_bool'] == 0]
+    non_clicked = non_clicked.sample(len(clicked['srch_id']))
+
+    fifty_fifty = pd.concat([clicked, non_clicked])
+    fifty_fifty = fifty_fifty.sort_values(by=['srch_id'])
+    fifty_fifty.to_csv('Data/fifty_fifty.csv', index=False)
 # def drop_columns(df):
 #     kut_columns = ['date_time']
     
@@ -38,28 +48,40 @@ def make_clicked_file():
 
 if __name__ == "__main__":
     
+    # # Deletes all the stupid features of the pre processed files
+    # df = pd.read_csv('Data/prepro_test.csv')
+    # print("-2")
+    # # df = drop_columns(df)
+    # df.to_csv('Data/prepro_test.csv', index=False)
+
+    # df = pd.read_csv('Data/prepro_train.csv')
+    # # df = drop_columns(df)
+    # df.to_csv('Data/prepro_train.csv', index=False)
+
     # print("-1")
     # # Makes file with all clicked values for training
     # make_clicked_file()
 
-    print('1')
-    # Makes validation test and train set
-    df = pd.read_csv('Data/prepro_train2.csv')
+    # print('1')
+    # # Makes validation test and train set
+    # df = pd.read_csv('Data/prepro_train2.csv')
 
-    df = make_files(df, 'test')
-    df.to_csv('Data/validation_test_small.csv', index=False)
+    # df = make_files(df, 'test')
+    # df.to_csv('Data/validation_test_small.csv', index=False)
     
-    df = pd.read_csv('Data/clicked_data.csv')
+    # df = pd.read_csv('Data/clicked_data.csv')
 
-    df = make_files(df, 'train')
-    df.to_csv('Data/validation_train_clicked.csv', index=False)
+    # df = make_files(df, 'train')
+    # df.to_csv('Data/validation_train_clicked.csv', index=False)
 
-    print('2')
+    # print('2')
 
+    make_50_50_file()
 
     # makes submission_train set
     # df = pd.read_csv('Data/prepro_train2.csv')
     # df = add_values(df)
     # df.to_csv('Data/train_submission.csv', index=False)
     # print('3')
+
 
