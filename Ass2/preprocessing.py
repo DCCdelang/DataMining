@@ -19,8 +19,6 @@ def extract_date_time(df, plot = False):
 
 # Gross price divided by days of stay
 def price_per_day(df):
-    # df = booking_Filter(df).copy()
-    # df["gross_bookings_per_day"] = df["gross_bookings_usd"]/df["srch_length_of_stay"]
     df["price_per_day"] = df["price_usd"]/df["srch_length_of_stay"]
     return df
 
@@ -29,12 +27,6 @@ def exp_historical_price_dif(df):
     df["historical_price"] = np.exp(df["prop_log_historical_price_avg"])
     df["hist_price_dif_avg"] = df["historical_price"] - df["price_per_day_avg"]
     return df
-
-# Convert to log prices and difference
-# def log_historical_price_dif(df):
-#     df["log_price_usd"] = np.log(df["price_usd"])
-#     df["log_hist_price_dif"] = df["prop_log_historical_price"] - df["log_price_usd"]
-#     return df
 
 def starrating_diff(df):
     df["starrating_diff"]=np.abs(df["visitor_hist_starrating"]-df["prop_starrating"])
@@ -68,7 +60,6 @@ def prob_quality_book(df):
     df = df.drop(["count"],axis=1)
     df = df.drop(["booking_bool_tot"],axis=1)
     df = df.drop(["count_tot"],axis=1)
-
     return df
 
 def prob_quality_book_test(df_train, df_test):
@@ -99,6 +90,7 @@ def position_average(df_train,df_test):
     df = df_ranked.join(df_ranked.groupby(["prop_id"])["position_mean_ex"].max(),on="prop_id",rsuffix="tend")    
 
     df = df.drop(["position_mean_ex","position_mean"],axis=1)
+    df = df[df["srch_id"].notna()]
 
     df_train = df[df["train_bool"]==1]
     df_test = df[df["train_bool"]==0]
@@ -140,8 +132,6 @@ def position_average_simple(df_train,df_test):
     df_train.loc[df_train.random_bool == 1, 'position_mean_extend'] = 0
     df_test.loc[df_test.random_bool == 1, 'position_mean_extend'] = 0
 
-    print(df_test.shape)
-    print(df_train.shape)
     return df_train, df_test
 
 # Function to average out numerical values per property, can be done in combination with test set. Should be done at beginning?!
@@ -149,22 +139,66 @@ def averages_per_prop(df_train, df_test):
     df = pd.concat([df_train,df_test])
     
     df["count"] = 1
-    df = df.join(df.groupby(["prop_id"])["prop_starrating"].mean(), on="prop_id",rsuffix="_avg")
+    df = df.join(df.groupby(["prop_id"])["prop_starrating"].mean(), on="prop_id",rsuffix="_avg_prop")
 
-    df = df.join(df.groupby(["prop_id"])["prop_review_score"].mean(), on="prop_id",rsuffix="_avg")
+    df = df.join(df.groupby(["prop_id"])["prop_review_score"].mean(), on="prop_id",rsuffix="_avg_prop")
 
-    df = df.join(df.groupby(["prop_id"])["prop_location_score1"].mean(), on="prop_id",rsuffix="_avg")
+    df = df.join(df.groupby(["prop_id"])["prop_location_score1"].mean(), on="prop_id",rsuffix="_avg_prop")
 
-    df = df.join(df.groupby(["prop_id"])["prop_location_score2"].mean(), on="prop_id",rsuffix="_avg")
+    df = df.join(df.groupby(["prop_id"])["prop_location_score2"].mean(), on="prop_id",rsuffix="_avg_prop")
 
-    df = df.join(df.groupby(["prop_id"])["prop_log_historical_price"].mean(), on="prop_id",rsuffix="_avg")
+    df = df.join(df.groupby(["prop_id"])["prop_log_historical_price"].mean(), on="prop_id",rsuffix="_avg_prop")
 
-    df = df.join(df.groupby(["prop_id"])["price_per_day"].mean(), on="prop_id",rsuffix="_avg")
-    df.round(2)
-
+    df = df.join(df.groupby(["prop_id"])["price_per_day"].mean(), on="prop_id",rsuffix="_avg_prop")
+    
     df = df.drop(["count"],axis=1)
     df_train = df[df["train_bool"]==1]
     df_test = df[df["train_bool"]==0]
+    df_test = df_test.drop(["gross_bookings_usd","click_bool","booking_bool"],axis=1)
+    return df_train,df_test
+
+def averages_per_srch_id(df_train, df_test):
+    df = pd.concat([df_train,df_test])
+    
+    df["count"] = 1
+    df = df.join(df.groupby(["srch_id"])["prop_starrating"].mean(), on="srch_id",rsuffix="_avg_srch")
+
+    df = df.join(df.groupby(["srch_id"])["prop_review_score"].mean(), on="srch_id",rsuffix="_avg_srch")
+
+    df = df.join(df.groupby(["srch_id"])["prop_location_score1"].mean(), on="srch_id",rsuffix="_avg_srch")
+
+    df = df.join(df.groupby(["srch_id"])["prop_location_score2"].mean(), on="srch_id",rsuffix="_avg_srch")
+
+    df = df.join(df.groupby(["srch_id"])["prop_log_historical_price"].mean(), on="srch_id",rsuffix="_avg_srch")
+
+    df = df.join(df.groupby(["srch_id"])["price_per_day"].mean(), on="srch_id",rsuffix="_avg_srch")
+    
+    df = df.drop(["count"],axis=1)
+    df_train = df[df["train_bool"]==1]
+    df_test = df[df["train_bool"]==0]
+    df_test = df_test.drop(["gross_bookings_usd","click_bool","booking_bool"],axis=1)
+    return df_train,df_test
+
+def averages_per_destin(df_train, df_test):
+    df = pd.concat([df_train,df_test])
+    
+    df["count"] = 1
+    df = df.join(df.groupby(["srch_destination_id"])["prop_starrating"].mean(), on="srch_destination_id",rsuffix="_avg_dest")
+
+    df = df.join(df.groupby(["srch_destination_id"])["prop_review_score"].mean(), on="srch_destination_id",rsuffix="_avg_dest")
+
+    df = df.join(df.groupby(["srch_destination_id"])["prop_location_score1"].mean(), on="srch_destination_id",rsuffix="_avg_dest")
+
+    df = df.join(df.groupby(["srch_destination_id"])["prop_location_score2"].mean(), on="srch_destination_id",rsuffix="_avg_dest")
+
+    df = df.join(df.groupby(["srch_destination_id"])["prop_log_historical_price"].mean(), on="srch_destination_id",rsuffix="_avg_dest")
+
+    df = df.join(df.groupby(["srch_destination_id"])["price_per_day"].mean(), on="srch_destination_id",rsuffix="_avg_dest")
+    
+    df = df.drop(["count"],axis=1)
+    df_train = df[df["train_bool"]==1]
+    df_test = df[df["train_bool"]==0]
+    df_test = df_test.drop(["gross_bookings_usd","click_bool","booking_bool"],axis=1)
     return df_train,df_test
 
 def std_per_prop(df_train, df_test):
@@ -264,28 +298,77 @@ if __name__ == "__main__":
     """WERKEN ALLEBEI NOG NIET GVD"""
     df_train,df_test = position_average(df_train,df_test)
     # df_train,df_test = position_average_simple(df_train,df_test)
+    print('1')
+
+    print(df_test.shape)
+    print(df_train.shape)
 
     df_train = prob_quality_book(df_train)
     df_test = prob_quality_book_test(df_train, df_test)
+    print('2')
+
+    print(df_test.shape)
+    print(df_train.shape)
 
     df_train = prob_quality_click(df_train)
     df_test = prob_quality_click_test(df_train, df_test)
+    print('3')
+
+    print(df_test.shape)
+    print(df_train.shape)
 
     df_train = price_per_day(df_train)
     df_test = price_per_day(df_test)
+    print('41')
+
+    print(df_test.shape)
+    print(df_train.shape)
 
     df_train,df_test = averages_per_prop(df_train, df_test)
+    
+    print("4.2")
+    print(df_test.shape)
+    print(df_train.shape)
+    
+    df_train,df_test = averages_per_srch_id(df_train, df_test)
+    
+    print("4.2")
+    print(df_test.shape)
+    print(df_train.shape)
+
+    df_train,df_test = averages_per_destin(df_train, df_test)
+
+    print('5')
+
+    print(df_test.shape)
+    print(df_train.shape)
 
     df_train = exp_historical_price_dif(df_train)
     df_test = exp_historical_price_dif(df_test)
 
+    print('6')
+
+    print(df_test.shape)
+    print(df_train.shape)
+
     df_train = starrating_diff(df_train)
     df_test = starrating_diff(df_test)
+
+    print('7')
+
+    print(df_test.shape)
+    print(df_train.shape)
 
     drop_nan_columns(df_test, threshhold=0.05)
     drop_nan_columns(df_train, threshhold=0.05)
     df_train = df_train.round(2)
     df_test = df_test.round(2)
+
+    print('8')
+
+    print(df_test.shape)
+    print(df_train.shape)
+
 
     print('1')
     df_train.to_csv('Data/prepro_train.csv', index=False)

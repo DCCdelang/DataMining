@@ -174,10 +174,11 @@ def median_per_prop(df):
 # df_test = pd.read_csv('Ass2/Data/training_head.csv')
 # df_test.head(1000).to_csv("Ass2/Data/test_head_s.csv",index=False)
 
-df_sub = pd.read_csv("Data/submission2.csv")
+df_sub = pd.read_csv("Data/prepro_test.csv")
+print(df_sub.shape)
 # df_sub = df_sub.loc[df_sub["srch_id"]>0]
-df_sub["srch_id"] = pd.to_numeric(df_sub["srch_id"],downcast='integer')
-df_sub.to_csv("Data/submission2.csv", index=False)
+# df_sub["srch_id"] = pd.to_numeric(df_sub["srch_id"],downcast='integer')
+# df_sub.to_csv("Data/submission2.csv", index=False)
 exit()
 
 start2 = time.time()

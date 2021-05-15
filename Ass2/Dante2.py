@@ -24,7 +24,7 @@ def filter_train(df_train,filter_type): # Choose Balanced, clicked
         df_train1 = df_train.loc[df_train["click_bool"]==1]
         print(df_train1.shape)
         df_train2 = df_train[df_train["srch_id"].isin(df_train1["srch_id"])]
-        size = 1        # sample size
+        size = 2        # sample size
         replace = True  # with replacement
         fn = lambda obj: obj.loc[rs.choice(obj.index, size, replace),:]
         df_train2 = df_train2.groupby('srch_id', as_index=False).apply(fn)
@@ -43,7 +43,7 @@ def train_validation(df_train):
 
 def model(X_train, y_train):
     # reg = AdaBoostRegressor(random_state=0, n_estimators=100, loss='linear', learning_rate=0.05 )
-    reg = GradientBoostingRegressor(n_estimators=20, learning_rate=0.05, max_depth=2, random_state=0)
+    reg = GradientBoostingRegressor(n_estimators=100, learning_rate=0.05, max_depth=2, random_state=0)
     reg = reg.fit(X_train, y_train)
     return reg
 
@@ -58,19 +58,17 @@ def dcg_score(y_true, y_score, k=5):
     return np.sum(gain / discounts)
 
 def test_model(reg, X_test,y_test):
-    ids = list(set(X_test["srch_id"]))
-    bar = Bar("Processing",max=len(ids))
+    X_test["value"] = y_test
+    Ids = X_test.groupby("srch_id")
+    bar = Bar("Processing",max=len(Ids))
     scores = []
-    for i in ids:
+    for _, group in Ids:
         bar.next()
-        X_test["value"] = y_test
-        X_test1 = X_test.loc[X_test["srch_id"]==i]
-        # print(X_test)
+        X_test1 = group
+        # print(X_test1)
         X = X_test1.drop(["value"],axis=1)
         y = np.asarray(X_test1["value"])
         y_pred = np.asarray(list(reg.predict(X)))
-        # print(y)
-        # print(y_pred)
 
         actual = dcg_score(y,y_pred)
         best = dcg_score(y,y)
@@ -85,6 +83,11 @@ def test_model(reg, X_test,y_test):
     
     return np.mean(scores)
 
+"""WHAT YOU GONNA DO? SUBMIT OR TEST?"""
+
+I_want = "Test" # "Submit" or "Test"
+print("This is for a", I_want)
+
 df_train = pd.read_csv('Data/prepro_train.csv')
 print("Train loaded")
 df_test = pd.read_csv('Data/prepro_test.csv')
@@ -98,34 +101,38 @@ df_train = df_train.drop(["click_bool","booking_bool","gross_bookings_usd"], axi
 df_train = df_train.fillna(-1)
 print("Train Cleaned")
 
-df_test = df_test.drop(["click_bool","booking_bool","gross_bookings_usd"], axis=1)
 df_test = df_test.fillna(-1)
 print("Test Cleaned")
 
-# Testen/valideren op alleen training data
-# X_train, X_test, y_train, y_test = train_validation(df_train)
+if I_want == "Test":
+    # Testen/valideren op alleen training data
+    X_train, X_test, y_train, y_test = train_validation(df_train)
+    print("Splitted")
 
-# Trainen op alle data
-X_train, y_train = df_train.drop(["value"],axis=1), df_train["value"]
-print("Splitted")
+if I_want == "Submit":
+    # Trainen op alle data
+    X_train, y_train = df_train.drop(["value"],axis=1), df_train["value"]
+    print("Splitted")
 
 # sorteren van submission file op ranking?
 reg = model(X_train,y_train)
 print("Trained")
 
-# Test model on train data
-# NDGC_score = test_model(reg, X_test, y_test)
-# print("NDCG score = ", NDGC_score)
+if I_want == "Test":
+    # Test model on train data
+    NDGC_score = test_model(reg, X_test, y_test)
+    print("NDCG score = ", NDGC_score)
 
-y_pred = np.asarray(list(reg.predict(df_test)))
+if I_want == "Submit":
+    y_pred = np.asarray(list(reg.predict(df_test)))
 
-df_test["prediction"] = y_pred
-print("Predicted")
+    df_test["prediction"] = y_pred
+    print("Predicted")
 
-df_test = df_test.sort_values(['srch_id', 'prediction'], ascending=[True, False])
-print("Sorted")
+    df_test = df_test.sort_values(['srch_id', 'prediction'], ascending=[True, False])
+    print("Sorted")
 
-df_test = df_test[["srch_id","prop_id"]]
+    df_test = df_test[["srch_id","prop_id","prediction"]]
 
-df_test.to_csv("Data/submission.csv",index=False)
-print("Done")
+    df_test.to_csv("Data/submission3.csv",index=False)
+    print("Done")
