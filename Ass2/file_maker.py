@@ -38,7 +38,6 @@ def make_clicked_file():
 
 if __name__ == "__main__":
     
-<<<<<<< HEAD
     # # Deletes all the stupid features of the pre processed files
     # df = pd.read_csv('Data/prepro_test.csv')
     # print("-2")
@@ -52,11 +51,6 @@ if __name__ == "__main__":
     print("-1")
     # Makes file with all clicked values for training
     make_clicked_file()
-=======
-    # print("-1")
-    # # Makes file with all clicked values for training
-    # make_clicked_file()
->>>>>>> 4c20576fe442c4a91d595e0d6577287442b0cc9d
 
     print('1')
     # Makes validation test and train set
@@ -78,4 +72,5 @@ if __name__ == "__main__":
     # df = add_values(df)
     # df.to_csv('Data/train_submission.csv', index=False)
     # print('3')
+
 
