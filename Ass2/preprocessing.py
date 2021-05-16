@@ -24,8 +24,8 @@ def price_per_day(df):
 
 # Convert to usd prices and difference
 def exp_historical_price_dif(df):
-    df["historical_price"] = np.exp(df["prop_log_historical_price_avg"])
-    df["hist_price_dif_avg"] = df["historical_price"] - df["price_per_day_avg"]
+    df["historical_price"] = np.exp(df["prop_log_historical_price_avg_prop"])
+    df["hist_price_dif_avg"] = df["historical_price"] - df["price_per_day_avg_prop"]
     return df
 
 def starrating_diff(df):
@@ -319,7 +319,7 @@ if __name__ == "__main__":
 
     df_train = price_per_day(df_train)
     df_test = price_per_day(df_test)
-    print('41')
+    print('4.1')
 
     print(df_test.shape)
     print(df_train.shape)
@@ -368,7 +368,6 @@ if __name__ == "__main__":
 
     print(df_test.shape)
     print(df_train.shape)
-
 
     print('1')
     df_train.to_csv('Data/prepro_train.csv', index=False)

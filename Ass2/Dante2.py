@@ -1,14 +1,7 @@
 import pandas as pd
 import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-from sklearn.inspection import permutation_importance
-from sklearn.ensemble import GradientBoostingRegressor,GradientBoostingClassifier
-# from sklearn.metrics import dcg_score
-from sklearn.neural_network import MLPRegressor
+from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.ensemble import RandomForestRegressor, StackingRegressor, AdaBoostRegressor
-# from sklearn.model_selection import GridSearchCV 
-# from LambdaRankNN import LambdaRankNN
 from sklearn.model_selection import train_test_split
 from numpy.random import RandomState
 from progress.bar import Bar
@@ -43,7 +36,16 @@ def train_validation(df_train):
 
 def model(X_train, y_train):
     # reg = AdaBoostRegressor(random_state=0, n_estimators=100, loss='linear', learning_rate=0.05 )
-    reg = GradientBoostingRegressor(n_estimators=100, learning_rate=0.05, max_depth=2, random_state=0)
+    # reg = GradientBoostingRegressor(n_estimators=100, learning_rate=0.05, max_depth=2, random_state=42)
+    estimators = [
+    ('rf', RandomForestRegressor(n_estimators = 100, random_state=42)), 
+    ('gb',GradientBoostingRegressor(n_estimators=10, learning_rate=1.0, max_depth=2, random_state=42))
+    ]
+   
+    reg = StackingRegressor(
+    estimators=estimators,
+    final_estimator=AdaBoostRegressor(random_state=42, n_estimators=100, loss='linear'))
+    
     reg = reg.fit(X_train, y_train)
     return reg
 
@@ -85,7 +87,7 @@ def test_model(reg, X_test,y_test):
 
 """WHAT YOU GONNA DO? SUBMIT OR TEST?"""
 
-I_want = "Test" # "Submit" or "Test"
+I_want = "Submit" # "Submit" or "Test"
 print("This is for a", I_want)
 
 df_train = pd.read_csv('Data/prepro_train.csv')
@@ -132,7 +134,14 @@ if I_want == "Submit":
     df_test = df_test.sort_values(['srch_id', 'prediction'], ascending=[True, False])
     print("Sorted")
 
-    df_test = df_test[["srch_id","prop_id","prediction"]]
+    df_test["srch_id"] = pd.to_numeric(df_test["srch_id"],downcast='integer')
 
-    df_test.to_csv("Data/submission3.csv",index=False)
+    df_test1 = df_test[["srch_id","prop_id"]]
+
+    df_test1.to_csv("Data/submission3.csv",index=False)
+    print("Almost done")
+
+    df_test2 = df_test[["srch_id","prop_id","prediction"]]
+
+    df_test2.to_csv("Data/submission3_predictions.csv",index=False)
     print("Done")
