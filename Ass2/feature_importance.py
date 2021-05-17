@@ -6,9 +6,15 @@ from sklearn.ensemble import ExtraTreesClassifier
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+def add_values(df):
+    
+    df['value'] = df.apply(lambda row: row.click_bool + (row.booking_bool * 4), axis=1)
+    return df
 
-data = pd.read_csv("Data/clicked_data_submission.csv")
+data = pd.read_csv("Data/fifty_fifty.csv")
 data = data.fillna(0)
+
+data = add_values(data)
 # data[data < 0] = 0
 features = list(data.columns)
 print(len(features))
@@ -34,13 +40,13 @@ df = featureScores.nlargest(25,'Score')
 print(featureScores.nlargest(25,'Score'))  #print 10 best features
 
 
-# model = ExtraTreesClassifier()
-# model.fit(X,y)
-# print(model.feature_importances_) #use inbuilt class feature_importances of tree based classifiers
-# #plot graph of feature importances for better visualization
-# feat_importances = pd.Series(model.feature_importances_, index=X.columns)
-# feat_importances.nlargest(20).plot(kind='barh')
-# plt.show()
+model = ExtraTreesClassifier()
+model.fit(X,y)
+print(model.feature_importances_) #use inbuilt class feature_importances of tree based classifiers
+#plot graph of feature importances for better visualization
+feat_importances = pd.Series(model.feature_importances_, index=X.columns)
+feat_importances.nlargest(20).plot(kind='barh')
+plt.show()
 
 
 # get correlations of each features in dataset

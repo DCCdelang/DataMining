@@ -370,7 +370,7 @@ if __name__ == "__main__":
     print(df_train.shape)
 
     print('1')
-    df_train.to_csv('Data/prepro_train.csv', index=False)
+    df_train.to_csv('Data/prepro_train2.csv', index=False)
     print('2')
-    df_test.to_csv('Data/prepro_test.csv', index=False)
+    df_test.to_csv('Data/prepro_test2.csv', index=False)
     print('3')

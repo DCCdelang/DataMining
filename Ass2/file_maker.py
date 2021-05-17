@@ -1,6 +1,6 @@
 import pandas as pd
 
-def make_files(df, kind, test=300000, train=30000):
+def make_files(df, kind, test=500000, train=30000):
     if kind == 'test':
         df = df.tail(test)
         df = add_values(df)
@@ -64,20 +64,22 @@ if __name__ == "__main__":
 
     # print('1')
     # # Makes validation test and train set
-    # df = pd.read_csv('Data/prepro_train2.csv')
+    df = pd.read_csv('Data/prepro_train2.csv')
 
-    # df = make_files(df, 'test')
-    # df.to_csv('Data/validation_test_small.csv', index=False)
+    df = make_files(df, 'test')
+    df.to_csv('Data/validation_test.csv', index=False)
     
     # df = pd.read_csv('Data/clicked_data.csv')
 
-    # df = make_files(df, 'train')
+    # df = make_files(df, 'test')
     # df.to_csv('Data/validation_train_clicked.csv', index=False)
 
     # print('2')
 
     make_50_50_file()
 
+    fifty_fifty = pd.read_csv('Data/fifty_fifty.csv')
+    fifty_fifty.head(200000).to_csv('Data/fifty_fifty_small.csv', index=False)
     # makes submission_train set
     # df = pd.read_csv('Data/prepro_train2.csv')
     # df = add_values(df)
