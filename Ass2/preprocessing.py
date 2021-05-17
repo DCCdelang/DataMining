@@ -206,42 +206,44 @@ def std_per_prop(df_train, df_test):
 
     df["count"] = 1
     
-    df = df.join(df.groupby(["prop_id"])["prop_starrating"].std(), on="prop_id",rsuffix="_std")
+    df = df.join(df.groupby(["prop_id"])["prop_starrating"].std(), on="prop_id",rsuffix="_std_prop")
 
-    df = df.join(df.groupby(["prop_id"])["prop_review_score"].std(), on="prop_id",rsuffix="_std")
+    df = df.join(df.groupby(["prop_id"])["prop_review_score"].std(), on="prop_id",rsuffix="_std_prop")
 
-    df = df.join(df.groupby(["prop_id"])["prop_location_score1"].std(), on="prop_id",rsuffix="_std")
+    df = df.join(df.groupby(["prop_id"])["prop_location_score1"].std(), on="prop_id",rsuffix="_std_prop")
 
-    df = df.join(df.groupby(["prop_id"])["prop_location_score2"].std(), on="prop_id",rsuffix="_std")
+    df = df.join(df.groupby(["prop_id"])["prop_location_score2"].std(), on="prop_id",rsuffix="_std_prop")
 
-    df = df.join(df.groupby(["prop_id"])["prop_log_historical_price"].std(), on="prop_id",rsuffix="_std")
+    df = df.join(df.groupby(["prop_id"])["prop_log_historical_price"].std(), on="prop_id",rsuffix="_std_prop")
 
-    df = df.join(df.groupby(["prop_id"])["price_per_day"].std(), on="prop_id",rsuffix="_std")
+    df = df.join(df.groupby(["prop_id"])["price_per_day"].std(), on="prop_id",rsuffix="_std_prop")
 
     df = df.drop(["count"],axis=1)
-    df_train = df.head(df_train.shape[0])
-    df_test = df.head(df_test.shape[0])
+    df_train = df[df["train_bool"]==1]
+    df_test = df[df["train_bool"]==0]
+    df_test = df_test.drop(["gross_bookings_usd","click_bool","booking_bool"],axis=1)
     return df_train,df_test
 
 def median_per_prop(df_train, df_test):
     df = pd.concat([df_train,df_test])
 
     df["count"] = 1
-    df = df.join(df.groupby(["prop_id"])["prop_starrating"].median(), on="prop_id",rsuffix="_median")
+    df = df.join(df.groupby(["prop_id"])["prop_starrating"].median(), on="prop_id",rsuffix="_median_prop")
 
-    df = df.join(df.groupby(["prop_id"])["prop_review_score"].median(), on="prop_id",rsuffix="_median")
+    df = df.join(df.groupby(["prop_id"])["prop_review_score"].median(), on="prop_id",rsuffix="_median_prop")
 
-    df = df.join(df.groupby(["prop_id"])["prop_location_score1"].median(), on="prop_id",rsuffix="_median")
+    df = df.join(df.groupby(["prop_id"])["prop_location_score1"].median(), on="prop_id",rsuffix="_median_prop")
 
-    df = df.join(df.groupby(["prop_id"])["prop_location_score2"].median(), on="prop_id",rsuffix="_median")
+    df = df.join(df.groupby(["prop_id"])["prop_location_score2"].median(), on="prop_id",rsuffix="_median_prop")
 
-    df = df.join(df.groupby(["prop_id"])["prop_log_historical_price"].median(), on="prop_id",rsuffix="_median")
+    df = df.join(df.groupby(["prop_id"])["prop_log_historical_price"].median(), on="prop_id",rsuffix="_median_prop")
 
-    df = df.join(df.groupby(["prop_id"])["price_per_day"].median(), on="prop_id",rsuffix="_median")
+    df = df.join(df.groupby(["prop_id"])["price_per_day"].median(), on="prop_id",rsuffix="_median_prop")
 
     df = df.drop(["count"],axis=1)
-    df_train = df.head(df_train.shape[0])
-    df_test = df.head(df_test.shape[0])
+    df_train = df[df["train_bool"]==1]
+    df_test = df[df["train_bool"]==0]
+    df_test = df_test.drop(["gross_bookings_usd","click_bool","booking_bool"],axis=1)
     return df_train,df_test
 
 def drop_nan_columns(df, threshhold=0.1):
@@ -325,6 +327,8 @@ if __name__ == "__main__":
     print(df_train.shape)
 
     df_train,df_test = averages_per_prop(df_train, df_test)
+    df_train,df_test = std_per_prop(df_train, df_test)
+    df_train,df_test = median_per_prop(df_train, df_test)
     
     print("4.2")
     print(df_test.shape)

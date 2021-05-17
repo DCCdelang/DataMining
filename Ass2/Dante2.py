@@ -1,10 +1,15 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.ensemble import RandomForestRegressor, StackingRegressor, AdaBoostRegressor
 from sklearn.model_selection import train_test_split
 from numpy.random import RandomState
 from progress.bar import Bar
+import xgboost as xgb
+from sklearn.metrics import make_scorer
+from sklearn.preprocessing import MinMaxScaler
+pd.set_option('display.max_rows', None)
 
 rs = RandomState(42)
 
@@ -13,11 +18,13 @@ def add_values(df_train):
     return df_train
 
 def filter_train(df_train,filter_type): # Choose Balanced, clicked
+    if filter_type == "None":
+        print("# No filter")
     if filter_type == "balanced":
         df_train1 = df_train.loc[df_train["click_bool"]==1]
         print(df_train1.shape)
         df_train2 = df_train[df_train["srch_id"].isin(df_train1["srch_id"])]
-        size = 2        # sample size
+        size = 5        # sample size
         replace = True  # with replacement
         fn = lambda obj: obj.loc[rs.choice(obj.index, size, replace),:]
         df_train2 = df_train2.groupby('srch_id', as_index=False).apply(fn)
@@ -34,19 +41,22 @@ def train_validation(df_train):
     X_train, X_test, y_train, y_test = train_test_split(df_train.drop(["value"],axis=1), df_train["value"], test_size=0.4, random_state=42)
     return X_train, X_test, y_train, y_test
 
-def model(X_train, y_train):
+def model(X_train, y_train, n_estimator=150):
     # reg = AdaBoostRegressor(random_state=0, n_estimators=100, loss='linear', learning_rate=0.05 )
     # reg = GradientBoostingRegressor(n_estimators=100, learning_rate=0.05, max_depth=2, random_state=42)
-    estimators = [
-    ('rf', RandomForestRegressor(n_estimators = 100, random_state=42)), 
-    ('gb',GradientBoostingRegressor(n_estimators=10, learning_rate=1.0, max_depth=2, random_state=42))
-    ]
+    # estimators = [
+    # ('rf', RandomForestRegressor(n_estimators = 100, random_state=42)), 
+    # ('gb',GradientBoostingRegressor(n_estimators=10, learning_rate=1.0, max_depth=2, random_state=42))
+    # ]
    
-    reg = StackingRegressor(
-    estimators=estimators,
-    final_estimator=AdaBoostRegressor(random_state=42, n_estimators=100, loss='linear'))
+    # reg = StackingRegressor(
+    # estimators=estimators,
+    # final_estimator=AdaBoostRegressor(random_state=42, n_estimators=100, loss='linear'))
     
+    reg = xgb.XGBRegressor(n_estimators = n_estimator, n_jobs=1, random_state = 42)
+
     reg = reg.fit(X_train, y_train)
+
     return reg
 
 # https://www.kaggle.com/davidgasquez/ndcg-scorer
@@ -85,30 +95,49 @@ def test_model(reg, X_test,y_test):
     
     return np.mean(scores)
 
+def feature_importance(reg):
+    xgb.plot_importance(reg,importance_type ="gain")
+    plt.show()
+    feature_important = reg.get_booster().get_score(importance_type='weight')
+    keys = list(feature_important.keys())
+    values = list(feature_important.values())
+
+    data = pd.DataFrame(data=values, index=keys, columns=["score"]).sort_values(by = "score", ascending=False)
+    data.plot(kind='barh')
+    plt.show()
+
 """WHAT YOU GONNA DO? SUBMIT OR TEST?"""
 
-I_want = "Submit" # "Submit" or "Test"
+I_want = "Test" # "Submit" or "Test"
 print("This is for a", I_want)
 
 df_train = pd.read_csv('Data/prepro_train.csv')
 print("Train loaded")
-df_test = pd.read_csv('Data/prepro_test.csv')
-print("Test loaded")
+# df_test = pd.read_csv('Data/prepro_test.csv')
+# print("Test loaded")
 
-df_train = filter_train(df_train,filter_type="balanced")
+df_train = filter_train(df_train,filter_type="None")
 print("Filtered")
 
 df_train = add_values(df_train)
-df_train = df_train.drop(["click_bool","booking_bool","gross_bookings_usd"], axis=1)
-df_train = df_train.fillna(-1)
+# df_train = df_train.drop(["click_bool","booking_bool","gross_bookings_usd"], axis=1)
+# df_train = df_train.fillna(-1)
 print("Train Cleaned")
 
-df_test = df_test.fillna(-1)
-print("Test Cleaned")
+print(df_train.isna().sum())
+
+# df_test = df_test.fillna(-1)
+# print("Test Cleaned")
 
 if I_want == "Test":
     # Testen/valideren op alleen training data
     X_train, X_test, y_train, y_test = train_validation(df_train)
+    X_train["value"] = y_train
+    X_train = filter_train(X_train,filter_type="balanced")
+    X_train = X_train.drop(["click_bool","booking_bool","gross_bookings_usd","position"], axis=1)
+    X_test = X_test.drop(["click_bool","booking_bool","gross_bookings_usd","position"], axis=1)
+    y_train = X_train["value"]
+    X_train = X_train.drop(["value"],axis=1)
     print("Splitted")
 
 if I_want == "Submit":
@@ -121,6 +150,13 @@ reg = model(X_train,y_train)
 print("Trained")
 
 if I_want == "Test":
+    # B = ["gbtree", "gblinear", "dart"]
+    # N_est = [50, 100, 150]
+    # for booster in B:
+    #     for n_est in N_est:
+    #         print("Param: B=",booster,"n_est=",n_est)
+    #         reg = model(X_train,y_train,n_est,booster)
+    #         print("Trained")
     # Test model on train data
     NDGC_score = test_model(reg, X_test, y_test)
     print("NDCG score = ", NDGC_score)
@@ -145,3 +181,6 @@ if I_want == "Submit":
 
     df_test2.to_csv("Data/submission3_predictions.csv",index=False)
     print("Done")
+
+feature_importance(reg)
+print("plotted")
