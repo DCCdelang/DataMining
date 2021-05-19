@@ -29,7 +29,7 @@ def exp_historical_price_dif(df):
     return df
 
 def starrating_diff(df):
-    df["starrating_diff"]=np.abs(df["visitor_hist_starrating"]-df["prop_starrating"])
+    df["starrating_diff"]=np.abs(df["visitor_hist_starrating"]-df["prop_starrating_avg_prop"])
     return df
 
 def prob_quality_click(df):
