@@ -30,7 +30,7 @@ def make_clicked_file():
     df.to_csv('Data/clicked_data.csv', index=False)
 
 def make_50_50_file():
-    df = pd.read_csv('Data/prepro_train2.csv')
+    df = pd.read_csv('Data/prepro_train3.csv')
     clicked = df.loc[df['click_bool'] == 1]
     
     non_clicked = df.loc[df['click_bool'] == 0]
@@ -38,7 +38,7 @@ def make_50_50_file():
 
     fifty_fifty = pd.concat([clicked, non_clicked])
     fifty_fifty = fifty_fifty.sort_values(by=['srch_id'])
-    fifty_fifty.to_csv('Data/fifty_fifty.csv', index=False)
+    fifty_fifty.to_csv('Data/fifty_fifty3.csv', index=False)
 # def drop_columns(df):
 #     kut_columns = ['date_time']
     
@@ -64,10 +64,10 @@ if __name__ == "__main__":
 
     # print('1')
     # # Makes validation test and train set
-    df = pd.read_csv('Data/prepro_train2.csv')
+    df = pd.read_csv('Data/prepro_train3.csv')
 
     df = make_files(df, 'test')
-    df.to_csv('Data/validation_test.csv', index=False)
+    df.to_csv('Data/validation_test3.csv', index=False)
     
     # df = pd.read_csv('Data/clicked_data.csv')
 
@@ -78,8 +78,8 @@ if __name__ == "__main__":
 
     make_50_50_file()
 
-    fifty_fifty = pd.read_csv('Data/fifty_fifty.csv')
-    fifty_fifty.head(200000).to_csv('Data/fifty_fifty_small.csv', index=False)
+    fifty_fifty = pd.read_csv('Data/fifty_fifty3.csv')
+    fifty_fifty.head(200000).to_csv('Data/fifty_fifty_small3.csv', index=False)
     # makes submission_train set
     # df = pd.read_csv('Data/prepro_train2.csv')
     # df = add_values(df)
