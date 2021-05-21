@@ -18,6 +18,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 import xgboost as xgb
 from sklearn.impute import KNNImputer,SimpleImputer
+from pyltr2.pyltr.models.lambdamart import LambdaMART
 import pyltr
 
 def dcg_score(y_true, y_score, k=5):
@@ -189,7 +190,7 @@ def test_clf_model(new_frame):
 
 
 def train_reg_model():
-    train = pd.read_csv('Data/fifty_fifty_small3.csv')
+    train = pd.read_csv('Data/fifty_fifty_small.csv')
     train = train.fillna(-1)
     scaler = MinMaxScaler()
     # features = ['random_bool', 'prob_book', 'srch_length_of_stay', 'srch_booking_window', 'historical_price', 'visitor_hist_starrating', 'srch_query_affinity_score', 'visitor_hist_adr_usd', 'prop_brand_bool', 'prop_review_score', 'prop_review_score_avg', 'srch_adults_count', 'prop_location_score2', 'starrating_diff', 'site_id', 'prop_log_historical_price_avg', 'visitor_location_country_id', 'prop_country_id', 'comp8_rate_percent_diff', 'prop_location_score1', 'prop_location_score1_avg', 'prop_location_score2_avg', 'promotion_flag', 'srch_saturday_night_bool', 'prop_log_historical_price']
@@ -244,11 +245,21 @@ def train_reg_model():
     colsample_bytree=0.9, 
     eta=0.05, 
     max_depth=6, 
-    n_estimators=110, 
+    n_estimators=1000, 
     subsample=0.75 
     )
     groups = train.groupby('srch_id').size().to_frame('size')['size'].to_numpy()
     reg.fit(X, y, group=groups)
+
+
+    # reg = LambdaMART(random_state=42, verbose = 1, n_estimators=100)
+
+    # print(X_train.dtypes)
+
+    # qids = np.sort(np.asarray(train["srch_id"], dtype = np.int64))
+
+    # reg = reg.fit(X, y, qids)
+
     # metric = pyltr.metrics.NDCG(k=5)
 
     # model = pyltr.models.LambdaMART(
@@ -285,7 +296,7 @@ def grid_search():
     '''
     best = xgb.XGBRegressor(objective ='reg:linear', colsample_bytree = 0.3, learning_rate = 0.1, max_depth = 4, alpha = 10, n_estimators = 150, child_weight = 10, gamma = 1, subsample=0.8)
     '''
-    train = pd.read_csv('Data/fifty_fifty_small.csv')
+    train = pd.read_csv('Data/fifty_fifty_small3.csv')
     train = train.fillna(-1)
 
     # features = ['random_bool', 'prob_book', 'srch_length_of_stay', 'srch_booking_window', 'historical_price', 'visitor_hist_starrating', 'srch_query_affinity_score', 'visitor_hist_adr_usd', 'prop_brand_bool', 'prop_review_score', 'prop_review_score_avg', 'srch_adults_count', 'prop_location_score2', 'starrating_diff', 'site_id', 'prop_log_historical_price_avg', 'visitor_location_country_id', 'prop_country_id', 'comp8_rate_percent_diff', 'prop_location_score1', 'prop_location_score1_avg', 'prop_location_score2_avg', 'promotion_flag', 'srch_saturday_night_bool', 'prop_log_historical_price']
@@ -333,7 +344,7 @@ def test_reg_model(reg):
     
     test = pd.read_csv('Data/validation_test3.csv')
     
-    # test = test.fillna(-1)
+    test = test.fillna(-1)
     
     p_scores = []
     scores = []
@@ -407,8 +418,8 @@ def test_reg_model(reg):
     
 
 def make_submission_file():
-    train = pd.read_csv('Data/fifty_fifty3.csv')
-    # train = train.fillna(-1)
+    train = pd.read_csv('Data/25_75.csv')
+    train = train.fillna(-1)
     train = add_values(train)
     features = list(train.columns)
     features.remove('value')
@@ -445,12 +456,20 @@ def make_submission_file():
     colsample_bytree=0.9, 
     eta=0.05, 
     max_depth=6, 
-    n_estimators=110, 
+    n_estimators=1000, 
     subsample=0.75 
     )
     groups = train.groupby('srch_id').size().to_frame('size')['size'].to_numpy()
     reg = reg.fit(X, y, group=groups)
     # reg = reg.fit(X, y)
+
+    # reg = LambdaMART(random_state=42, verbose = 1, n_estimators=100)
+
+    # print(X_train.dtypes)
+
+    # qids = np.sort(np.asarray(train["srch_id"], dtype = np.int64))
+
+    # reg = reg.fit(X, y, qids)
     
     test = pd.read_csv('Data/prepro_test3.csv')
     test = test.fillna(-1)
@@ -467,7 +486,7 @@ def make_submission_file():
 
     df_sub["srch_id"] = pd.to_numeric(df_sub["srch_id"],downcast='integer')
 
-    df_sub.to_csv('Data/submission_XGBOOSTRANK.csv', index=False)
+    df_sub.to_csv('Data/submission_XGBoost_last.csv', index=False)
 
 
     # print(df.columns,df1.columns)
@@ -475,8 +494,8 @@ def make_submission_file():
 
 if __name__ == "__main__":
 
-    # print(test_reg_model(train_reg_model()))
-    make_submission_file()
+    print(test_reg_model(train_reg_model()))
+    # make_submission_file()
 
     # df = pd.read_csv('Data/submission_GXBOOST_new_features.csv')
     # first_column = df.columns[0]

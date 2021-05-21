@@ -1,4 +1,5 @@
 import pandas as pd
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 def make_files(df, kind, test=500000, train=30000):
     if kind == 'test':
@@ -29,16 +30,15 @@ def make_clicked_file():
     df = df.loc[df['click_bool'] == 1]
     df.to_csv('Data/clicked_data.csv', index=False)
 
-def make_50_50_file():
-    df = pd.read_csv('Data/prepro_train3.csv')
+def make_50_50_file(df):
     clicked = df.loc[df['click_bool'] == 1]
     
     non_clicked = df.loc[df['click_bool'] == 0]
-    non_clicked = non_clicked.sample(len(clicked['srch_id']))
+    non_clicked = non_clicked.sample(3*len(clicked['srch_id']))
 
     fifty_fifty = pd.concat([clicked, non_clicked])
     fifty_fifty = fifty_fifty.sort_values(by=['srch_id'])
-    fifty_fifty.to_csv('Data/fifty_fifty3.csv', index=False)
+    fifty_fifty.to_csv('Data/25_75.csv', index=False)
 # def drop_columns(df):
 #     kut_columns = ['date_time']
     
@@ -66,8 +66,12 @@ if __name__ == "__main__":
     # # Makes validation test and train set
     df = pd.read_csv('Data/prepro_train3.csv')
 
-    df = make_files(df, 'test')
-    df.to_csv('Data/validation_test3.csv', index=False)
+    x = df.values #returns a numpy array
+    min_max_scaler = MinMaxScaler()
+    x_scaled = min_max_scaler.fit_transform(x)
+    df = pd.DataFrame(x_scaled)
+    df_v = make_files(df, 'test')
+    df_v.to_csv('Data/validation_test3_scaled.csv', index=False)
     
     # df = pd.read_csv('Data/clicked_data.csv')
 
@@ -78,8 +82,9 @@ if __name__ == "__main__":
 
     make_50_50_file()
 
-    fifty_fifty = pd.read_csv('Data/fifty_fifty3.csv')
-    fifty_fifty.head(200000).to_csv('Data/fifty_fifty_small3.csv', index=False)
+    fifty_fifty = pd.read_csv('Data/25_75.csv')
+    fifty_fifty = fifty_fifty.sort_values('srch_id')
+    fifty_fifty.head(400000).to_csv('Data/25_75_small.csv', index=False)
     # makes submission_train set
     # df = pd.read_csv('Data/prepro_train2.csv')
     # df = add_values(df)

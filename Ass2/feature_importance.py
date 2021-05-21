@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 import seaborn as sns
 
-matplotlib.rcParams.update({'font.size': 12})
+matplotlib.rcParams.update({'font.size': 32})
 def make_clicked_file():
     df = pd.read_csv('Data/training_set_VU_DM.csv')
     df = df.loc[df['click_bool'] == 1]
@@ -18,7 +18,7 @@ def add_values(df):
     df['value'] = df.apply(lambda row: row.click_bool + (row.booking_bool * 4), axis=1)
     return df
 # make_clicked_file()
-data = pd.read_csv("Data/fifty_fifty.csv")
+data = pd.read_csv("Data/training_set_VU_DM.csv")
 data = data.fillna(-1)
 
 data = add_values(data)
@@ -63,23 +63,27 @@ y = data['value']    #target column i.e price range#apply SelectKBest class to e
 # new_features = list(df['Specs'])
 
 # new_features.append('value')
-features.append('value')
+features = ['value', 'random_bool', 'prop_location_score2', 'promotion_flag', 'prop_review_score', 'prop_starrating']
+# features.append('value')
 data = data[features]
 corrmat = data.corr()
 top_corr_features = corrmat.index
 
-k = 6 
+k = len(features) 
 import numpy
-print(numpy.corrcoef(data['value'], data['prop_location_score2'])[0, 1])
-print(numpy.corrcoef(data['value'], data['promotion_flag'])[0, 1])
+# print(numpy.corrcoef(data['value'], data['prop_location_score2'])[0, 1])
+# print(numpy.corrcoef(data['value'], data['promotion_flag'])[0, 1])
 cols = corrmat.nlargest(k, 'value')['value'].index
-print(cols)
+# print(cols)
 cm = np.corrcoef(data[cols].values.T)
 f, ax = plt.subplots(figsize =(12, 10))
 print(cm)
+
+for i in cm:
+    print(i[0])
 sns.heatmap(cm, ax = ax, cmap ="YlGnBu",
             linewidths = 0.1, yticklabels = cols.values, 
-                              xticklabels = cols.values, annot=True)
+                              xticklabels = cols.values, annot=False)
 # plt.figure(figsize=(20,20))
 # #plot heat map
 # g=sns.heatmap(data[top_corr_features].corr(),annot=True,cmap="RdYlGn")
