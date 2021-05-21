@@ -1,3 +1,4 @@
+from lightgbm.sklearn import LGBMRanker
 import pandas as pd
 import random
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
@@ -19,6 +20,12 @@ from sklearn.neighbors import KNeighborsClassifier
 import xgboost as xgb
 from sklearn.impute import KNNImputer,SimpleImputer
 import pyltr
+import lightgbm 
+from sklearn.linear_model import Ridge, Lasso
+from sklearn.svm import SVR
+
+from mlxtend.regressor import StackingCVRegressor
+
 
 def dcg_score(y_true, y_score, k=5):
 
@@ -189,7 +196,7 @@ def test_clf_model(new_frame):
 
 
 def train_reg_model():
-    train = pd.read_csv('Data/fifty_fifty_small3.csv')
+    train = pd.read_csv('Data/25_75_small.csv')
     train = train.fillna(-1)
     scaler = MinMaxScaler()
     # features = ['random_bool', 'prob_book', 'srch_length_of_stay', 'srch_booking_window', 'historical_price', 'visitor_hist_starrating', 'srch_query_affinity_score', 'visitor_hist_adr_usd', 'prop_brand_bool', 'prop_review_score', 'prop_review_score_avg', 'srch_adults_count', 'prop_location_score2', 'starrating_diff', 'site_id', 'prop_log_historical_price_avg', 'visitor_location_country_id', 'prop_country_id', 'comp8_rate_percent_diff', 'prop_location_score1', 'prop_location_score1_avg', 'prop_location_score2_avg', 'promotion_flag', 'srch_saturday_night_bool', 'prop_log_historical_price']
@@ -234,21 +241,23 @@ def train_reg_model():
     # # reg  = xgb.XGBRegressor(objective ='reg:linear', colsample_bytree = 0.3, learning_rate = 0.1, max_depth = 4, alpha = 10, n_estimators = 150)
     # reg = reg.fit(X, y)
     
+    # reg = xgb.XGBRanker(booster='gbtree',objective='rank:ndcg',random_state=42, learning_rate=0.1,colsample_bytree=0.9, eta=0.05,  max_depth=6, n_estimators=250, subsample=0.75 )
 
 
-    reg = xgb.XGBRanker(  
-    booster='gbtree',
-    objective='rank:ndcg',
-    random_state=42, 
-    learning_rate=0.1,
-    colsample_bytree=0.9, 
-    eta=0.05, 
-    max_depth=6, 
-    n_estimators=110, 
-    subsample=0.75 
-    )
-    groups = train.groupby('srch_id').size().to_frame('size')['size'].to_numpy()
-    reg.fit(X, y, group=groups)
+    # reg = xgb.XGBRanker(n_estimators=250, random_state=0)
+    reg = lightgbm.LGBMRanker(n_estimators=1000,random_state=42)
+    # reg = xgb.XGBRanker(random_state=42)
+    # xgbo = xgb.XGBRegressor(n_estimators=100,random_state=42)
+    # gbm = GradientBoostingRegressor(n_estimators=50,random_state=42)
+    # ridge = Ridge(random_state=42)
+    # lasso = Lasso(random_state=42)
+    # svr = SVR()
+
+    # stack = StackingCVRegressor(regressors = (lgbm,xgbo,gbm,ridge,lasso,svr), meta_regressor = lgbm, cv=3, use_features_in_secondary=True, store_train_meta_features=True, shuffle=False, random_state=42,verbose=2,n_jobs=-1)
+    # stack.fit(X,y)
+    
+    groups = train.groupby('srch_id').size().to_frame('size')['size'].to_numpy()    
+    reg.fit(X, y,group=groups)
     # metric = pyltr.metrics.NDCG(k=5)
 
     # model = pyltr.models.LambdaMART(
@@ -285,43 +294,45 @@ def grid_search():
     '''
     best = xgb.XGBRegressor(objective ='reg:linear', colsample_bytree = 0.3, learning_rate = 0.1, max_depth = 4, alpha = 10, n_estimators = 150, child_weight = 10, gamma = 1, subsample=0.8)
     '''
-    train = pd.read_csv('Data/fifty_fifty_small.csv')
+    train = pd.read_csv('Data/fifty_fifty_small3.csv')
     train = train.fillna(-1)
 
     # features = ['random_bool', 'prob_book', 'srch_length_of_stay', 'srch_booking_window', 'historical_price', 'visitor_hist_starrating', 'srch_query_affinity_score', 'visitor_hist_adr_usd', 'prop_brand_bool', 'prop_review_score', 'prop_review_score_avg', 'srch_adults_count', 'prop_location_score2', 'starrating_diff', 'site_id', 'prop_log_historical_price_avg', 'visitor_location_country_id', 'prop_country_id', 'comp8_rate_percent_diff', 'prop_location_score1', 'prop_location_score1_avg', 'prop_location_score2_avg', 'promotion_flag', 'srch_saturday_night_bool', 'prop_log_historical_price']
-    features = ['random_bool', 'position_mean_extend', 'prob_book', 'prob_click', 'prop_location_score2', 'srch_length_of_stay', 'srch_booking_window', 'prop_location_score2_avg_prop', 'promotion_flag', 'prop_starrating', 'prop_starrating_avg_prop', 'prop_starrating_avg_dest', 'prop_location_score1_avg_dest', 'prop_review_score', 'prop_review_score_avg_prop', 'historical_price', 'visitor_hist_starrating', 'srch_query_affinity_score', 'prop_review_score_avg_srch', 'visitor_hist_adr_usd', 'prop_brand_bool', 'prop_log_historical_price_avg_dest', 'srch_adults_count', 'prop_review_score_avg_dest', 'prop_log_historical_price_avg_prop']
-    features = ['random_bool', 'position_mean_extend', 'prob_book', 'prob_click', 'prop_location_score2', 'srch_length_of_stay', 'srch_booking_window', 'prop_location_score2_avg_prop', 'promotion_flag', 'prop_location_score2_median_prop', 'prop_starrating', 'prop_starrating_avg_prop', 'prop_starrating_median_prop', 'prop_location_score1_avg_dest', 'prop_starrating_avg_dest', 'prop_review_score', 'prop_review_score_avg_prop', 'prop_review_score_median_prop', 'prop_location_score2_std_prop', 'historical_price', 'visitor_hist_starrating', 'srch_query_affinity_score', 'prop_review_score_avg_srch', 'visitor_hist_adr_usd', 'prop_brand_bool']
+    # features = ['random_bool', 'position_mean_extend', 'prob_book', 'prob_click', 'prop_location_score2', 'srch_length_of_stay', 'srch_booking_window', 'prop_location_score2_avg_prop', 'promotion_flag', 'prop_starrating', 'prop_starrating_avg_prop', 'prop_starrating_avg_dest', 'prop_location_score1_avg_dest', 'prop_review_score', 'prop_review_score_avg_prop', 'historical_price', 'visitor_hist_starrating', 'srch_query_affinity_score', 'prop_review_score_avg_srch', 'visitor_hist_adr_usd', 'prop_brand_bool', 'prop_log_historical_price_avg_dest', 'srch_adults_count', 'prop_review_score_avg_dest', 'prop_log_historical_price_avg_prop']
+    # features = ['random_bool', 'position_mean_extend', 'prob_book', 'prob_click', 'prop_location_score2', 'srch_length_of_stay', 'srch_booking_window', 'prop_location_score2_avg_prop', 'promotion_flag', 'prop_location_score2_median_prop', 'prop_starrating', 'prop_starrating_avg_prop', 'prop_starrating_median_prop', 'prop_location_score1_avg_dest', 'prop_starrating_avg_dest', 'prop_review_score', 'prop_review_score_avg_prop', 'prop_review_score_median_prop', 'prop_location_score2_std_prop', 'historical_price', 'visitor_hist_starrating', 'srch_query_affinity_score', 'prop_review_score_avg_srch', 'visitor_hist_adr_usd', 'prop_brand_bool']
 
-    # features = list(train.columns)
-    # features.remove('click_bool')
-    # features.remove('gross_bookings_usd')
-    # features.remove('booking_bool')
-    # features.remove('srch_id')
-    # features.remove('position')
+    features = list(train.columns)
+    features.remove('click_bool')
+    features.remove('gross_bookings_usd')
+    features.remove('booking_bool')
+    features.remove('srch_id')
+    features.remove('position')
     train = add_values(train)
     X = train[features]
     y = train["value"]  
     learning_rate = [0.05, 0.1, 0.2]
     child_weight = [1, 5, 10]
-    gamma =  [0, 1, 5]
+    boosting_type =  ["gbdt","dart","goss"]
     subsample = [0.8, 1.0]
     colsample_bytree= [0.3, 0.6, 0.8]
-    max_depth = [3, 4, 5]
-    n_estimators = [50, 100, 150]
+    max_depth = [-1, 4, 5]
+    n_estimators = [100, 150, 200]
     lists = []
 
-    for d in colsample_bytree:
-        for c in subsample:
-            for b in gamma:  
-                for a in child_weight:
+    for d in n_estimators:
+        for c in max_depth:
+            for b in boosting_type:  
+                for a in learning_rate:
                     lists.append([a, b, c, d])
     random.shuffle(lists)
 
     param_scores = {}
     for params in lists:
         print(params)
-        reg  = xgb.XGBRegressor(objective ='reg:linear', colsample_bytree = params[-1], learning_rate = 0.1, max_depth = 4, alpha = 10, n_estimators = 150, gamma = params[1], child_weight=params[0], subsample = params[2])
-        reg = reg.fit(X, y)
+        # reg  = xgb.XGBRegressor(objective ='reg:linear', colsample_bytree = params[-1], learning_rate = 0.1, max_depth = 4, alpha = 10, n_estimators = 150, gamma = params[1], child_weight=params[0], subsample = params[2])
+        reg = lightgbm.LGBMRanker(n_estimators = 150, max_depth=-1, boosting_type = 'gbdt',learning_rate=0.1,random_state=42)
+        groups = train.groupby('srch_id').size().to_frame('size')['size'].to_numpy()   
+        reg = reg.fit(X, y, group=groups)
         score = test_reg_model(reg)
         print('score: ', score)
         param_scores[str(params)] = score
@@ -331,9 +342,9 @@ def grid_search():
 
 def test_reg_model(reg):
     
-    test = pd.read_csv('Data/validation_test3.csv')
+    test = pd.read_csv('Data/validation_test_25_75.csv')
     
-    # test = test.fillna(-1)
+    test = test.fillna(-1)
     
     p_scores = []
     scores = []
@@ -361,6 +372,8 @@ def test_reg_model(reg):
     #            .apply(lambda test: predict(reg, test)))
     # test.loc[:, test.columns != 'value'] = imputer.fit_transform(test.loc[:, test.columns != 'value'])
     ids = list(set(test['srch_id']))
+    test["value_predict"] = reg.predict(test[features])
+
     for i in ids:
         test1 = test.loc[test['srch_id'] == i]
 
@@ -370,7 +383,7 @@ def test_reg_model(reg):
         y = test1["value"]  
         # y_pred = reg.predict(X)
         
-        predictions = reg.predict(X)
+        predictions = test1["value_predict"]
         # print(predictions)
         true = np.asarray([y])
         # predict = np.asarray([list(predictions)])
@@ -407,7 +420,7 @@ def test_reg_model(reg):
     
 
 def make_submission_file():
-    train = pd.read_csv('Data/fifty_fifty3.csv')
+    train = pd.read_csv('Data/25_75.csv')
     # train = train.fillna(-1)
     train = add_values(train)
     features = list(train.columns)
@@ -437,22 +450,24 @@ def make_submission_file():
     # reg.fit(np.asarray(X, dtype = np.int64), np.asarray(y, dtype = np.int64), qid, epochs=5)
     
     # reg  = xgb.XGBRegressor(objective ='reg:linear', colsample_bytree = 0.3, learning_rate = 0.1, max_depth = 5, alpha = 10, n_estimators = 100)
-    reg = xgb.XGBRanker(  
-    booster='gbtree',
-    objective='rank:ndcg',
-    random_state=42, 
-    learning_rate=0.1,
-    colsample_bytree=0.9, 
-    eta=0.05, 
-    max_depth=6, 
-    n_estimators=110, 
-    subsample=0.75 
-    )
+    # reg = xgb.XGBRanker(  
+    # booster='gbtree',
+    # objective='rank:ndcg',
+    # random_state=42, 
+    # learning_rate=0.1,
+    # colsample_bytree=0.9, 
+    # eta=0.05, 
+    # max_depth=6, 
+    # n_estimators=250, 
+    # subsample=0.75 
+    # )
+    # reg = xgb.XGBRanker(n_estimators=1000, random_state=0)
+    reg = lightgbm.LGBMRanker(n_estimators=1000,random_state=42)
     groups = train.groupby('srch_id').size().to_frame('size')['size'].to_numpy()
     reg = reg.fit(X, y, group=groups)
     # reg = reg.fit(X, y)
     
-    test = pd.read_csv('Data/prepro_test3.csv')
+    test = pd.read_csv('Data/prepro_test.csv')
     test = test.fillna(-1)
     df_sub = test
     
@@ -467,7 +482,7 @@ def make_submission_file():
 
     df_sub["srch_id"] = pd.to_numeric(df_sub["srch_id"],downcast='integer')
 
-    df_sub.to_csv('Data/submission_XGBOOSTRANK.csv', index=False)
+    df_sub.to_csv('Data/submission_LGBMRANK2.csv', index=False)
 
 
     # print(df.columns,df1.columns)
