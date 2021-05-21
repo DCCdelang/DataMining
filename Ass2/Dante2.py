@@ -12,7 +12,11 @@ from sklearn.metrics import dcg_score,ndcg_score
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import LabelBinarizer
 import sys
+<<<<<<< HEAD
 from pyltr3.pyltr.models.lambdamart import LambdaMART
+=======
+from pyltr2.pyltr.models.lambdamart import LambdaMART
+>>>>>>> 737ed609d5b417d333562c19607d866afb3217b1
 pd.set_option('display.max_rows', None)
 
 
